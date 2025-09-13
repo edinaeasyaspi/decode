@@ -158,6 +158,7 @@ public class Robot8034 extends LinearOpMode {
             if (gamepad1.a) {
                 fast = !fast;
             }
+
             if (gamepad1.b) {
                 slow = !slow;
             }
@@ -188,6 +189,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
+            telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
+            telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
             telemetry.update();
         }
     }
