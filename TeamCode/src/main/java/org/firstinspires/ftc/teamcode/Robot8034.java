@@ -83,6 +83,8 @@ public class Robot8034 extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "MotorThree");
         backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
 
+        //When we have the servo for intake:
+
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
