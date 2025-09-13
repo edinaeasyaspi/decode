@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -110,6 +111,8 @@ public class Robot8034 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+            boolean slow = false;
+            boolean fast = false;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
@@ -152,15 +155,27 @@ public class Robot8034 extends LinearOpMode {
             frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
+            if (gamepad1.a) {
+                fast = !fast;
+            }
+            if (gamepad1.b) {
+                slow = !slow;
+            }
             frontLeftPower /= 2;
             frontRightPower /= 2;
             backLeftPower /= 2;
             backRightPower /= 2;
-            if (gamepad1.a) {
+            if (fast) {
                 frontLeftPower *= 2;
                 frontRightPower *= 2;
                 backLeftPower *= 2;
                 backRightPower *= 2;
+            }
+            if (slow) {
+                frontLeftPower /= 2;
+                frontRightPower /= 2;
+                backLeftPower /= 2;
+                backRightPower /= 2;
             }
 
             // Send calculated power to wheels
