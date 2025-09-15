@@ -73,6 +73,10 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
+    boolean slow = false;
+    boolean fast = false;
+    boolean bwas = false;
+    boolean awas = false;
 
     @Override
     public void runOpMode() {
@@ -111,8 +115,6 @@ public class Robot8034 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
-            boolean slow = false;
-            boolean fast = false;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
@@ -155,13 +157,15 @@ public class Robot8034 extends LinearOpMode {
             frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-            if (gamepad1.a) {
+            if (awas && !gamepad1.a) {
                 fast = !fast;
             }
 
-            if (gamepad1.b) {
+            if (bwas && !gamepad1.b) {
                 slow = !slow;
             }
+            awas = gamepad1.a;
+            bwas = gamepad1.b;
             frontLeftPower /= 2;
             frontRightPower /= 2;
             backLeftPower /= 2;
