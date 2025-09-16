@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.inputsys;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class Input {
+  /// 0 is inactive
+  /// 1 is just pressed
+  /// 2 is being held (inverse of 0)
+  /// 3 is just released 
   private byte[] states;
   private Gamepad pad;
 
@@ -14,10 +18,48 @@ public class Input {
 
   public void Update(){
     boolean[] currState = LoadCurrState(); 
+    for(int i = 0; i < currState.length; ++i){
+      if(currState[i]){
+        switch(states[i]){
+          case 0: 
+            states[i] = 1;
+          break;
+          case 2:
+          case 1:
+            states[i] = 2;
+          break;
+          case 3:
+            states[i] = 1;
+          break;
+          default:
+            states[i] = 1;
+          break;
+        }
+        
+      } else {
+        switch (states[i]) {
+          case 0:
+          case 3:
+            states[i] = 0;
+          break;
+          case 2:
+          case 1:
+            states[i] = 3;
+          break;
+          }
+      }
+    }
   }
 
   public boolean GetKeyDown(KeyCode code){
     return states[code.ordinal()] == 1;
+  }
+
+  public boolean GetKey(KeyCode code){
+    return states[code.ordinal()] == 2;
+  }
+  public boolean GetKeyUp(KeyCode code){
+    return states[code.ordinal()] == 3;
   }
   
   private boolean[] LoadCurrState(){
@@ -39,7 +81,6 @@ public class Input {
     currState[KeyCode.rt.ordinal()] = pad.right_trigger > 0.5;
     currState[KeyCode.guide.ordinal()] = pad.guide;
     currState[KeyCode.start.ordinal()] = pad.start;
-
     return currState;
   } 
 }
