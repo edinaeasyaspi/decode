@@ -159,10 +159,12 @@ public class Robot8034 extends LinearOpMode {
             */
             if (awas && !gamepad1.a) {
                 fast = !fast;
+                slow = false;
             }
 
             if (bwas && !gamepad1.b) {
                 slow = !slow;
+                fast = false;
             }
             awas = gamepad1.a;
             bwas = gamepad1.b;
