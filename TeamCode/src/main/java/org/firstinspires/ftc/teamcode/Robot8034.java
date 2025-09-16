@@ -157,12 +157,12 @@ public class Robot8034 extends LinearOpMode {
             frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-            if (awas && !gamepad1.a) {
+            if (!awas && gamepad1.a) {
                 fast = !fast;
                 slow = false;
             }
 
-            if (bwas && !gamepad1.b) {
+            if (!bwas && gamepad1.b) {
                 slow = !slow;
                 fast = false;
             }
