@@ -36,6 +36,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.inputsys.Input;
+import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
+
 /*
  * This file contains an example of a Linear "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -73,20 +76,22 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
+
+    private static Input input;
+
     boolean slow = false;
     boolean fast = false;
-    boolean bwas = false;
-    boolean awas = false;
 
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // to the names assigned during the robot configuration st!bwas && gamepad1.bep on the DS or RC devices.
         frontLeftDrive = hardwareMap.get(DcMotor.class, "MotorOne");
         backLeftDrive = hardwareMap.get(DcMotor.class, "MotorTwo");
         frontRightDrive = hardwareMap.get(DcMotor.class, "MotorThree");
         backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
+        input = new Input(gamepad1);
 
         //When we have the servo for intake:
 
@@ -114,6 +119,8 @@ public class Robot8034 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            input.Update();
+
             double max;
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
@@ -156,17 +163,15 @@ public class Robot8034 extends LinearOpMode {
             frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-            if (!awas && gamepad1.a) {
+            if (input.GetKeyDown(KeyCode.a)) {
                 fast = !fast;
                 slow = false;
             }
 
-            if (!bwas && gamepad1.b) {
+            if (input.GetKeyDown(KeyCode.b)) {
                 slow = !slow;
                 fast = false;
             }
-            awas = gamepad1.a;
-            bwas = gamepad1.b;
             frontLeftPower /= 2;
             frontRightPower /= 2;
             backLeftPower /= 2;
