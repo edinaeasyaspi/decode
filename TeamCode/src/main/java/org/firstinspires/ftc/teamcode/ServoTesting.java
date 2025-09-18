@@ -27,9 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -48,10 +47,9 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Concept: Scan Servo", group = "Concept")
-public class ConceptScanServo extends LinearOpMode {
-
-    static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
+@TeleOp(name = "ServoTesting")
+public class ServoTesting extends LinearOpMode {
+    static final double INCREMENT   = 0.01;
     static final int    CYCLE_MS    =   50;     // period of each cycle
     static final double MAX_POS     =  1.0;     // Maximum rotational position
     static final double MIN_POS     =  0.0;     // Minimum rotational position
@@ -80,22 +78,21 @@ public class ConceptScanServo extends LinearOpMode {
         while(opModeIsActive()){
 
             // slew the servo, according to the rampUp (direction) variable.
-            if (rampUp) {
+            if (gamepad1.a) {
                 // Keep stepping up until we hit the max value.
                 position += INCREMENT ;
                 if (position >= MAX_POS ) {
                     position = MAX_POS;
-                    rampUp = !rampUp;   // Switch ramp direction
-                    sleep(500);
+                    rampUp = !rampUp;
                 }
             }
-            else {
+            }
+            if (gamepad1.b) {
                 // Keep stepping down until we hit the min value.
                 position -= INCREMENT ;
                 if (position <= MIN_POS ) {
                     position = MIN_POS;
                     rampUp = !rampUp;
-                    sleep(500); // Switch ramp direction
                 }
             }
 
@@ -110,8 +107,5 @@ public class ConceptScanServo extends LinearOpMode {
             idle();
         }
 
-        // Signal done;
-        telemetry.addData(">", "Done");
-        telemetry.update();
     }
-}
+
