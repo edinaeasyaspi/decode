@@ -86,7 +86,6 @@ public class ServoTesting extends LinearOpMode {
                     rampUp = !rampUp;
                 }
             }
-            }
             if (gamepad1.b) {
                 // Keep stepping down until we hit the min value.
                 position -= INCREMENT ;
@@ -108,4 +107,4 @@ public class ServoTesting extends LinearOpMode {
         }
 
     }
-
+}

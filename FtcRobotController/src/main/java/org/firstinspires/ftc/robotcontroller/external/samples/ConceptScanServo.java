@@ -80,7 +80,7 @@ public class ConceptScanServo extends LinearOpMode {
         while(opModeIsActive()){
 
             // slew the servo, according to the rampUp (direction) variable.
-            if (rampUp) {
+            if (rampUp && gamepad1.a) {
                 // Keep stepping up until we hit the max value.
                 position += INCREMENT ;
                 if (position >= MAX_POS ) {
@@ -89,7 +89,7 @@ public class ConceptScanServo extends LinearOpMode {
                     sleep(500);
                 }
             }
-            else {
+            else if(gamepad1.a) {
                 // Keep stepping down until we hit the min value.
                 position -= INCREMENT ;
                 if (position <= MIN_POS ) {
@@ -101,6 +101,7 @@ public class ConceptScanServo extends LinearOpMode {
 
             // Display the current value
             telemetry.addData("Servo Position", "%5.2f", position);
+            telemetry.addData("", "A pressed is %s", gamepad1.a ? "true" : "false" );
             telemetry.addData(">", "Press Stop to end test." );
             telemetry.update();
 
