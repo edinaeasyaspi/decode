@@ -61,7 +61,7 @@ public class ServoTesting extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         // Connect to servo (Assume Robot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
@@ -73,11 +73,12 @@ public class ServoTesting extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+        while (!gamepad1.a) Thread.sleep(100);
         // Scan servo till stop pressed.
         while(opModeIsActive()){
 
             // slew the servo, according to the rampUp (direction) variable.
-            if (gamepad1.a || rampUp) {
+            if (gamepad1.a) {
                 // Keep stepping up until we hit the max value.
                 position += INCREMENT ;
                 if (position >= MAX_POS ) {
@@ -85,8 +86,7 @@ public class ServoTesting extends LinearOpMode {
                     rampUp = !rampUp;
                 }
             }
-            }
-            if (gamepad1.b || !rampUp) {
+            if (gamepad1.b) {
                 // Keep stepping down until we hit the min value.
                 position -= INCREMENT ;
                 if (position <= MIN_POS ) {
@@ -107,4 +107,4 @@ public class ServoTesting extends LinearOpMode {
         }
 
     }
-
+}
