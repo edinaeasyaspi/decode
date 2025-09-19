@@ -56,7 +56,7 @@ public class ServoTesting extends LinearOpMode {
 
     // Define class members
     Servo   servo;
-    double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
+    double  position = MAX_POS; // Start at halfway position
     boolean rampUp = true;
 
 
