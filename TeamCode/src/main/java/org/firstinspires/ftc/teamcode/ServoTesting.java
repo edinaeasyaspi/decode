@@ -51,8 +51,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoTesting extends LinearOpMode {
     static final double INCREMENT   = 0.01;
     static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  1.0;     // Maximum rotational position
-    static final double MIN_POS     =  0.0;     // Minimum rotational position
+    static final double MAX_POS     =  0.86;     // Maximum rotational position
+    static final double MIN_POS     =  0.65;     // Minimum rotational position
 
     // Define class members
     Servo   servo;
