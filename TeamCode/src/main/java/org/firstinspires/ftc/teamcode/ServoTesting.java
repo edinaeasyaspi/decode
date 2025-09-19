@@ -95,8 +95,13 @@ public class ServoTesting extends LinearOpMode {
                 }
             }
 
+            if(gamepad1.x)
+                position = MAX_POS;
+            else if (gamepad1.y)
+                position = MIN_POS;
+
             // Display the current value
-            telemetry.addData("Servo Position", "%5.2f", position);
+            telemetry.addData("Servo Position", "%f", position);
             telemetry.addData(">", "Press Stop to end test." );
             telemetry.update();
 
