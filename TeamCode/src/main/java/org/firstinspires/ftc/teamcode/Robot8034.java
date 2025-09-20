@@ -36,9 +36,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
 import org.firstinspires.ftc.teamcode.mechanisms.Servo;
+import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -94,6 +96,7 @@ public class Robot8034 extends LinearOpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
         input = new Input(gamepad1);
 
+
         //When we have the servo for intake:
 
         // ########################################################################################
@@ -119,9 +122,9 @@ public class Robot8034 extends LinearOpMode {
         runtime.reset();
 
 
-        Servo servoOne = new Servo(
+        ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                0.86f,0.65f);
+                0.86,0.65);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -178,7 +181,7 @@ public class Robot8034 extends LinearOpMode {
                 fast = false;
             }
             if (input.GetKeyDown(KeyCode.y)) {
-                servoOne.DownUpDown();
+                servoOne.UpDown();
             }
             frontLeftPower /= 2;
             frontRightPower /= 2;
