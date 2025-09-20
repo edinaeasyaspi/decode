@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
+import org.firstinspires.ftc.teamcode.mechanisms.Servo;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -117,6 +118,10 @@ public class Robot8034 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+
+        Servo servoOne = new Servo(
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
+                0.86f,0.65f);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -171,6 +176,9 @@ public class Robot8034 extends LinearOpMode {
             if (input.GetKeyDown(KeyCode.b)) {
                 slow = !slow;
                 fast = false;
+            }
+            if (input.GetKeyDown(KeyCode.y)) {
+                servoOne.DownUpDown();
             }
             frontLeftPower /= 2;
             frontRightPower /= 2;
