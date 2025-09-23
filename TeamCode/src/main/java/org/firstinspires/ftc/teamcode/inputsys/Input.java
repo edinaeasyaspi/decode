@@ -6,7 +6,7 @@ public class Input {
   /// 0 is inactive
   /// 1 is just pressed
   /// 2 is being held (inverse of 0)
-  /// 3 is just released 
+  /// 3 is just released
   private byte[] states;
   private Gamepad pad;
 
@@ -17,11 +17,11 @@ public class Input {
 
 
   public void Update(){
-    boolean[] currState = LoadCurrState(); 
+    boolean[] currState = LoadCurrState();
     for(int i = 0; i < currState.length; ++i){
       if(currState[i]){
         switch(states[i]){
-          case 0: 
+          case 0:
             states[i] = 1;
           break;
           case 2:
@@ -35,7 +35,7 @@ public class Input {
             states[i] = 1;
           break;
         }
-        
+
       } else {
         switch (states[i]) {
           case 0:
@@ -61,7 +61,7 @@ public class Input {
   public boolean GetKeyUp(KeyCode code){
     return states[code.ordinal()] == 3;
   }
-  
+
   private boolean[] LoadCurrState(){
     boolean[] currState = new boolean[KeyCode.END.ordinal()];
     currState[KeyCode.a.ordinal()] = pad.a;
@@ -82,5 +82,6 @@ public class Input {
     currState[KeyCode.guide.ordinal()] = pad.guide;
     currState[KeyCode.start.ordinal()] = pad.start;
     return currState;
-  } 
+  }
 }
+

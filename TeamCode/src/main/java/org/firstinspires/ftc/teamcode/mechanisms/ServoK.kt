@@ -4,11 +4,11 @@ import com.qualcomm.robotcore.hardware.Servo
 import org.firstinspires.ftc.teamcode.Robot8034
 
 class ServoK (val servo: Servo, val min: Double, val max: Double) {
-    fun UpDown() {
+    fun upDown() {
         val thread = Thread {
-            servo.setPosition(max)
+            servo.position = max
             Thread.sleep(700)
-            servo.setPosition(min)
+            servo.position = min
         }
         thread.start()
 

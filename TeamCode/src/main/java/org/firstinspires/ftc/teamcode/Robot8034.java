@@ -180,9 +180,11 @@ public class Robot8034 extends LinearOpMode {
                 slow = !slow;
                 fast = false;
             }
+
             if (input.GetKeyDown(KeyCode.y)) {
-                servoOne.UpDown();
+                servoOne.upDown();
             }
+
             frontLeftPower /= 2;
             frontRightPower /= 2;
             backLeftPower /= 2;
