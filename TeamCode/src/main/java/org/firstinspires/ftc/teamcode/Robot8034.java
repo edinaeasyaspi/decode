@@ -121,7 +121,9 @@ public class Robot8034 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-
+        //0.40, 0.63
+        //0.15, 0.35
+        //
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
                 0.86,0.65);

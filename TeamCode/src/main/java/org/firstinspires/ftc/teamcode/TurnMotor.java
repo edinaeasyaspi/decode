@@ -15,7 +15,7 @@ public class TurnMotor extends LinearOpMode{
     public void runOpMode() {
         motor = hardwareMap.get(DcMotor.class, "MotorOne");
         waitForStart();
-        motor.setPower(-1);
+        motor.setPower(1);
         sleep(10000);
         motor.setPower(0);
     }
