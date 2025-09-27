@@ -10,12 +10,13 @@ import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
 import org.firstinspires.ftc.teamcode.mechanisms.Servo;
 
 @TeleOp(name="TurnMotor")
+@Disabled
 public class TurnMotor extends LinearOpMode{
     DcMotor motor = null;
     public void runOpMode() {
         motor = hardwareMap.get(DcMotor.class, "MotorOne");
         waitForStart();
-        motor.setPower(1);
+        motor.setPower(-1);
         sleep(10000);
         motor.setPower(0);
     }
