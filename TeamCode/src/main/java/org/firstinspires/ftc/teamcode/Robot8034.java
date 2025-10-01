@@ -123,10 +123,18 @@ public class Robot8034 extends LinearOpMode {
 
         //0.40, 0.63
         //0.15, 0.35
-        //
+        //0.70,  0.73
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                0.86,0.65);
+                0.63,0.40);
+        ServoK servoTwo = new ServoK(
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
+                0.35, 0.15
+        );
+        ServoK servoThree = new ServoK(
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
+                0.69, 0.73
+        );
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -174,17 +182,24 @@ public class Robot8034 extends LinearOpMode {
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
             if (input.GetKeyDown(KeyCode.a)) {
-                fast = !fast;
-                slow = false;
+                if (slow) {
+                    slow = false;
+                    fast = false;
+                } else if (fast) {
+                    fast = false;
+                    slow = true;
+                } else {
+                    fast = true;
+                }
             }
-
             if (input.GetKeyDown(KeyCode.b)) {
-                slow = !slow;
-                fast = false;
+                servoThree.upDown();
             }
-
             if (input.GetKeyDown(KeyCode.y)) {
                 servoOne.upDown();
+            }
+            if (input.GetKeyDown(KeyCode.x)) {
+                servoTwo.upDown();
             }
 
             frontLeftPower /= 2;
@@ -216,6 +231,10 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
             telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
+            telemetry.addData("SERV 1 " ,"%s", servoOne.getStat());
+            telemetry.addData("SERV 2 " ,"%s", servoTwo.getStat());
+            telemetry.addData("SERV 3 " ,"%s", servoThree.getStat());
+
             telemetry.update();
         }
     }
