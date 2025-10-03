@@ -33,9 +33,8 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -73,14 +72,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 @TeleOp(name = "Sensor: Color", group = "Sensor")
 //@Disabled
-public class ColorSensor extends LinearOpMode {
+public class SensorColor extends LinearOpMode {
 
-  /** The colorSensor field will contain a reference to our color sensor hardware object */
+  /**
+   * The colorSensor field will contain a reference to our color sensor hardware object
+   */
   NormalizedColorSensor colorSensor;
 
-  /** The relativeLayout field is used to aid in providing interesting visual feedback
+  /**
+   * The relativeLayout field is used to aid in providing interesting visual feedback
    * in this sample application; you probably *don't* need this when you use a color sensor on your
-   * robot. Note that you won't see anything change on the Driver Station, only on the Robot Controller. */
+   * robot. Note that you won't see anything change on the Driver Station, only on the Robot Controller.
+   */
   View relativeLayout;
 
   /*
@@ -93,7 +96,8 @@ public class ColorSensor extends LinearOpMode {
    * block around the main, core logic, and an easy way to make that all clear was to separate
    * the former from the latter in separate methods.
    */
-  @Override public void runOpMode() {
+  @Override
+  public void runOpMode() {
 
     // Get a reference to the RelativeLayout so we can later change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
@@ -112,7 +116,7 @@ public class ColorSensor extends LinearOpMode {
           relativeLayout.setBackgroundColor(Color.WHITE);
         }
       });
-      }
+    }
   }
 
   protected void runSample() {
@@ -140,12 +144,12 @@ public class ColorSensor extends LinearOpMode {
     // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
     // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
     // the values you get from ColorSensor are dependent on the specific sensor you're using.
-    colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+    colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
 
     // If possible, turn the light on in the beginning (it might already be on anyway,
     // we just make sure it is if we can).
     if (colorSensor instanceof SwitchableLight) {
-      ((SwitchableLight)colorSensor).enableLight(true);
+      ((SwitchableLight) colorSensor).enableLight(true);
     }
 
     // Wait for the start button to be pressed.
@@ -180,7 +184,7 @@ public class ColorSensor extends LinearOpMode {
         // If the button is (now) down, then toggle the light
         if (xButtonCurrentlyPressed) {
           if (colorSensor instanceof SwitchableLight) {
-            SwitchableLight light = (SwitchableLight)colorSensor;
+            SwitchableLight light = (SwitchableLight) colorSensor;
             light.enableLight(!light.isLightOn());
           }
         }
@@ -207,7 +211,16 @@ public class ColorSensor extends LinearOpMode {
               .addData("Saturation", "%.3f", hsvValues[1])
               .addData("Value", "%.3f", hsvValues[2]);
       telemetry.addData("Alpha", "%.3f", colors.alpha);
-
+      if (hsvValues[0] >= 120 && hsvValues[0] <=180 && colors.green > 0.25) {
+        telemetry.addLine().addData("GreenTrue", "%.3f", hsvValues[0]);
+      } else {
+        telemetry.addLine().addData("GreenFalse", "%.3f", hsvValues[0]);
+      }
+      if (hsvValues[0] >= 220 && hsvValues[0] <=300) {
+        telemetry.addLine().addData("PurpleTrue", "%.3f", hsvValues[0]);
+      } else {
+        telemetry.addLine().addData("PurpleFalse", "%.3f", hsvValues[0]);
+      }
       /* If this color sensor also has a distance sensor, display the measured distance.
        * Note that the reported distance is only useful at very close range, and is impacted by
        * ambient light and surface reflectivity. */

@@ -121,15 +121,13 @@ public class Robot8034 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //0.40, 0.63
-        //0.15, 0.35
-        //0.70,  0.73
+        //max means high min means low
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
                 0.63,0.40);
         ServoK servoTwo = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
-                0.35, 0.15
+                0.69, 0.46
         );
         ServoK servoThree = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
