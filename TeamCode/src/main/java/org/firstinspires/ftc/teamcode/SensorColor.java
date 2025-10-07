@@ -42,6 +42,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 
 /*
  * This OpMode shows how to use a color sensor in a generic
@@ -140,6 +141,9 @@ public class SensorColor extends LinearOpMode {
     // state of the X button on the gamepad
     boolean xButtonPreviouslyPressed = false;
     boolean xButtonCurrentlyPressed = false;
+    ServoK servoOne = new ServoK(
+            hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
+            0.63,0.40);
 
     // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
     // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
@@ -211,12 +215,12 @@ public class SensorColor extends LinearOpMode {
               .addData("Saturation", "%.3f", hsvValues[1])
               .addData("Value", "%.3f", hsvValues[2]);
       telemetry.addData("Alpha", "%.3f", colors.alpha);
-      if (hsvValues[0] >= 120 && hsvValues[0] <=180 && colors.green > 0.25) {
+      if (hsvValues[0] >= 100 && hsvValues[0] <200) {
         telemetry.addLine().addData("GreenTrue", "%.3f", hsvValues[0]);
       } else {
         telemetry.addLine().addData("GreenFalse", "%.3f", hsvValues[0]);
       }
-      if (hsvValues[0] >= 220 && hsvValues[0] <=300) {
+      if (hsvValues[0] >= 200 && hsvValues[0] <=300) {
         telemetry.addLine().addData("PurpleTrue", "%.3f", hsvValues[0]);
       } else {
         telemetry.addLine().addData("PurpleFalse", "%.3f", hsvValues[0]);
