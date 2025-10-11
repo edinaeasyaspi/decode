@@ -85,6 +85,7 @@ public class SensorColor extends LinearOpMode {
    * robot. Note that you won't see anything change on the Driver Station, only on the Robot Controller.
    */
   View relativeLayout;
+  final float[] hsvValues = new float[3];
 
   /*
    * The runOpMode() method is the root of this OpMode, as it is in all LinearOpModes.
@@ -103,6 +104,7 @@ public class SensorColor extends LinearOpMode {
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
     int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
     relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+    colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
 
     try {
       runSample(); // actually execute the sample
@@ -121,35 +123,18 @@ public class SensorColor extends LinearOpMode {
 
   protected void runSample() {
 
-    // Once per loop, we will update this hsvValues array. The first element (0) will contain the
-    // hue, the second element (1) will contain the saturation, and the third element (2) will
-    // contain the value. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
-    // for an explanation of HSV color.
-    final float[] hsvValues = new float[3];
 
-    // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
-    // state of the X button on the gamepad
-//    boolean xButtonPreviouslyPressed = false;
-//    boolean xButtonCurrentlyPressed = false;
-//    ServoK servoOne = new ServoK(
-//            hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-//            0.63,0.40);
-
-    // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
-    // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
-    // the values you get from ColorSensor are dependent on the specific sensor you're using.
-    colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
 
     // If possible, turn the light on in the beginning (it might already be on anyway,
     // we just make sure it is if we can).
-    if (colorSensor instanceof SwitchableLight) {
-      ((SwitchableLight) colorSensor).enableLight(true);
-    }
     // Wait for the start button to be pressed.
     waitForStart();
 
     // Loop until we are asked to stop
     while (opModeIsActive()) {
+      if (colorSensor instanceof SwitchableLight) {
+        ((SwitchableLight) colorSensor).enableLight(true);
+      }
       // Explain basic gain information via telemetry
       telemetry.addLine("Hold the A button on gamepad 1 to increase gain, or B to decrease it.\n");
       telemetry.addLine("Higher gain values mean that the sensor will report larger numbers for Red, Green, and Blue, and Value\n");
