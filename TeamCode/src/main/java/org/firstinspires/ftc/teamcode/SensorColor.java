@@ -33,7 +33,6 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -121,15 +120,6 @@ public class SensorColor extends LinearOpMode {
   }
 
   protected void runSample() {
-    // You can give the sensor a gain value, will be multiplied by the sensor's raw value before the
-    // normalized color values are calculated. Color sensors (especially the REV Color Sensor V3)
-    // can give very low values (depending on the lighting conditions), which only use a small part
-    // of the 0-1 range that is available for the red, green, and blue values. In brighter conditions,
-    // you should use a smaller gain than in dark conditions. If your gain is too high, all of the
-    // colors will report at or near 1, and you won't be able to determine what color you are
-    // actually looking at. For this reason, it's better to err on the side of a lower gain
-    // (but always greater than  or equal to 1).
-    float gain = 2;
 
     // Once per loop, we will update this hsvValues array. The first element (0) will contain the
     // hue, the second element (1) will contain the saturation, and the third element (2) will
@@ -139,11 +129,11 @@ public class SensorColor extends LinearOpMode {
 
     // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
     // state of the X button on the gamepad
-    boolean xButtonPreviouslyPressed = false;
-    boolean xButtonCurrentlyPressed = false;
-    ServoK servoOne = new ServoK(
-            hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-            0.63,0.40);
+//    boolean xButtonPreviouslyPressed = false;
+//    boolean xButtonCurrentlyPressed = false;
+//    ServoK servoOne = new ServoK(
+//            hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
+//            0.63,0.40);
 
     // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
     // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
@@ -155,7 +145,6 @@ public class SensorColor extends LinearOpMode {
     if (colorSensor instanceof SwitchableLight) {
       ((SwitchableLight) colorSensor).enableLight(true);
     }
-
     // Wait for the start button to be pressed.
     waitForStart();
 
@@ -164,36 +153,33 @@ public class SensorColor extends LinearOpMode {
       // Explain basic gain information via telemetry
       telemetry.addLine("Hold the A button on gamepad 1 to increase gain, or B to decrease it.\n");
       telemetry.addLine("Higher gain values mean that the sensor will report larger numbers for Red, Green, and Blue, and Value\n");
-
+      telemetry.addLine("X toggles light.");
       // Update the gain value if either of the A or B gamepad buttons is being held
-      if (gamepad1.a) {
-        // Only increase the gain by a small amount, since this loop will occur multiple times per second.
-        gain += 0.005;
-      } else if (gamepad1.b && gain > 1) { // A gain of less than 1 will make the values smaller, which is not helpful.
-        gain -= 0.005;
-      }
-
-      // Show the gain value via telemetry
-      telemetry.addData("Gain", gain);
+//      if (gamepad1.a) {
+//        // Only increase the gain by a small amount, since this loop will occur multiple times per second.
+//        gain += 0.005;
+//      } else if (gamepad1.b && gain > 1) { // A gain of less than 1 will make the values smaller, which is not helpful.
+//        gain -= 0.005;
+//      }
 
       // Tell the sensor our desired gain value (normally you would do this during initialization,
       // not during the loop)
-      colorSensor.setGain(gain);
+      colorSensor.setGain(2);
 
       // Check the status of the X button on the gamepad
-      xButtonCurrentlyPressed = gamepad1.x;
-
-      // If the button state is different than what it was, then act
-      if (xButtonCurrentlyPressed != xButtonPreviouslyPressed) {
-        // If the button is (now) down, then toggle the light
-        if (xButtonCurrentlyPressed) {
-          if (colorSensor instanceof SwitchableLight) {
-            SwitchableLight light = (SwitchableLight) colorSensor;
-            light.enableLight(!light.isLightOn());
-          }
-        }
-      }
-      xButtonPreviouslyPressed = xButtonCurrentlyPressed;
+//      xButtonCurrentlyPressed = gamepad1.x;
+//
+//      // If the button state is different than what it was, then act
+//      if (xButtonCurrentlyPressed != xButtonPreviouslyPressed) {
+//        // If the button is (now) down, then toggle the light
+//        if (xButtonCurrentlyPressed) {
+//          if (colorSensor instanceof SwitchableLight) {
+//            SwitchableLight light = (SwitchableLight) colorSensor;
+//            light.enableLight(!light.isLightOn());
+//          }
+//        }
+//      }
+//      xButtonPreviouslyPressed = xButtonCurrentlyPressed;
 
       // Get the normalized colors from the sensor
       NormalizedRGBA colors = colorSensor.getNormalizedColors();
@@ -206,24 +192,24 @@ public class SensorColor extends LinearOpMode {
       // Update the hsvValues array by passing it to Color.colorToHSV()
       Color.colorToHSV(colors.toColor(), hsvValues);
 
-      telemetry.addLine()
-              .addData("Red", "%.3f", colors.red)
-              .addData("Green", "%.3f", colors.green)
-              .addData("Blue", "%.3f", colors.blue);
+      //telemetry.addLine()
+              //.addData("Red", "%.3f", colors.red)
+              //.addData("Green", "%.3f", colors.green)
+              //.addData("Blue", "%.3f", colors.blue);
       telemetry.addLine()
               .addData("Hue", "%.3f", hsvValues[0])
               .addData("Saturation", "%.3f", hsvValues[1])
               .addData("Value", "%.3f", hsvValues[2]);
       telemetry.addData("Alpha", "%.3f", colors.alpha);
       if (hsvValues[0] >= 100 && hsvValues[0] <200) {
-        telemetry.addLine().addData("GreenTrue", "%.3f", hsvValues[0]);
+        telemetry.addLine("GreenTrue");
       } else {
-        telemetry.addLine().addData("GreenFalse", "%.3f", hsvValues[0]);
+        telemetry.addLine("GreenFalse");
       }
       if (hsvValues[0] >= 200 && hsvValues[0] <=300) {
-        telemetry.addLine().addData("PurpleTrue", "%.3f", hsvValues[0]);
+        telemetry.addLine("PurpleTrue");
       } else {
-        telemetry.addLine().addData("PurpleFalse", "%.3f", hsvValues[0]);
+        telemetry.addLine("PurpleFalse");
       }
       /* If this color sensor also has a distance sensor, display the measured distance.
        * Note that the reported distance is only useful at very close range, and is impacted by

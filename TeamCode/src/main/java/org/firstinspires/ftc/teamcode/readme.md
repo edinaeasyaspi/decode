@@ -129,3 +129,11 @@ Note: Some names start with "Team" and others start with "team".  This is intent
 5)  Add:    include ':Team0417' to the "/settings.gradle" file.
     
 6)  Open up Android Studios and clean out any old files by using the menu to "Build/Clean Project""
+
+## Servo Configurations (Not relateed to the readme.md)
+
+min is the down position for servoK and max is up pisition
+
+ServoOne = min = ___ max = ___
+ServoTwo = min = ___ max = ___
+ServoThree = min = ___ max = ___
