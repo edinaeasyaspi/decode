@@ -86,6 +86,7 @@ public class SensorColor extends LinearOpMode {
    */
   View relativeLayout;
   final float[] hsvValues = new float[3];
+  int numtoreturn = 0;
 
   /*
    * The runOpMode() method is the root of this OpMode, as it is in all LinearOpModes.
@@ -124,7 +125,7 @@ public class SensorColor extends LinearOpMode {
     }
   }
 
-  protected void runSample() {
+  protected int runSample() {
 
       if (colorSensor instanceof SwitchableLight) {
         ((SwitchableLight) colorSensor).enableLight(true);
@@ -182,13 +183,16 @@ public class SensorColor extends LinearOpMode {
       telemetry.addData("Alpha", "%.3f", colors.alpha);
       if (hsvValues[0] >= 100 && hsvValues[0] <200) {
         telemetry.addLine("GreenTrue");
-      } else {
-        telemetry.addLine("GreenFalse");
-      }
-      if (hsvValues[0] >= 200 && hsvValues[0] <=300) {
+        telemetry.addLine("PurpleFalse");
+        numtoreturn = 1;
+      } else if (hsvValues[0] >= 200 && hsvValues[0] <=300) {
         telemetry.addLine("PurpleTrue");
+        telemetry.addLine("GreenFalse");
+        numtoreturn = 2;
       } else {
         telemetry.addLine("PurpleFalse");
+        telemetry.addLine("GreenFalse");
+        numtoreturn = 0;
       }
       /* If this color sensor also has a distance sensor, display the measured distance.
        * Note that the reported distance is only useful at very close range, and is impacted by
@@ -205,5 +209,6 @@ public class SensorColor extends LinearOpMode {
           relativeLayout.setBackgroundColor(Color.HSVToColor(hsvValues));
         }
       });
+      return numtoreturn;
     }
   }
