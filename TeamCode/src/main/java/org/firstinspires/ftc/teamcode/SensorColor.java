@@ -107,7 +107,10 @@ public class SensorColor extends LinearOpMode {
     colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
 
     try {
-      runSample(); // actually execute the sample
+      waitForStart();
+      while (opModeIsActive()) {
+        runSample(); // actually execute the sample
+      }
     } finally {
       // On the way out, *guarantee* that the background is reasonable. It doesn't actually start off
       // as pure white, but it's too much work to dig out what actually was used, and this is good
@@ -123,15 +126,6 @@ public class SensorColor extends LinearOpMode {
 
   protected void runSample() {
 
-
-
-    // If possible, turn the light on in the beginning (it might already be on anyway,
-    // we just make sure it is if we can).
-    // Wait for the start button to be pressed.
-    waitForStart();
-
-    // Loop until we are asked to stop
-    while (opModeIsActive()) {
       if (colorSensor instanceof SwitchableLight) {
         ((SwitchableLight) colorSensor).enableLight(true);
       }
@@ -213,4 +207,3 @@ public class SensorColor extends LinearOpMode {
       });
     }
   }
-}
