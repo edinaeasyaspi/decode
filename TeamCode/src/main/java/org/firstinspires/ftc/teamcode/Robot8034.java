@@ -229,10 +229,6 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
             telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
-            telemetry.addData("SERV 1 " ,"%s", servoOne.getStat());
-            telemetry.addData("SERV 2 " ,"%s", servoTwo.getStat());
-            telemetry.addData("SERV 3 " ,"%s", servoThree.getStat());
-
             telemetry.update();
         }
     }
