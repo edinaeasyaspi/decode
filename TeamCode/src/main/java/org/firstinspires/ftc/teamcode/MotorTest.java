@@ -9,7 +9,7 @@ public class MotorTest extends LinearOpMode{
     DcMotor intakeMotor = null;
     DcMotor intakeMotor2 = null;
     double newpower = 0;
-    double negative_power = 0;
+    double newpower2 = 0;
     public void runOpMode() {
         intakeMotor = hardwareMap.get(DcMotor.class, "MotorOne");
         intakeMotor2 = hardwareMap.get(DcMotor.class, "MotorTwo");
@@ -21,10 +21,16 @@ public class MotorTest extends LinearOpMode{
             if (gamepad1.b) {
                 newpower -= 0.01;
             }
-            negative_power = -1 * newpower;
+            if (gamepad1.y) {
+                newpower2 -= 0.01;
+            }
+            if (gamepad1.x) {
+                newpower2 += 0.01;
+            }
             telemetry.addData("Power:", newpower);
-            intakeMotor.setPower(negative_power);
-            intakeMotor2.setPower(newpower);
+            telemetry.addData("Power2:", newpower2);
+            intakeMotor.setPower(newpower);
+            intakeMotor2.setPower(newpower2);
             telemetry.update();
             sleep(100);
         }

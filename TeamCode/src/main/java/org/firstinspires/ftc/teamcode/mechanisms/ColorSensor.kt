@@ -11,6 +11,14 @@ class ColorSensor(var colorSensor: NormalizedColorSensor? = null) {
         Color.colorToHSV(colors.toColor(), hsvValues)
         return HSV(hsvValues[0], hsvValues[1], hsvValues[2])
     }
+    fun isGreen(): Boolean {
+        val color = getColor();
+        return color.hue >= 100 && color.hue <= 200
+    }
+    fun isPurple(): Boolean {
+        val color = getColor();
+        return color.hue >= 200 && color.hue <= 350
+    }
 }
 
 /*@JvmInline

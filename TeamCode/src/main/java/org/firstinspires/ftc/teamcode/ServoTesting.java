@@ -49,7 +49,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 @TeleOp(name = "ServoTesting")
 public class ServoTesting extends LinearOpMode {
-    static final double INCREMENT   = 0.01;
+    static final double INCREMENT   = 0.001;
     static final int    CYCLE_MS    =   50;     // period of each cycle
     static final double MAX_POS     =  1.00;     // Maximum rotational position
     static final double MIN_POS     =  0.00;     // Minimum rotational position
@@ -66,8 +66,7 @@ public class ServoTesting extends LinearOpMode {
         // Connect to servo (Assume Robot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
         servo = hardwareMap.get(Servo.class, "ServoOne");
-        servo.setPosition(position);
-
+        position = servo.getPosition();
         // Wait for the start button
         telemetry.addData(">", "Press Start to scan Servo." );
         telemetry.update();

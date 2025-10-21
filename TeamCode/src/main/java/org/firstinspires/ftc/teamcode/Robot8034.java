@@ -32,12 +32,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
-import org.firstinspires.ftc.teamcode.mechanisms.Servo;
+import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 
 /*
@@ -77,6 +78,9 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor backLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backRightDrive;
+    private DcMotor Intake1;
+    private DcMotor Intake2;
+    float intakepower = 0;
 
     private static Input input;
 
@@ -92,6 +96,8 @@ public class Robot8034 extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "MotorTwo");
         frontRightDrive = hardwareMap.get(DcMotor.class, "MotorThree");
         backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
+        Intake1 = hardwareMap.get(DcMotor.class, "MotorFive");
+        Intake2 = hardwareMap.get(DcMotor.class, "MotorSix");
         input = new Input(gamepad1);
 
 
@@ -111,7 +117,6 @@ public class Robot8034 extends LinearOpMode {
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -120,6 +125,7 @@ public class Robot8034 extends LinearOpMode {
         runtime.reset();
 
         //max means high min means low
+        // need to check these later
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
                 0.63,0.40);
@@ -131,6 +137,7 @@ public class Robot8034 extends LinearOpMode {
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
                 0.69, 0.73
         );
+        ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensor"));
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -189,13 +196,12 @@ public class Robot8034 extends LinearOpMode {
                 }
             }
             if (input.GetKeyDown(KeyCode.b)) {
-                servoThree.upDown();
+                intakepower = intakepower == 0 ? 1:0;
             }
             if (input.GetKeyDown(KeyCode.y)) {
                 servoOne.upDown();
-            }
-            if (input.GetKeyDown(KeyCode.x)) {
                 servoTwo.upDown();
+                servoThree.upDown();
             }
 
             frontLeftPower /= 2;
@@ -220,6 +226,8 @@ public class Robot8034 extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
+            Intake1.setPower(intakepower);
+            Intake2.setPower(-0.75*intakepower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -227,6 +235,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
             telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
+            telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
+            telemetry.addData("color val" ,"%s", colorSensorOne.isPurple() ? "purple" : "not purple");
             telemetry.update();
         }
     }
