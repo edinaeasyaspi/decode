@@ -24,7 +24,7 @@ class ColorSensor(var colorSensor: NormalizedColorSensor? = null) {
 /*@JvmInline
 value class HSV(val hue: Float, val saturation: Float, val value: Float){
     init{}
-}*/
+}*/ //<--Do we really need this comment
 data class HSV(
     val hue: Float,
     val saturation: Float,

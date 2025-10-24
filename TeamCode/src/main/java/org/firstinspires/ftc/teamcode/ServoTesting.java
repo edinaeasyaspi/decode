@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoTesting extends LinearOpMode {
     static final double INCREMENT   = 0.001;
     static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  1.00;     // Maximum rotational position
+    static final double MAX_POS     =  10.00;     // Maximum rotational position
     static final double MIN_POS     =  0.00;     // Minimum rotational position
 
     // Define class members
@@ -71,8 +71,6 @@ public class ServoTesting extends LinearOpMode {
         telemetry.addData(">", "Press Start to scan Servo." );
         telemetry.update();
         waitForStart();
-
-        while (!gamepad1.a) Thread.sleep(100);
         // Scan servo till stop pressed.
         while(opModeIsActive()){
 

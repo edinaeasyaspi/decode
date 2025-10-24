@@ -68,7 +68,6 @@ import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
 @TeleOp(name="Robot8034")
 public class Robot8034 extends LinearOpMode {
 
@@ -96,8 +95,8 @@ public class Robot8034 extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "MotorTwo");
         frontRightDrive = hardwareMap.get(DcMotor.class, "MotorThree");
         backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
-        Intake1 = hardwareMap.get(DcMotor.class, "MotorFive");
-        Intake2 = hardwareMap.get(DcMotor.class, "MotorSix");
+        //Intake1 = hardwareMap.get(DcMotor.class, "MotorFive");
+        //Intake2 = hardwareMap.get(DcMotor.class, "MotorSix");
         input = new Input(gamepad1);
 
 
@@ -128,7 +127,7 @@ public class Robot8034 extends LinearOpMode {
         // need to check these later
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                0.63,0.40);
+                1.03,0.838);
         ServoK servoTwo = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
                 0.69, 0.46
@@ -137,7 +136,9 @@ public class Robot8034 extends LinearOpMode {
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
                 0.69, 0.73
         );
-        ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensor"));
+        ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
+        ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
+        ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -198,11 +199,6 @@ public class Robot8034 extends LinearOpMode {
             if (input.GetKeyDown(KeyCode.b)) {
                 intakepower = intakepower == 0 ? 1:0;
             }
-            if (input.GetKeyDown(KeyCode.y)) {
-                servoOne.upDown();
-                servoTwo.upDown();
-                servoThree.upDown();
-            }
 
             frontLeftPower /= 2;
             frontRightPower /= 2;
@@ -226,8 +222,8 @@ public class Robot8034 extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
-            Intake1.setPower(intakepower);
-            Intake2.setPower(-0.75*intakepower);
+            //Intake1.setPower(intakepower);
+            //Intake2.setPower(-0.75*intakepower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
