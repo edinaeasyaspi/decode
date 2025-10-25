@@ -79,6 +79,8 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor backRightDrive;
     private DcMotor Intake1;
     private DcMotor Intake2;
+    private DcMotor Shoot1;
+    private DcMotor Shoot2;
     float intakepower = 0;
 
     private static Input input;
@@ -127,18 +129,20 @@ public class Robot8034 extends LinearOpMode {
         // need to check these later
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                1.03,0.838);
+                1.000,0.786);
         ServoK servoTwo = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
-                0.69, 0.46
+                0.76, 0.541
         );
         ServoK servoThree = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
-                0.69, 0.73
+                0.735, 0.773
         );
-        ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
-        ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
-        ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+        //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
+        //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
+        //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+        //Shoot1 = hardwareMap.get(Dcmotor.class, "MotorSeven")
+        //Shoot2 = hardwareMap.get(Dcmotor.class, "MotorEight")
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             input.Update();
@@ -199,6 +203,15 @@ public class Robot8034 extends LinearOpMode {
             if (input.GetKeyDown(KeyCode.b)) {
                 intakepower = intakepower == 0 ? 1:0;
             }
+            if (input.GetKeyDown(KeyCode.x)) {
+                servoOne.upDown();
+            }
+            if (input.GetKeyDown(KeyCode.a)) {
+                servoTwo.upDown();
+            }
+            if (input.GetKeyDown(KeyCode.y)) {
+                servoThree.upDown();
+            }
 
             frontLeftPower /= 2;
             frontRightPower /= 2;
@@ -231,8 +244,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
             telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
-            telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
-            telemetry.addData("color val" ,"%s", colorSensorOne.isPurple() ? "purple" : "not purple");
+            //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
+            //telemetry.addData("color val" ,"%s", colorSensorOne.isPurple() ? "purple" : "not purple");
             telemetry.update();
         }
     }

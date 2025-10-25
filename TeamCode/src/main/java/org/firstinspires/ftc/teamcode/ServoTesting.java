@@ -51,12 +51,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoTesting extends LinearOpMode {
     static final double INCREMENT   = 0.001;
     static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  10.00;     // Maximum rotational position
+    static final double MAX_POS     =  1.00;     // Maximum rotational position
     static final double MIN_POS     =  0.00;     // Minimum rotational position
 
     // Define class members
     Servo   servo;
-    double  position = MAX_POS - MIN_POS; // Start at halfway position
+    double  position = 0; // Start at halfway position
     boolean rampUp = true;
 
 
@@ -78,24 +78,16 @@ public class ServoTesting extends LinearOpMode {
             if (gamepad1.a) {
                 // Keep stepping up until we hit the max value.
                 position += INCREMENT ;
-                if (position >= MAX_POS ) {
-                    position = MAX_POS;
-                    rampUp = !rampUp;
-                }
             }
             if (gamepad1.b) {
                 // Keep stepping down until we hit the min value.
                 position -= INCREMENT ;
-                if (position <= MIN_POS ) {
-                    position = MIN_POS;
-                    rampUp = !rampUp;
-                }
             }
 
             if(gamepad1.x)
-                position = MAX_POS;
+                position = 1;
             else if (gamepad1.y)
-                position = MIN_POS;
+                position = 0;
 
             // Display the current value
             telemetry.addData("Servo Position", "%f", position);
@@ -104,7 +96,8 @@ public class ServoTesting extends LinearOpMode {
 
             // Set the servo to the new position and pause;
             servo.setPosition(position);
-            sleep(CYCLE_MS);
+            position = servo.getPosition();
+            sleep(100);
             idle();
         }
 
