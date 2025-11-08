@@ -82,12 +82,14 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor Intake2;
     private DcMotor Shoot1;
     private DcMotor Shoot2;
-    float intakepower = 0;
+    boolean intakepower = false;
+    boolean intakepower1 = false;
 
     private static Input input;
 
     boolean slow = false;
     boolean fast = false;
+    boolean outshothigh = false;
 
     @Override
     public void runOpMode() {
@@ -207,20 +209,26 @@ public class Robot8034 extends LinearOpMode {
                     fast = true;
                 }
             }
-            if (input.GetKeyDown(KeyCode.b)) {
-                intakepower = intakepower == 0 ? 1:0;
-            }
             if (input.GetKeyDown(KeyCode.x)) {
                 servoOne.upDown();
                 servoFour.supDown();
             }
-            if (input.GetKeyDown(KeyCode.a)) {
+            if (input.GetKeyDown(KeyCode.b)) {
                 servoTwo.upDown();
                 servoFour.supDown();
             }
             if (input.GetKeyDown(KeyCode.y)) {
                 servoThree.upDown();
                 servoFour.supDown();
+            }
+            if (input.GetKeyDown(KeyCode.rb)) {
+                intakepower = !intakepower;
+            }
+            if (input.GetKeyDown(KeyCode.lt)) {
+                outshothigh = !outshothigh;
+            }
+            if (input.GetKeyDown(KeyCode.lb)) {
+                intakepower1 = !intakepower1;
             }
 
             frontLeftPower /= 2;
@@ -245,11 +253,18 @@ public class Robot8034 extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
-            if (intakepower == 1) {
+            if (intakepower) {
                 IOsys.inon();
-                IOsys.outon();
-            } else if (intakepower == 0) {
+            } else {
                 IOsys.inoff();
+            }
+            if (intakepower1) {
+                if (outshothigh) {
+                    IOsys.out1on();
+                } else {
+                    IOsys.outon();
+                }
+            } else {
                 IOsys.outoff();
             }
 

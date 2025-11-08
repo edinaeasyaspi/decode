@@ -11,8 +11,8 @@ public class MotorTest extends LinearOpMode{
     double newpower = 0;
     double newpower2 = 0;
     public void runOpMode() {
-        intakeMotor = hardwareMap.get(DcMotor.class, "MotorOne");
-        intakeMotor2 = hardwareMap.get(DcMotor.class, "MotorTwo");
+        intakeMotor = hardwareMap.get(DcMotor.class, "MotorSeven");
+        intakeMotor2 = hardwareMap.get(DcMotor.class, "MotorEight");
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.a) {

@@ -10,6 +10,10 @@ class InOutSys(var motor1: DcMotor, var motor2: DcMotor, var motor3: DcMotor , v
         motor3.setPower(0.0);
         motor4.setPower(0.0);
     }
+    fun out1on() {
+        motor3.setPower(0.33);
+        motor4.setPower(-0.33);
+    }
     fun inon() {
         motor1.setPower(1.0);
         motor2.setPower(-0.65);
