@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.mechanisms
 
 import com.qualcomm.robotcore.hardware.DcMotor
+import kotlin.concurrent.thread
+
 class InOutSys(var motor1: DcMotor, var motor2: DcMotor, var motor3: DcMotor , var motor4: DcMotor) {
     fun outon() {
         motor3.setPower(0.40);

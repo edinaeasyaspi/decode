@@ -213,11 +213,11 @@ public class Robot8034 extends LinearOpMode {
                 servoOne.upDown();
                 servoFour.supDown();
             }
-            if (input.GetKeyDown(KeyCode.b)) {
+            if (input.GetKeyDown(KeyCode.y)) {
                 servoTwo.upDown();
                 servoFour.supDown();
             }
-            if (input.GetKeyDown(KeyCode.y)) {
+            if (input.GetKeyDown(KeyCode.b)) {
                 servoThree.upDown();
                 servoFour.supDown();
             }
@@ -255,6 +255,7 @@ public class Robot8034 extends LinearOpMode {
             backRightDrive.setPower(backRightPower);
             if (intakepower) {
                 IOsys.inon();
+                intakepower = false;
             } else {
                 IOsys.inoff();
             }
@@ -264,6 +265,7 @@ public class Robot8034 extends LinearOpMode {
                 } else {
                     IOsys.outon();
                 }
+                intakepower1 = false;
             } else {
                 IOsys.outoff();
             }
@@ -271,9 +273,10 @@ public class Robot8034 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
-            telemetry.addData("Slow" ,"%s", slow ? "true" : "false" );
-            telemetry.addData("Fast" ,"%s", fast ? "true" : "false" );
+            telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
+            telemetry.addData("Slow" ,"%s", slow ? "ON" : "OFF" );
+            telemetry.addData("Fast" ,"%s", fast ? "ON" : "OFF");
+            telemetry.addData("ShootFast?", "%s", outshothigh ? "ON" : "OFF");
             //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
             //telemetry.addData("color val" ,"%s", colorSensorOne.isPurple() ? "purple" : "not purple");
             telemetry.update();
