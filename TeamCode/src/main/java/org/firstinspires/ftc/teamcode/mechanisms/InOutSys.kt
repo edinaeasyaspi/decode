@@ -4,24 +4,50 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import kotlin.concurrent.thread
 
 class InOutSys(var motor1: DcMotor, var motor2: DcMotor, var motor3: DcMotor , var motor4: DcMotor) {
+    var motpow1: Double = 0.0
+    var motpow2: Double = 0.0
+    var motpow3: Double = 0.0
+    var motpow4: Double = 0.0
+    init {
+        val Thread = thread {
+            while (true) {
+                motor1.setPower(motpow1);
+                motor2.setPower(motpow2);
+                motor3.setPower(motpow3);
+                motor4.setPower(motpow4);
+                Thread.sleep(500);
+            }
+        }
+        Thread.start()
+    }
     fun outon() {
-        motor3.setPower(0.40);
-        motor4.setPower(-0.40);
+        motpow3 = 0.4;
+        motpow4 = -0.4;
     }
+
     fun outoff() {
-        motor3.setPower(0.0);
-        motor4.setPower(0.0);
+        motpow3 = 0.0;
+        motpow4 = 0.0;
     }
+
     fun out1on() {
-        motor3.setPower(0.33);
-        motor4.setPower(-0.33);
+        motpow3 = 0.30;
+        motpow4 = -0.30;
     }
+
     fun inon() {
-        motor1.setPower(1.0);
-        motor2.setPower(-0.65);
+        motpow1 = 1.0;
+        motpow2 = -0.65;
     }
+
     fun inoff() {
-        motor1.setPower(0.0);
-        motor2.setPower(0.0);
+        motpow1 = -1.0;
+        motpow2 = 0.5;
+        val Thread = thread {
+            Thread.sleep(1000);
+            motpow1 = 0.0;
+            motpow2 = 0.0;
+        }
+        Thread.start();
     }
 }

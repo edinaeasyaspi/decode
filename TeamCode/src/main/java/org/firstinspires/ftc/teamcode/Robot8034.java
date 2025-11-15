@@ -90,6 +90,8 @@ public class Robot8034 extends LinearOpMode {
     boolean slow = false;
     boolean fast = false;
     boolean outshothigh = false;
+    boolean itnull = true;
+    boolean it1null = true;
 
     @Override
     public void runOpMode() {
@@ -223,12 +225,14 @@ public class Robot8034 extends LinearOpMode {
             }
             if (input.GetKeyDown(KeyCode.rb)) {
                 intakepower = !intakepower;
+                itnull = false;
             }
             if (input.GetKeyDown(KeyCode.lt)) {
                 outshothigh = !outshothigh;
             }
             if (input.GetKeyDown(KeyCode.lb)) {
                 intakepower1 = !intakepower1;
+                it1null = false;
             }
 
             frontLeftPower /= 2;
@@ -253,21 +257,26 @@ public class Robot8034 extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
+            if (!itnull) {
             if (intakepower) {
                 IOsys.inon();
-                intakepower = false;
             } else {
                 IOsys.inoff();
             }
-            if (intakepower1) {
-                if (outshothigh) {
-                    IOsys.out1on();
+            itnull = true;
+            }
+            if (!it1null) {
+                if (intakepower1) {
+                    if (outshothigh) {
+                        IOsys.out1on();
+                    } else {
+                        IOsys.outon();
+                    }
+                    intakepower1 = false;
                 } else {
-                    IOsys.outon();
+                    IOsys.outoff();
                 }
-                intakepower1 = false;
-            } else {
-                IOsys.outoff();
+                it1null = true;
             }
 
             // Show the elapsed game time and wheel power.
@@ -277,8 +286,9 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Slow" ,"%s", slow ? "ON" : "OFF" );
             telemetry.addData("Fast" ,"%s", fast ? "ON" : "OFF");
             telemetry.addData("ShootFast?", "%s", outshothigh ? "ON" : "OFF");
+            telemetry.addData("Intake", "%s", intakepower ? "ON" :"OFF");
             //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
-            //telemetry.addData("color val" ,"%s", colorSensorOne.isPurple() ? "purple" : "not purple");
+            //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
             telemetry.update();
         }
     }
