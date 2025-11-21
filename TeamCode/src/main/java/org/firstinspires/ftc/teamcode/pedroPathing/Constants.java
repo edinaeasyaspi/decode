@@ -35,7 +35,9 @@ public class Constants {
             .rightRearEncoderDirection(Encoder.FORWARD)
             .robotWidth(18)
             .robotLength(18)
-            .forwardTicksToInches(2.08);
+            .forwardTicksToInches(-2.08)
+            .strafeTicksToInches(-0.43)
+            .turnTicksToInches(-0.02);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
             .rightFrontMotorName("MotorThree")
