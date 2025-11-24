@@ -15,14 +15,13 @@ class InOutSys(var motor1: DcMotor, var motor2: DcMotor, var motor3: DcMotor , v
                 motor2.setPower(motpow2);
                 motor3.setPower(motpow3);
                 motor4.setPower(motpow4);
-                Thread.sleep(500);
             }
         }
         Thread.start()
     }
     fun outon() {
-        motpow3 = 0.4;
-        motpow4 = -0.4;
+        motpow3 = 0.39;
+        motpow4 = -0.39;
     }
 
     fun outoff() {
@@ -31,13 +30,13 @@ class InOutSys(var motor1: DcMotor, var motor2: DcMotor, var motor3: DcMotor , v
     }
 
     fun out1on() {
-        motpow3 = 0.30;
-        motpow4 = -0.30;
+        motpow3 = 0.43;
+        motpow4 = -0.43;
     }
 
     fun inon() {
         motpow1 = 1.0;
-        motpow2 = -0.65;
+        motpow2 = -0.75;
     }
 
     fun inoff() {

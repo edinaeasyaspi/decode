@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -86,6 +88,7 @@ public class Robot8034 extends LinearOpMode {
     boolean intakepower1 = false;
 
     private static Input input;
+    private CRServo out2;
 
     boolean slow = false;
     boolean fast = false;
@@ -109,8 +112,7 @@ public class Robot8034 extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "MotorSeven"),
                 hardwareMap.get(DcMotor.class, "MotorEight")
         );
-
-
+        out2 = hardwareMap.get(CRServo.class, "ServoFive");
         //When we have the servo for intake:
 
         // ########################################################################################
@@ -138,7 +140,7 @@ public class Robot8034 extends LinearOpMode {
         // need to check these later
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                1.000,0.786);
+                1.000,0.766);
         ServoK servoTwo = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
                 0.709, 0.486
@@ -203,53 +205,53 @@ public class Robot8034 extends LinearOpMode {
             if (input.GetKeyDown(KeyCode.a)) {
                 if (slow) {
                     slow = false;
-                    fast = false;
-                } else if (fast) {
-                    fast = false;
-                    slow = true;
-                } else {
                     fast = true;
+                }
+                if (fast) {
+                    slow = true;
+                    fast = false;
                 }
             }
             if (input.GetKeyDown(KeyCode.x)) {
                 servoOne.upDown();
-                servoFour.supDown();
             }
             if (input.GetKeyDown(KeyCode.y)) {
                 servoTwo.upDown();
-                servoFour.supDown();
             }
             if (input.GetKeyDown(KeyCode.b)) {
                 servoThree.upDown();
-                servoFour.supDown();
             }
-            if (input.GetKeyDown(KeyCode.rb)) {
-                intakepower = !intakepower;
+            if (input.GetKeyDown(KeyCode.rt)) {
+                intakepower = true;
                 itnull = false;
             }
-            if (input.GetKeyDown(KeyCode.lt)) {
-                outshothigh = !outshothigh;
+            if (input.GetKeyDown(KeyCode.rb)) {
+                intakepower = false;
+                itnull = false;
             }
-            if (input.GetKeyDown(KeyCode.lb)) {
-                intakepower1 = !intakepower1;
+            if (input.GetKeyDown(KeyCode.up)) {
+                outshothigh = true;
+                intakepower1 = true;
                 it1null = false;
             }
-
-            frontLeftPower /= 2;
-            frontRightPower /= 2;
-            backLeftPower /= 2;
-            backRightPower /= 2;
-            if (fast) {
-                frontLeftPower *= 2;
-                frontRightPower *= 2;
-                backLeftPower *= 2;
-                backRightPower *= 2;
+            if (input.GetKeyDown(KeyCode.down)) {
+                outshothigh = false;
+                intakepower1 = true;
+                it1null = false;
+            }
+            if (input.GetKeyDown(KeyCode.lt)) {
+                intakepower1 = true;
+                it1null = false;
+            }
+            if (input.GetKeyDown(KeyCode.lb)) {
+                intakepower1 = false;
+                it1null = false;
             }
             if (slow) {
-                frontLeftPower /= 2;
-                frontRightPower /= 2;
-                backLeftPower /= 2;
-                backRightPower /= 2;
+                frontLeftPower /= 4;
+                frontRightPower /= 4;
+                backLeftPower /= 4;
+                backRightPower /= 4;
             }
 
             // Send calculated power to wheels
@@ -269,12 +271,15 @@ public class Robot8034 extends LinearOpMode {
                 if (intakepower1) {
                     if (outshothigh) {
                         IOsys.out1on();
+                        out2.setPower(-1);
                     } else {
                         IOsys.outon();
+                        out2.setPower(-1);
                     }
                     intakepower1 = false;
                 } else {
                     IOsys.outoff();
+                    out2.setPower(0);
                 }
                 it1null = true;
             }
