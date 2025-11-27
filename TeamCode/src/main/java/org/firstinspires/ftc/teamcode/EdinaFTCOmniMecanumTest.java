@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 //import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 //import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 //import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -66,7 +67,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name = "Omni/Mecacum Test", group = "test")
-//@Disabled
+@Disabled
 public class EdinaFTCOmniMecanumTest extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     boolean testMode = true;
