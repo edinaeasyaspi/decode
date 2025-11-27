@@ -38,11 +38,25 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
 import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.Range;
+
+import java.time.LocalTime;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -76,6 +90,18 @@ public class Robot8034 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
+    final double DESIRED_DISTANCE = 24.0;
+    final double SPEED_GAIN  =  0.02;
+    final double STRAFE_GAIN =  0.015;
+    final double TURN_GAIN   =  0.01;
+    final double MAX_AUTO_SPEED = 0;
+    final double MAX_AUTO_STRAFE= 0;
+    final double MAX_AUTO_TURN  = 0.3;
+    private static final boolean USE_WEBCAM = true;
+    private static final int DESIRED_TAG_ID = -1;
+    private VisionPortal visionPortal;
+    private AprilTagProcessor aprilTag;
+    private AprilTagDetection desiredTag = null;
     private DcMotor frontLeftDrive;
     private DcMotor backLeftDrive;
     private DcMotor frontRightDrive;
@@ -83,7 +109,7 @@ public class Robot8034 extends LinearOpMode {
     private DcMotor Intake1;
     private DcMotor Intake2;
     private DcMotor Shoot1;
-    private DcMotor Shoot2;
+    private DcMotor Shoot2;;
     boolean intakepower = false;
     boolean intakepower1 = false;
 
@@ -95,9 +121,16 @@ public class Robot8034 extends LinearOpMode {
     boolean outshothigh = false;
     boolean itnull = true;
     boolean it1null = true;
+    long nodestart;
 
     @Override
     public void runOpMode() {
+        boolean targetFound = false;
+        double drive = 0;
+        double strafe = 0;
+        double turn = 0;
+        initAprilTag();
+
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration st!bwas && gamepad1.bep on the DS or RC devices.
@@ -110,8 +143,11 @@ public class Robot8034 extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "MotorFive"),
                 hardwareMap.get(DcMotor.class, "MotorSix"),
                 hardwareMap.get(DcMotor.class, "MotorSeven"),
-                hardwareMap.get(DcMotor.class, "MotorEight")
+                hardwareMap.get(DcMotor.class, "MotorEight"),
+                hardwareMap.get(VoltageSensor.class, "Control Hub"),
+                telemetry
         );
+
         out2 = hardwareMap.get(CRServo.class, "ServoFive");
         //When we have the servo for intake:
 
@@ -149,52 +185,50 @@ public class Robot8034 extends LinearOpMode {
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
                 0.746, 0.78
         );
-        ServoK servoFour = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoFour"),
-                0.491, 0.548
-        );
         //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            input.Update();
+            nodestart = System.nanoTime();
+            if (!gamepad1.dpad_right) {
+                input.Update();
 
-            double max;
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x;
+                double max;
+                // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+                double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+                double lateral = gamepad1.left_stick_x;
+                double yaw = gamepad1.right_stick_x;
 
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double frontLeftPower = axial + lateral + yaw;
-            double frontRightPower = axial - lateral - yaw;
-            double backLeftPower = axial - lateral + yaw;
-            double backRightPower = axial + lateral - yaw;
+                // Combine the joystick requests for each axis-motion to determine each wheel's power.
+                // Set up a variable for each drive wheel to save the power level for telemetry.
+                double frontLeftPower = axial + lateral + yaw;
+                double frontRightPower = axial - lateral - yaw;
+                double backLeftPower = axial - lateral + yaw;
+                double backRightPower = axial + lateral - yaw;
 
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
-            max = Math.max(max, Math.abs(backLeftPower));
-            max = Math.max(max, Math.abs(backRightPower));
+                // Normalize the values so no wheel power exceeds 100%
+                // This ensures that the robot maintains the desired motion.
+                max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+                max = Math.max(max, Math.abs(backLeftPower));
+                max = Math.max(max, Math.abs(backRightPower));
 
-            if (max > 1.0) {
-                frontLeftPower /= max;
-                frontRightPower /= max;
-                backLeftPower /= max;
-                backRightPower /= max;
-            }
+                if (max > 1.0) {
+                    frontLeftPower /= max;
+                    frontRightPower /= max;
+                    backLeftPower /= max;
+                    backRightPower /= max;
+                }
 
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
+                // This is test code:
+                //
+                // Uncomment the following code to test your motor directions.
+                // Each button should make the corresponding motor run FORWARD.
+                //   1) First get all the motors to take to correct positions on the robot
+                //      by adjusting your Robot Configuration if necessary.
+                //   2) Then make sure they run in the correct direction by modifying the
+                //      the setDirection() calls above.
+                // Once the correct motors move in the correct direction re-comment this code.
 
             /*
             frontLeftPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
@@ -202,99 +236,258 @@ public class Robot8034 extends LinearOpMode {
             frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-            if (input.GetKeyDown(KeyCode.a)) {
-                if (slow) {
-                    slow = false;
-                    fast = true;
-                }
-                if (fast) {
-                    slow = true;
-                    fast = false;
-                }
-            }
-            if (input.GetKeyDown(KeyCode.x)) {
-                servoOne.upDown();
-            }
-            if (input.GetKeyDown(KeyCode.y)) {
-                servoTwo.upDown();
-            }
-            if (input.GetKeyDown(KeyCode.b)) {
-                servoThree.upDown();
-            }
-            if (input.GetKeyDown(KeyCode.rt)) {
-                intakepower = true;
-                itnull = false;
-            }
-            if (input.GetKeyDown(KeyCode.rb)) {
-                intakepower = false;
-                itnull = false;
-            }
-            if (input.GetKeyDown(KeyCode.up)) {
-                outshothigh = true;
-                intakepower1 = true;
-                it1null = false;
-            }
-            if (input.GetKeyDown(KeyCode.down)) {
-                outshothigh = false;
-                intakepower1 = true;
-                it1null = false;
-            }
-            if (input.GetKeyDown(KeyCode.lt)) {
-                intakepower1 = true;
-                it1null = false;
-            }
-            if (input.GetKeyDown(KeyCode.lb)) {
-                intakepower1 = false;
-                it1null = false;
-            }
-            if (slow) {
-                frontLeftPower /= 4;
-                frontRightPower /= 4;
-                backLeftPower /= 4;
-                backRightPower /= 4;
-            }
-
-            // Send calculated power to wheels
-            frontLeftDrive.setPower(frontLeftPower);
-            frontRightDrive.setPower(frontRightPower);
-            backLeftDrive.setPower(backLeftPower);
-            backRightDrive.setPower(backRightPower);
-            if (!itnull) {
-            if (intakepower) {
-                IOsys.inon();
-            } else {
-                IOsys.inoff();
-            }
-            itnull = true;
-            }
-            if (!it1null) {
-                if (intakepower1) {
-                    if (outshothigh) {
-                        IOsys.out1on();
-                        out2.setPower(-1);
-                    } else {
-                        IOsys.outon();
-                        out2.setPower(-1);
+                if (input.GetKeyDown(KeyCode.a)) {
+                    if (slow) {
+                        slow = false;
+                        fast = true;
                     }
-                    intakepower1 = false;
-                } else {
-                    IOsys.outoff();
-                    out2.setPower(0);
+                    if (fast) {
+                        slow = true;
+                        fast = false;
+                    }
                 }
-                it1null = true;
-            }
+                if (input.GetKeyDown(KeyCode.x)) {
+                    servoOne.upDown();
+                }
+                if (input.GetKeyDown(KeyCode.y)) {
+                    servoTwo.upDown();
+                }
+                if (input.GetKeyDown(KeyCode.b)) {
+                    servoThree.upDown();
+                }
+                if (input.GetKeyDown(KeyCode.rt)) {
+                    intakepower = true;
+                    itnull = false;
+                }
+                if (input.GetKeyDown(KeyCode.rb)) {
+                    intakepower = false;
+                    itnull = false;
+                }
+                if (input.GetKeyDown(KeyCode.up)) {
+                    outshothigh = true;
+                    intakepower1 = true;
+                    it1null = false;
+                }
+                if (input.GetKeyDown(KeyCode.down)) {
+                    outshothigh = false;
+                    intakepower1 = true;
+                    it1null = false;
+                }
+                if (input.GetKeyDown(KeyCode.lt)) {
+                    intakepower1 = true;
+                    it1null = false;
+                }
+                if (input.GetKeyDown(KeyCode.lb)) {
+                    intakepower1 = false;
+                    it1null = false;
+                }
+                if (slow) {
+                    frontLeftPower /= 4;
+                    frontRightPower /= 4;
+                    backLeftPower /= 4;
+                    backRightPower /= 4;
+                }
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-            telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
-            telemetry.addData("Slow" ,"%s", slow ? "ON" : "OFF" );
-            telemetry.addData("Fast" ,"%s", fast ? "ON" : "OFF");
-            telemetry.addData("ShootFast?", "%s", outshothigh ? "ON" : "OFF");
-            telemetry.addData("Intake", "%s", intakepower ? "ON" :"OFF");
-            //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
-            //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
+                // Send calculated power to wheels
+                frontLeftDrive.setPower(frontLeftPower);
+                frontRightDrive.setPower(frontRightPower);
+                backLeftDrive.setPower(backLeftPower);
+                backRightDrive.setPower(backRightPower);
+                if (!itnull) {
+                    if (intakepower) {
+                        IOsys.inon();
+                    } else {
+                        IOsys.inoff();
+                    }
+                    itnull = true;
+                }
+                if (!it1null) {
+                    if (intakepower1) {
+                        if (outshothigh) {
+                            IOsys.out1on();
+                            out2.setPower(-1);
+                        } else {
+                            IOsys.outon();
+                            out2.setPower(-1);
+                        }
+                        intakepower1 = false;
+                    } else {
+                        IOsys.outoff();
+                        out2.setPower(0);
+                    }
+                    it1null = true;
+                }
+
+                // Show the elapsed game time and wheel power.
+                telemetry.addData("Status", "Run Time: " + runtime.toString());
+                telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
+                telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
+                telemetry.addData("Slow", "%s", slow ? "ON" : "OFF");
+                telemetry.addData("Fast", "%s", fast ? "ON" : "OFF");
+                telemetry.addData("ShootFast?", "%s", outshothigh ? "ON" : "OFF");
+                telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
+                telemetry.addData("ShootPower", "%4.2f", IOsys.getMotpow3());
+                telemetry.addData("Speed:","%4.2f", IOsys.getMotpow3());
+                //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
+                //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
+                telemetry.update();
+            } else {
+                targetFound = false;
+                desiredTag  = null;
+
+                // Step through the list of detected tags and look for a matching tag
+                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+                for (AprilTagDetection detection : currentDetections) {
+                    // Look to see if we have size info on this tag.
+                    if (detection.metadata != null) {
+                        //  Check to see if we want to track towards this tag.
+                        if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                            // Yes, we want to use this tag.
+                            targetFound = true;
+                            desiredTag = detection;
+                            break;  // don't look any further.
+                        } else {
+                            // This tag is in the library, but we do not want to track it right now.
+                            telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                        }
+                    } else {
+                        // This tag is NOT in the library, so we don't have enough information to track to it.
+                        telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                    }
+                }
+
+                // Tell the driver what we see, and what to do.
+                if (targetFound) {
+                    telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
+                    telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+                    telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
+                    telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
+                    telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+                } else {
+                    telemetry.addData("\n>","Drive using joysticks to find valid target\n");
+                }
+
+                // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
+                if (targetFound) {
+
+                    // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+                    double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                    double  headingError    = desiredTag.ftcPose.bearing;
+                    double  yawError        = desiredTag.ftcPose.yaw;
+
+                    // Use the speed and turn "gains" to calculate how we want the robot to move.
+                    drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                    turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+                    strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                    telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                } else {
+
+                    // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
+                    drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
+                    strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
+                    turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+                    telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                }
+                telemetry.update();
+
+                // Apply desired axes motions to the drivetrain.
+                moveRobot(drive, strafe, turn);
+                sleep(10);
+            }
+        }
+    }
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double frontLeftPower    =  x - y - yaw;
+        double frontRightPower   =  x + y + yaw;
+        double backLeftPower     =  x + y - yaw;
+        double backRightPower    =  x - y + yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+        max = Math.max(max, Math.abs(backLeftPower));
+        max = Math.max(max, Math.abs(backRightPower));
+
+        if (max > 1.0) {
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
+        }
+
+        // Send powers to the wheels.
+        backLeftDrive.setPower(frontLeftPower);
+        backRightDrive.setPower(frontRightPower);
+        frontLeftDrive.setPower(backLeftPower);
+        frontRightDrive.setPower(backRightPower);
+    }
+
+    /**
+     * Initialize the AprilTag processor.
+     */
+    private void initAprilTag() {
+        // Create the AprilTag processor by using a builder.
+        aprilTag = new AprilTagProcessor.Builder().build();
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // e.g. Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+
+        // Create the vision portal by using a builder.
+        if (USE_WEBCAM) {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .addProcessor(aprilTag)
+                    .build();
+        } else {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessor(aprilTag)
+                    .build();
+        }
+    }
+
+    /*
+     Manually set the camera gain and exposure.
+     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
+    */
+    private void    setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
+
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
             telemetry.update();
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested())
+        {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
         }
     }
 }

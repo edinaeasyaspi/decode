@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
@@ -44,7 +45,9 @@ public class robot8034auto extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "MotorFive"),
                 hardwareMap.get(DcMotor.class, "MotorSix"),
                 hardwareMap.get(DcMotor.class, "MotorSeven"),
-                hardwareMap.get(DcMotor.class, "MotorEight")
+                hardwareMap.get(DcMotor.class, "MotorEight"),
+                hardwareMap.get(VoltageSensor.class, "Control Hub"),
+                telemetry
         );
         servoFour = hardwareMap.get(CRServo.class, "ServoFive");
         waitForStart();
