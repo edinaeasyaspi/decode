@@ -95,7 +95,7 @@ public class Robot8034 extends LinearOpMode {
     final double STRAFE_GAIN =  0.015;
     final double TURN_GAIN   =  0.01;
     final double MAX_AUTO_SPEED = 0;
-    final double MAX_AUTO_STRAFE= 0;
+    final double MAX_AUTO_STRAFE= 0.3;
     final double MAX_AUTO_TURN  = 0.3;
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
@@ -117,7 +117,6 @@ public class Robot8034 extends LinearOpMode {
     private CRServo out2;
 
     boolean slow = false;
-    boolean fast = false;
     boolean outshothigh = false;
     boolean itnull = true;
     boolean it1null = true;
@@ -130,7 +129,7 @@ public class Robot8034 extends LinearOpMode {
         double strafe = 0;
         double turn = 0;
         initAprilTag();
-
+        setManualExposure(6, 250);
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration st!bwas && gamepad1.bep on the DS or RC devices.
@@ -191,6 +190,7 @@ public class Robot8034 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             nodestart = System.nanoTime();
+            if (input.GetKeyDown(KeyCode.right)) targetFound = false;
             if (!gamepad1.dpad_right) {
                 input.Update();
 
@@ -237,14 +237,7 @@ public class Robot8034 extends LinearOpMode {
             backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
                 if (input.GetKeyDown(KeyCode.a)) {
-                    if (slow) {
-                        slow = false;
-                        fast = true;
-                    }
-                    if (fast) {
-                        slow = true;
-                        fast = false;
-                    }
+                    slow = !slow;
                 }
                 if (input.GetKeyDown(KeyCode.x)) {
                     servoOne.upDown();
@@ -320,21 +313,21 @@ public class Robot8034 extends LinearOpMode {
 
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
-                telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-                telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
-                telemetry.addData("Slow", "%s", slow ? "ON" : "OFF");
-                telemetry.addData("Fast", "%s", fast ? "ON" : "OFF");
-                telemetry.addData("ShootFast?", "%s", outshothigh ? "ON" : "OFF");
+//                telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
+//                telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
+//                telemetry.addData("Slow", "%s", slow ? "ON" : "OFF");
+                telemetry.addData("Movement Speed", "%s", slow ? "SLOW" : "FAST");
+                telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
                 telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
-                telemetry.addData("ShootPower", "%4.2f", IOsys.getMotpow3());
-                telemetry.addData("Speed:","%4.2f", IOsys.getMotpow3());
+                telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
+                telemetry.addData("ShotSpeed:","%4.2f", IOsys.getMotpow3());
+                telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
                 //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
                 //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
                 telemetry.update();
             } else {
-                targetFound = false;
                 desiredTag  = null;
-
+                if (!targetFound) {
                 // Step through the list of detected tags and look for a matching tag
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
                 for (AprilTagDetection detection : currentDetections) {
@@ -354,7 +347,7 @@ public class Robot8034 extends LinearOpMode {
                         // This tag is NOT in the library, so we don't have enough information to track to it.
                         telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
                     }
-                }
+                }}
 
                 // Tell the driver what we see, and what to do.
                 if (targetFound) {
@@ -386,7 +379,7 @@ public class Robot8034 extends LinearOpMode {
                     // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                     drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
                     strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-                    turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+                    turn   = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
                     telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
                 }
                 telemetry.update();
