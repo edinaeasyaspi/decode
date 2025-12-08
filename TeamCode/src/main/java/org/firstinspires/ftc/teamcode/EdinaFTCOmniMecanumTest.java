@@ -29,9 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-//import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-//import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-//import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * 3) Yaw: Rotating Clockwise and counter clockwise Right-joystick Right and
  * Left
  * <p>
- * This code is written assuming that the right-side motors need to be reversed
+ * This code is written assuming that the left-side motors need to be reversed
  * for the robot to drive forward.
  * When you first test your robot, if it moves backwards when you push the left
  * stick forward, then you must flip
@@ -67,26 +67,26 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name = "Omni/Mecacum Test", group = "test")
-@Disabled
+//@Disabled
 public class EdinaFTCOmniMecanumTest extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     boolean testMode = true;
     boolean motorForward = true;
     double power;
-//    GamepadEx gamePadEx;
+    GamepadEx gamePadEx;
 
     @Override
     public void runOpMode() {
-//        gamePadEx = new GamepadEx(gamepad1);
-//        ToggleButtonReader startToggle = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.START);
-//        ToggleButtonReader directionToggle = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.LEFT_BUMPER);
-//        // Initialize the hardware variables. Note that the strings used here must
+        gamePadEx = new GamepadEx(gamepad1);
+        ToggleButtonReader startToggle = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.START);
+        ToggleButtonReader directionToggle = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.LEFT_BUMPER);
+        // Initialize the hardware variables. Note that the strings used here must
         // correspond to the names assigned during the robot configuration step on
         // the DS or RC devices.
-        DcMotorEx leftFrontDrive = hardwareMap.get(DcMotorEx.class, "MotorOne");
-        DcMotorEx leftBackDrive = hardwareMap.get(DcMotorEx.class, "MotorTwo");
-        DcMotorEx rightFrontDrive = hardwareMap.get(DcMotorEx.class, "MotorThree");
-        DcMotorEx rightBackDrive = hardwareMap.get(DcMotorEx.class, "MotorFour");
+        DcMotorEx leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftfrontdrive");
+        DcMotorEx leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftbackdrive");
+        DcMotorEx rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightfrontdrive");
+        DcMotorEx rightBackDrive = hardwareMap.get(DcMotorEx.class, "riightbackdrive");
 
         // Most robots need the motors on one side to be reversed to drive forward.
         // When you first test your robot, push the left joystick forward
@@ -123,12 +123,12 @@ public class EdinaFTCOmniMecanumTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-//            startToggle.readValue();
-//            directionToggle.readValue();
+            startToggle.readValue();
+            directionToggle.readValue();
 //            // Start toggles test mode to use x, a, y and b to test each motor.
-//            testMode = startToggle.getState();
+            testMode = startToggle.getState();
 //            // Switch motor direction.
-//            motorForward = directionToggle.getState();
+            motorForward = directionToggle.getState();
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to
             // rotate.
