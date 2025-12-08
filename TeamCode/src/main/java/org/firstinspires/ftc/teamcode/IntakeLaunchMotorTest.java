@@ -12,7 +12,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Intake/Launch Motors Test", group = "test")
-public class LaunchMotorTest extends OpMode {
+public class IntakeLaunchMotorTest extends OpMode {
     MotorEx leftMotor = null;
     MotorEx rightMotor = null;
     MotorGroup motorGroup = null;
