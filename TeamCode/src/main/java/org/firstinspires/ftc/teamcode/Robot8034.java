@@ -32,19 +32,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
-import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -55,10 +51,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -127,12 +124,11 @@ public class Robot8034 extends LinearOpMode {
     boolean itnull = true;
     boolean it1null = true;
     long nodestart;
-    GamepadEx gamepadEx;
+    GamepadEx gamePadEx = new GamepadEx(gamepad1);
+    ToggleButtonReader aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
 
     @Override
     public void runOpMode() {
-        gamepadEx = new GamepadEx(gamepad1);
-
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
@@ -198,56 +194,15 @@ public class Robot8034 extends LinearOpMode {
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            aReader.readValue();
+
             nodestart = System.nanoTime();
-            if (input.GetKeyDown(KeyCode.right)) targetFound = false;
+//            if (gamepadEx.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) targetFound = false;
             if (!gamepad1.dpad_right) {
-                input.Update();
-
                 double max;
-                // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-                double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-                double lateral = gamepad1.left_stick_x;
-                double yaw = gamepad1.right_stick_x;
+                // Toggle slow mode
+                slow = aReader.getState();
 
-                // Combine the joystick requests for each axis-motion to determine each wheel's power.
-                // Set up a variable for each drive wheel to save the power level for telemetry.
-                double frontLeftPower = axial + lateral + yaw;
-                double frontRightPower = axial - lateral - yaw;
-                double backLeftPower = axial - lateral + yaw;
-                double backRightPower = axial + lateral - yaw;
-
-                // Normalize the values so no wheel power exceeds 100%
-                // This ensures that the robot maintains the desired motion.
-                max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
-                max = Math.max(max, Math.abs(backLeftPower));
-                max = Math.max(max, Math.abs(backRightPower));
-
-                if (max > 1.0) {
-                    frontLeftPower /= max;
-                    frontRightPower /= max;
-                    backLeftPower /= max;
-                    backRightPower /= max;
-                }
-
-                // This is test code:
-                //
-                // Uncomment the following code to test your motor directions.
-                // Each button should make the corresponding motor run FORWARD.
-                //   1) First get all the motors to take to correct positions on the robot
-                //      by adjusting your Robot Configuration if necessary.
-                //   2) Then make sure they run in the correct direction by modifying the
-                //      the setDirection() calls above.
-                // Once the correct motors move in the correct direction re-comment this code.
-
-            /*
-            frontLeftPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            backLeftPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            frontRightPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            backRightPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
-                if (input.GetKeyDown(KeyCode.a)) {
-                    slow = !slow;
-                }
                 if (input.GetKeyDown(KeyCode.x)) {
                     servoOne.upDown();
                 }
@@ -283,15 +238,9 @@ public class Robot8034 extends LinearOpMode {
                     intakepower1 = false;
                     it1null = false;
                 }
-                if (slow) {
-                    frontLeftPower /= 4;
-                    frontRightPower /= 4;
-                    backLeftPower /= 4;
-                    backRightPower /= 4;
-                }
 
                 // Send drive power to the wheels
-                mecanumDrive.driveRobotCentric(gamepadEx.getLeftX(), gamepadEx.getLeftY(), gamepadEx.getRightY());
+                mecanumDrive.driveRobotCentric(gamePadEx.getLeftX(), gamePadEx.getLeftY(), gamePadEx.getRightY());
 
                 if (!itnull) {
                     if (intakepower) {
@@ -320,17 +269,12 @@ public class Robot8034 extends LinearOpMode {
 
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
-//                telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-//                telemetry.addData("Back  left/Right", "%42f, %4.2f", backLeftPower, backRightPower);
-//                telemetry.addData("Slow", "%s", slow ? "ON" : "OFF");
                 telemetry.addData("Movement Speed", "%s", slow ? "SLOW" : "FAST");
                 telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
                 telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
                 telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
                 telemetry.addData("ShotSpeed:", "%4.2f", IOsys.getMotpow3());
                 telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
-                //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
-                //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
                 telemetry.update();
             } else {
                 desiredTag = null;
@@ -393,7 +337,7 @@ public class Robot8034 extends LinearOpMode {
                 telemetry.update();
 
                 // Apply desired axes motions to the drivetrain.
-                mecanumDrive.driveRobotCentric(gamepadEx.getLeftY(), gamepadEx.getLeftX(), gamepadEx.getRightY());
+                mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
                 sleep(10);
             }
         }
