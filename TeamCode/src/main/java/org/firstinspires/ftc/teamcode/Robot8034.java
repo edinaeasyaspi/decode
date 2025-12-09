@@ -53,6 +53,10 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -85,31 +89,33 @@ import java.util.concurrent.TimeUnit;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name="Robot8034")
+@TeleOp(name = "Robot8034")
 public class Robot8034 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     final double DESIRED_DISTANCE = 24.0;
-    final double SPEED_GAIN  =  0.02;
-    final double STRAFE_GAIN =  0.015;
-    final double TURN_GAIN   =  0.01;
+    final double SPEED_GAIN = 0.02;
+    final double STRAFE_GAIN = 0.015;
+    final double TURN_GAIN = 0.01;
     final double MAX_AUTO_SPEED = 0;
-    final double MAX_AUTO_STRAFE= 0.3;
-    final double MAX_AUTO_TURN  = 0.3;
+    final double MAX_AUTO_STRAFE = 0.3;
+    final double MAX_AUTO_TURN = 0.3;
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
-    private DcMotor frontLeftDrive;
-    private DcMotor backLeftDrive;
-    private DcMotor frontRightDrive;
-    private DcMotor backRightDrive;
+    private MotorEx frontLeftDrive;
+    private MotorEx backLeftDrive;
+    private MotorEx frontRightDrive;
+    private MotorEx backRightDrive;
+    private MecanumDrive mecanumDrive;
     private DcMotor Intake1;
     private DcMotor Intake2;
     private DcMotor Shoot1;
-    private DcMotor Shoot2;;
+    private DcMotor Shoot2;
+
     boolean intakepower = false;
     boolean intakepower1 = false;
 
@@ -121,9 +127,12 @@ public class Robot8034 extends LinearOpMode {
     boolean itnull = true;
     boolean it1null = true;
     long nodestart;
+    GamepadEx gamepadEx;
 
     @Override
     public void runOpMode() {
+        gamepadEx = new GamepadEx(gamepad1);
+
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
@@ -132,11 +141,15 @@ public class Robot8034 extends LinearOpMode {
         setManualExposure(6, 250);
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration st!bwas && gamepad1.bep on the DS or RC devices.
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "MotorOne");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "MotorTwo");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "MotorThree");
-        backRightDrive = hardwareMap.get(DcMotor.class, "MotorFour");
+        // to the names assigned during the robot configuration the DS.
+        frontLeftDrive = new MotorEx(hardwareMap, "leftIntake", Motor.GoBILDA.RPM_435);
+        backLeftDrive = new MotorEx(hardwareMap, "rightIntake", Motor.GoBILDA.RPM_435);
+        frontRightDrive = new MotorEx(hardwareMap, "leftLaunch", Motor.GoBILDA.RPM_435);
+        backRightDrive = new MotorEx(hardwareMap, "leftLaunch", Motor.GoBILDA.RPM_435);
+        frontLeftDrive.setInverted(true);
+        backLeftDrive.setInverted(true);
+        mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
+
         input = new Input(gamepad1);
         InOutSys IOsys = new InOutSys(
                 hardwareMap.get(DcMotor.class, "MotorFive"),
@@ -160,10 +173,6 @@ public class Robot8034 extends LinearOpMode {
         // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
         // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -175,7 +184,7 @@ public class Robot8034 extends LinearOpMode {
         // need to check these later
         ServoK servoOne = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
-                1.000,0.766);
+                1.000, 0.766);
         ServoK servoTwo = new ServoK(
                 hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
                 0.709, 0.486
@@ -281,11 +290,9 @@ public class Robot8034 extends LinearOpMode {
                     backRightPower /= 4;
                 }
 
-                // Send calculated power to wheels
-                frontLeftDrive.setPower(frontLeftPower);
-                frontRightDrive.setPower(frontRightPower);
-                backLeftDrive.setPower(backLeftPower);
-                backRightDrive.setPower(backRightPower);
+                // Send drive power to the wheels
+                mecanumDrive.driveRobotCentric(gamepadEx.getLeftX(), gamepadEx.getLeftY(), gamepadEx.getRightY());
+
                 if (!itnull) {
                     if (intakepower) {
                         IOsys.inon();
@@ -320,100 +327,76 @@ public class Robot8034 extends LinearOpMode {
                 telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
                 telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
                 telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
-                telemetry.addData("ShotSpeed:","%4.2f", IOsys.getMotpow3());
+                telemetry.addData("ShotSpeed:", "%4.2f", IOsys.getMotpow3());
                 telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
                 //telemetry.addData("color val" ,"%s", colorSensorOne.isGreen() ? "greeen" : "not green");
                 //telemetry.addData("color val" ,"%s", .isPurple() ? "purple" : "not purple");
                 telemetry.update();
             } else {
-                desiredTag  = null;
+                desiredTag = null;
                 if (!targetFound) {
-                // Step through the list of detected tags and look for a matching tag
-                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                for (AprilTagDetection detection : currentDetections) {
-                    // Look to see if we have size info on this tag.
-                    if (detection.metadata != null) {
-                        //  Check to see if we want to track towards this tag.
-                        if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-                            // Yes, we want to use this tag.
-                            targetFound = true;
-                            desiredTag = detection;
-                            break;  // don't look any further.
+                    // Step through the list of detected tags and look for a matching tag
+                    List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+                    for (AprilTagDetection detection : currentDetections) {
+                        // Look to see if we have size info on this tag.
+                        if (detection.metadata != null) {
+                            //  Check to see if we want to track towards this tag.
+                            if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                                // Yes, we want to use this tag.
+                                targetFound = true;
+                                desiredTag = detection;
+                                break;  // don't look any further.
+                            } else {
+                                // This tag is in the library, but we do not want to track it right now.
+                                telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                            }
                         } else {
-                            // This tag is in the library, but we do not want to track it right now.
-                            telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                            // This tag is NOT in the library, so we don't have enough information to track to it.
+                            telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
                         }
-                    } else {
-                        // This tag is NOT in the library, so we don't have enough information to track to it.
-                        telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
                     }
-                }}
+                }
 
                 // Tell the driver what we see, and what to do.
                 if (targetFound) {
-                    telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
+                    telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
                     telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                    telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-                    telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-                    telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+                    telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+                    telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+                    telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
                 } else {
-                    telemetry.addData("\n>","Drive using joysticks to find valid target\n");
+                    telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
                 }
 
                 // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
                 if (targetFound) {
 
                     // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                    double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                    double  headingError    = desiredTag.ftcPose.bearing;
-                    double  yawError        = desiredTag.ftcPose.yaw;
+                    double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                    double headingError = desiredTag.ftcPose.bearing;
+                    double yawError = desiredTag.ftcPose.yaw;
 
                     // Use the speed and turn "gains" to calculate how we want the robot to move.
-                    drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                    turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+                    drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                    turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
                     strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
-                    telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                    telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
                 } else {
 
                     // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                    drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
-                    strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-                    turn   = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
-                    telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                    drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
+                    strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
+                    turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
+                    telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
                 }
                 telemetry.update();
 
                 // Apply desired axes motions to the drivetrain.
-                moveRobot(drive, strafe, turn);
+                mecanumDrive.driveRobotCentric(gamepadEx.getLeftY(), gamepadEx.getLeftX(), gamepadEx.getRightY());
                 sleep(10);
             }
         }
-    }
-    public void moveRobot(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double frontLeftPower    =  x - y - yaw;
-        double frontRightPower   =  x + y + yaw;
-        double backLeftPower     =  x + y - yaw;
-        double backRightPower    =  x - y + yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
-        max = Math.max(max, Math.abs(backLeftPower));
-        max = Math.max(max, Math.abs(backRightPower));
-
-        if (max > 1.0) {
-            frontLeftPower /= max;
-            frontRightPower /= max;
-            backLeftPower /= max;
-            backRightPower /= max;
-        }
-
-        // Send powers to the wheels.
-        backLeftDrive.setPower(frontLeftPower);
-        backRightDrive.setPower(frontRightPower);
-        frontLeftDrive.setPower(backLeftPower);
-        frontRightDrive.setPower(backRightPower);
     }
 
     /**
@@ -450,7 +433,7 @@ public class Robot8034 extends LinearOpMode {
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
     */
-    private void    setManualExposure(int exposureMS, int gain) {
+    private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 
         if (visionPortal == null) {
@@ -469,14 +452,13 @@ public class Robot8034 extends LinearOpMode {
         }
 
         // Set camera controls unless we are stopping.
-        if (!isStopRequested())
-        {
+        if (!isStopRequested()) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
                 sleep(50);
             }
-            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
             sleep(20);
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
             gainControl.setGain(gain);
