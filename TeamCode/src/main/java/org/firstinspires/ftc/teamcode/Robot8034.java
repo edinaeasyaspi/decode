@@ -104,11 +104,13 @@ public class Robot8034 extends LinearOpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
+
     private MotorEx frontLeftDrive;
     private MotorEx backLeftDrive;
     private MotorEx frontRightDrive;
     private MotorEx backRightDrive;
     private MecanumDrive mecanumDrive;
+    private double SLOW_MODE_FACTOR = 0.4;
 
     private DcMotor Intake1;
     private DcMotor Intake2;
@@ -197,6 +199,7 @@ public class Robot8034 extends LinearOpMode {
             aReader.readValue();
 
             // Look for the Apriltag to get distance and heading to target.
+            // Only do this when the A button is held down.
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isLauncherReady = checkIsLauncherReady();
             }
@@ -216,6 +219,7 @@ public class Robot8034 extends LinearOpMode {
                 cellManager.execute(ArtifactCellManager.CELL.Right, rightCell);
             }
 
+            // Intake and Launch controls
             if (input.GetKeyDown(KeyCode.rt)) {
                 intakepower = true;
                 itnull = false;
@@ -225,27 +229,33 @@ public class Robot8034 extends LinearOpMode {
                 intakepower = false;
                 itnull = false;
             }
+
             if (input.GetKeyDown(KeyCode.up)) {
                 outshothigh = true;
                 intakepower1 = true;
                 it1null = false;
             }
+
             if (input.GetKeyDown(KeyCode.down)) {
                 outshothigh = false;
                 intakepower1 = true;
                 it1null = false;
             }
+
             if (input.GetKeyDown(KeyCode.lt)) {
                 intakepower1 = true;
                 it1null = false;
             }
+
             if (input.GetKeyDown(KeyCode.lb)) {
                 intakepower1 = false;
                 it1null = false;
             }
 
             // Send drive power to the wheels
-            mecanumDrive.driveRobotCentric(gamePadEx.getLeftX(), gamePadEx.getLeftY(), gamePadEx.getRightY());
+            mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
+                    isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
+                    isSlowMode ? gamePadEx.getRightY() * SLOW_MODE_FACTOR : gamePadEx.getRightY());
 
             if (!itnull) {
                 if (intakepower) {
