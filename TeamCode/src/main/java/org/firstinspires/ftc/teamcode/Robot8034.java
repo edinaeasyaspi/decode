@@ -172,17 +172,6 @@ public class Robot8034 extends LinearOpMode {
                 new double[]{1.000, 0.709, 0.746}
         );
 
-        ServoK servoOne = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellLef"),
-                1.000, 0.766);
-        ServoK servoTwo = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellCenter"),
-                0.709, 0.486
-        );
-        ServoK servoThree = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellRight"),
-                0.746, 0.78
-        );
         //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
@@ -215,16 +204,16 @@ public class Robot8034 extends LinearOpMode {
             // Toggle slow mode
             isSlowMode = aReader.getState();
 
-            if (input.GetKeyDown(KeyCode.x)) {
-                servoOne.upDown();
+            // Activate the appropriate cell servo
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
+                cellManager.execute(ArtifactCellManager.CELL.Left, leftCell);
             }
 
-            if (input.GetKeyDown(KeyCode.y)) {
-                servoTwo.upDown();
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
+                cellManager.execute(ArtifactCellManager.CELL.Center, centerCell);
             }
-
-            if (input.GetKeyDown(KeyCode.b)) {
-                servoThree.upDown();
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
+                cellManager.execute(ArtifactCellManager.CELL.Right, rightCell);
             }
 
             if (input.GetKeyDown(KeyCode.rt)) {
