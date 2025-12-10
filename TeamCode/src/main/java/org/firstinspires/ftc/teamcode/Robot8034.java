@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -48,13 +49,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -108,10 +109,16 @@ public class Robot8034 extends LinearOpMode {
     private MotorEx frontRightDrive;
     private MotorEx backRightDrive;
     private MecanumDrive mecanumDrive;
+
     private DcMotor Intake1;
     private DcMotor Intake2;
     private DcMotor Shoot1;
     private DcMotor Shoot2;
+
+    private ServoEx leftCell;
+    private ServoEx centerCell;
+    private ServoEx rightCell;
+    ArtifactCellManager cellManager;
 
     boolean intakepower = false;
     boolean intakepower1 = false;
@@ -119,11 +126,11 @@ public class Robot8034 extends LinearOpMode {
     private static Input input;
     private CRServo out2;
 
-    boolean slow = false;
+    boolean isSlowMode = false;
+    boolean isLauncherReady = false;
     boolean outshothigh = false;
     boolean itnull = true;
     boolean it1null = true;
-    long nodestart;
     GamepadEx gamePadEx = new GamepadEx(gamepad1);
     ToggleButtonReader aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
 
@@ -156,190 +163,135 @@ public class Robot8034 extends LinearOpMode {
                 telemetry
         );
 
-        out2 = hardwareMap.get(CRServo.class, "ServoFive");
-        //When we have the servo for intake:
-
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        // Wait for the game to start (driver presses START)
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        waitForStart();
-        runtime.reset();
-
-        //max means high min means low
         // need to check these later
+        leftCell = new ServoEx(hardwareMap, "cellLeft");
+        centerCell = new ServoEx(hardwareMap, "cellCenter");
+        rightCell = new ServoEx(hardwareMap, "cellRight");
+        cellManager = new ArtifactCellManager(
+                new double[]{0.766, 0.486, 0.78},
+                new double[]{1.000, 0.709, 0.746}
+        );
+
         ServoK servoOne = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellLef"),
                 1.000, 0.766);
         ServoK servoTwo = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellCenter"),
                 0.709, 0.486
         );
         ServoK servoThree = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellRight"),
                 0.746, 0.78
         );
         //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+        out2 = hardwareMap.get(CRServo.class, "ServoFive");
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.addLine("a: Toggle Slow Mode");
+        telemetry.addLine("x: Servo One Up/Down");
+        telemetry.addLine("y: Servo Two Up/Down");
+        telemetry.addLine("b: Servo Three Up/Down");
+        telemetry.addLine("Right Trigger: Intake On");
+        telemetry.addLine("Right Bumper: Intake Off");
+        telemetry.addLine("Left Trigger: Outtake On");
+        telemetry.addLine("Left Bumper: Outtake Off");
+        telemetry.update();
+
+        // Ready for start of OpMode
+        waitForStart();
+        runtime.reset();
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             aReader.readValue();
 
-            nodestart = System.nanoTime();
-//            if (gamepadEx.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) targetFound = false;
-            if (!gamepad1.dpad_right) {
-                double max;
-                // Toggle slow mode
-                slow = aReader.getState();
-
-                if (input.GetKeyDown(KeyCode.x)) {
-                    servoOne.upDown();
-                }
-                if (input.GetKeyDown(KeyCode.y)) {
-                    servoTwo.upDown();
-                }
-                if (input.GetKeyDown(KeyCode.b)) {
-                    servoThree.upDown();
-                }
-                if (input.GetKeyDown(KeyCode.rt)) {
-                    intakepower = true;
-                    itnull = false;
-                }
-                if (input.GetKeyDown(KeyCode.rb)) {
-                    intakepower = false;
-                    itnull = false;
-                }
-                if (input.GetKeyDown(KeyCode.up)) {
-                    outshothigh = true;
-                    intakepower1 = true;
-                    it1null = false;
-                }
-                if (input.GetKeyDown(KeyCode.down)) {
-                    outshothigh = false;
-                    intakepower1 = true;
-                    it1null = false;
-                }
-                if (input.GetKeyDown(KeyCode.lt)) {
-                    intakepower1 = true;
-                    it1null = false;
-                }
-                if (input.GetKeyDown(KeyCode.lb)) {
-                    intakepower1 = false;
-                    it1null = false;
-                }
-
-                // Send drive power to the wheels
-                mecanumDrive.driveRobotCentric(gamePadEx.getLeftX(), gamePadEx.getLeftY(), gamePadEx.getRightY());
-
-                if (!itnull) {
-                    if (intakepower) {
-                        IOsys.inon();
-                    } else {
-                        IOsys.inoff();
-                    }
-                    itnull = true;
-                }
-                if (!it1null) {
-                    if (intakepower1) {
-                        if (outshothigh) {
-                            IOsys.out1on();
-                            out2.setPower(-1);
-                        } else {
-                            IOsys.outon();
-                            out2.setPower(-1);
-                        }
-                        intakepower1 = false;
-                    } else {
-                        IOsys.outoff();
-                        out2.setPower(0);
-                    }
-                    it1null = true;
-                }
-
-                // Show the elapsed game time and wheel power.
-                telemetry.addData("Status", "Run Time: " + runtime.toString());
-                telemetry.addData("Movement Speed", "%s", slow ? "SLOW" : "FAST");
-                telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
-                telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
-                telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
-                telemetry.addData("ShotSpeed:", "%4.2f", IOsys.getMotpow3());
-                telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
-                telemetry.update();
-            } else {
-                desiredTag = null;
-                if (!targetFound) {
-                    // Step through the list of detected tags and look for a matching tag
-                    List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                    for (AprilTagDetection detection : currentDetections) {
-                        // Look to see if we have size info on this tag.
-                        if (detection.metadata != null) {
-                            //  Check to see if we want to track towards this tag.
-                            if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-                                // Yes, we want to use this tag.
-                                targetFound = true;
-                                desiredTag = detection;
-                                break;  // don't look any further.
-                            } else {
-                                // This tag is in the library, but we do not want to track it right now.
-                                telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                            }
-                        } else {
-                            // This tag is NOT in the library, so we don't have enough information to track to it.
-                            telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-                        }
-                    }
-                }
-
-                // Tell the driver what we see, and what to do.
-                if (targetFound) {
-                    telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
-                    telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                    telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-                    telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-                    telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
-                } else {
-                    telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
-                }
-
-                // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-                if (targetFound) {
-
-                    // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                    double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                    double headingError = desiredTag.ftcPose.bearing;
-                    double yawError = desiredTag.ftcPose.yaw;
-
-                    // Use the speed and turn "gains" to calculate how we want the robot to move.
-                    drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                    turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                    strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-                    telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-                } else {
-
-                    // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                    drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-                    strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
-                    turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
-                    telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-                }
-                telemetry.update();
-
-                // Apply desired axes motions to the drivetrain.
-                mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
-                sleep(10);
+            // Look for the Apriltag to get distance and heading to target.
+            if (gamePadEx.isDown(GamepadKeys.Button.A)) {
+                isLauncherReady = checkIsLauncherReady();
             }
+
+            // Toggle slow mode
+            isSlowMode = aReader.getState();
+
+            if (input.GetKeyDown(KeyCode.x)) {
+                servoOne.upDown();
+            }
+
+            if (input.GetKeyDown(KeyCode.y)) {
+                servoTwo.upDown();
+            }
+
+            if (input.GetKeyDown(KeyCode.b)) {
+                servoThree.upDown();
+            }
+
+            if (input.GetKeyDown(KeyCode.rt)) {
+                intakepower = true;
+                itnull = false;
+            }
+
+            if (input.GetKeyDown(KeyCode.rb)) {
+                intakepower = false;
+                itnull = false;
+            }
+            if (input.GetKeyDown(KeyCode.up)) {
+                outshothigh = true;
+                intakepower1 = true;
+                it1null = false;
+            }
+            if (input.GetKeyDown(KeyCode.down)) {
+                outshothigh = false;
+                intakepower1 = true;
+                it1null = false;
+            }
+            if (input.GetKeyDown(KeyCode.lt)) {
+                intakepower1 = true;
+                it1null = false;
+            }
+            if (input.GetKeyDown(KeyCode.lb)) {
+                intakepower1 = false;
+                it1null = false;
+            }
+
+            // Send drive power to the wheels
+            mecanumDrive.driveRobotCentric(gamePadEx.getLeftX(), gamePadEx.getLeftY(), gamePadEx.getRightY());
+
+            if (!itnull) {
+                if (intakepower) {
+                    IOsys.inon();
+                } else {
+                    IOsys.inoff();
+                }
+                itnull = true;
+            }
+            if (!it1null) {
+                if (intakepower1) {
+                    if (outshothigh) {
+                        IOsys.out1on();
+                        out2.setPower(-1);
+                    } else {
+                        IOsys.outon();
+                        out2.setPower(-1);
+                    }
+                    intakepower1 = false;
+                } else {
+                    IOsys.outoff();
+                    out2.setPower(0);
+                }
+                it1null = true;
+            }
+
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
+            telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
+            telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
+            telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
+            telemetry.addData("ShotSpeed:", "%4.2f", IOsys.getMotpow3());
+            telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
+            telemetry.update();
         }
     }
 
@@ -408,5 +360,75 @@ public class Robot8034 extends LinearOpMode {
             gainControl.setGain(gain);
             sleep(20);
         }
+    }
+
+    /**
+     * Check to see if the launcher should be activated.
+     *
+     * @return true if the launcher is ready.
+     */
+    private boolean checkIsLauncherReady() {
+        boolean targetFound = false;
+        desiredTag = null;
+        if (!targetFound) {
+            // Step through the list of detected tags and look for a matching tag
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on this tag.
+                if (detection.metadata != null) {
+                    //  Check to see if we want to track towards this tag.
+                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                        // Yes, we want to use this tag.
+                        targetFound = true;
+                        desiredTag = detection;
+                        break;  // don't look any further.
+                    } else {
+                        // This tag is in the library, but we do not want to track it right now.
+                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    }
+                } else {
+                    // This tag is NOT in the library, so we don't have enough information to track to it.
+                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                }
+            }
+        }
+
+        // Tell the driver what we see, and what to do.
+        if (targetFound) {
+            telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
+            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
+        } else {
+            telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
+        }
+
+        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
+        if (targetFound) {
+            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+            double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+            double headingError = desiredTag.ftcPose.bearing;
+            double yawError = desiredTag.ftcPose.yaw;
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+//            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+//            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+//            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+//            telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+        } else {
+            // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
+//            drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
+//            strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
+//            turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
+//            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+        }
+        telemetry.update();
+
+        // Apply desired axes motions to the drivetrain.
+        mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
+        sleep(10);
+        return true;
     }
 }
