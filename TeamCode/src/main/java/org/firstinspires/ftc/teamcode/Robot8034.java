@@ -126,6 +126,7 @@ public class Robot8034 extends LinearOpMode {
         backLeftDrive.setInverted(true);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
+        //TODO: Adjust motor types.
         leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
         rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
         leftIntakeMotor.setInverted(false);
@@ -134,8 +135,8 @@ public class Robot8034 extends LinearOpMode {
         rightIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
-        leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.RPM_435);
-        rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.RPM_435);
+        leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
+        rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
         leftLaunchMotor.setInverted(true);
         rightLaunchMotor.setInverted(false);
         leftLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
