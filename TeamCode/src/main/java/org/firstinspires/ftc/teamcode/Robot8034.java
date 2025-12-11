@@ -43,6 +43,8 @@ import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
+import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
+import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -114,8 +116,10 @@ public class Robot8034 extends LinearOpMode {
 
     private MotorEx leftIntakeMotor;
     private MotorEx rightIntakeMotor;
+    private IntakeManager intakeManager;
     private MotorEx leftLaunchMotor;
     private MotorEx rightLaunchMotor;
+    private LaunchManager launchManager;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
@@ -147,13 +151,21 @@ public class Robot8034 extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
-        frontLeftDrive = new MotorEx(hardwareMap, "leftIntake", Motor.GoBILDA.RPM_435);
-        backLeftDrive = new MotorEx(hardwareMap, "rightIntake", Motor.GoBILDA.RPM_435);
-        frontRightDrive = new MotorEx(hardwareMap, "leftLaunch", Motor.GoBILDA.RPM_435);
-        backRightDrive = new MotorEx(hardwareMap, "leftLaunch", Motor.GoBILDA.RPM_435);
+        frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_435);
+        backLeftDrive = new MotorEx(hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_435);
+        frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_435);
+        backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_435);
         frontLeftDrive.setInverted(true);
         backLeftDrive.setInverted(true);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
+
+        leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
+        rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
+        leftIntakeMotor.setInverted(false);
+        rightIntakeMotor.setInverted(true);
+        leftIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
+        rightIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
+        intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
         input = new Input(gamepad1);
         InOutSys IOsys = new InOutSys(
