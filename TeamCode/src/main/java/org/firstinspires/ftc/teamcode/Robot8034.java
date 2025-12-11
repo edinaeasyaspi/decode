@@ -129,18 +129,10 @@ public class Robot8034 extends LinearOpMode {
         //TODO: Adjust motor types.
         leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
         rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
-        leftIntakeMotor.setInverted(false);
-        rightIntakeMotor.setInverted(true);
-        leftIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
-        rightIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
         leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
         rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
-        leftLaunchMotor.setInverted(true);
-        rightLaunchMotor.setInverted(false);
-        leftLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
-        rightLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor);
 
         // Initialize the artifact cell servos and manager

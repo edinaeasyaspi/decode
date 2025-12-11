@@ -5,14 +5,20 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 public class LaunchManager {
     public LaunchManager(MotorEx leftlaunchMotor, MotorEx rightlaunchMotor) {
-        this.leftlaunchMotor = leftlaunchMotor;
-        this.rightlaunchMotor = rightlaunchMotor;
+        this.leftLaunchMotor = leftlaunchMotor;
+        this.rightLaunchMotor = rightlaunchMotor;
+        this.leftLaunchMotor.setInverted(true);
+        this.rightLaunchMotor.setInverted(false);
+
+        this.launchMotors = new MotorGroup(leftlaunchMotor, rightlaunchMotor);
+        this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);
     }
 
-    private MotorEx leftlaunchMotor;
-    private MotorEx rightlaunchMotor;
-    private MotorGroup launchMotors = new MotorGroup(leftlaunchMotor, rightlaunchMotor);
+    private MotorEx leftLaunchMotor;
+    private MotorEx rightLaunchMotor;
+    private MotorGroup launchMotors;
 
+    // Launch power allows a variable speed launch.
     public void launchOn(double launchPower) {
         launchMotors.set(launchPower);
     }
