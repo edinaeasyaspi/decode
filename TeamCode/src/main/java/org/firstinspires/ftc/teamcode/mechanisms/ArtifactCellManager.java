@@ -7,7 +7,7 @@ public class ArtifactCellManager {
     public enum CELL_STATE {
         Idle,
         Up,
-        Down;
+        Down
     }
 
     public CELL_STATE leftCellState = CELL_STATE.Idle;
@@ -26,13 +26,11 @@ public class ArtifactCellManager {
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
-    private double[] cellPositions = {0.0, 0.5, 1.0};
-    private double[] cellDownPositions = {0.2, 0.7, 1.0};
-    private double SERVO_UP_POSITION = 0.0;
-    private double SERVO_DOWN_POSITION = 1.0;
-    private double UP_WAIT_TIME = 0.5;
-    private double DOWN_WAIT_TIME = 0.5;
-    private ElapsedTime timer = new ElapsedTime();
+    private final double[] cellPositions;
+    private final double[] cellDownPositions;
+    private final double UP_WAIT_TIME = 0.5;
+    private final double DOWN_WAIT_TIME = 0.5;
+    private final ElapsedTime timer = new ElapsedTime();
 
     public void execute(CELL cell, ServoEx servo) {
         switch (cell) {
@@ -49,9 +47,12 @@ public class ArtifactCellManager {
     }
 
     private void processCell(CELL cell, CELL_STATE state, ServoEx servo) {
+        double servoUpPosition = cellPositions[cell.ordinal()];
+        double servoDownPosition = cellDownPositions[cell.ordinal()];
+
         switch (state) {
             case Idle:
-                servo.set(SERVO_UP_POSITION);
+                servo.set(servoUpPosition);
                 timer.reset();
                 state = CELL_STATE.Up;
                 break;
@@ -63,7 +64,7 @@ public class ArtifactCellManager {
                 break;
             case Down:
                 if (timer.seconds() > DOWN_WAIT_TIME) {
-                    servo.set(SERVO_DOWN_POSITION);
+                    servo.set(servoDownPosition);
                     state = CELL_STATE.Idle;
                     break;
                 }
