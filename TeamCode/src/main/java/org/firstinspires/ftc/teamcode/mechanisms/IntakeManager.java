@@ -14,10 +14,10 @@ public class IntakeManager {
         intakeMotors.setRunMode(Motor.RunMode.VelocityControl);
     }
 
-    private MotorEx leftIntakeMotor;
-    private MotorEx rightIntakeMotor;
-    private MotorGroup intakeMotors;
-    private double INTAKE_ON_POWER = 0.8;
+    private final MotorEx leftIntakeMotor;
+    private final MotorEx rightIntakeMotor;
+    private final MotorGroup intakeMotors;
+    private final double INTAKE_ON_POWER = 0.8;
 
     public void intakeOn() {
         intakeMotors.set(INTAKE_ON_POWER);
