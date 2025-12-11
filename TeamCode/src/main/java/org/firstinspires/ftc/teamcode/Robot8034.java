@@ -55,6 +55,7 @@ import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
+import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
@@ -95,12 +96,6 @@ public class Robot8034 extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     final double DESIRED_DISTANCE = 24.0;
-    final double SPEED_GAIN = 0.02;
-    final double STRAFE_GAIN = 0.015;
-    final double TURN_GAIN = 0.01;
-    final double MAX_AUTO_SPEED = 0;
-    final double MAX_AUTO_STRAFE = 0.3;
-    final double MAX_AUTO_TURN = 0.3;
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
     private VisionPortal visionPortal;
@@ -126,19 +121,15 @@ public class Robot8034 extends LinearOpMode {
     private ServoEx rightCell;
     ArtifactCellManager cellManager;
 
-    boolean intakepower = false;
-    boolean intakepower1 = false;
-
-    private static Input input;
     private CRServo out2;
 
     boolean isSlowMode = false;
     boolean isLauncherReady = false;
-    boolean outshothigh = false;
-    boolean itnull = true;
-    boolean it1null = true;
+
     GamepadEx gamePadEx = new GamepadEx(gamepad1);
     ToggleButtonReader aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
+    TriggerReader leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
+    TriggerReader rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
     @Override
     public void runOpMode() {
@@ -175,20 +166,12 @@ public class Robot8034 extends LinearOpMode {
         rightLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor);
 
-        input = new Input(gamepad1);
-        InOutSys IOsys = new InOutSys(
-                hardwareMap.get(DcMotor.class, "MotorFive"),
-                hardwareMap.get(DcMotor.class, "MotorSix"),
-                hardwareMap.get(DcMotor.class, "MotorSeven"),
-                hardwareMap.get(DcMotor.class, "MotorEight"),
-                hardwareMap.get(VoltageSensor.class, "Control Hub"),
-                telemetry
-        );
-
-        // need to check these later
+        // Initialize the artifact cell servos and manager
         leftCell = new ServoEx(hardwareMap, "cellLeft");
         centerCell = new ServoEx(hardwareMap, "cellCenter");
         rightCell = new ServoEx(hardwareMap, "cellRight");
+        //TODO: Adjust positions as needed
+        // Maybe move these to constants in ArtifactCellManager
         cellManager = new ArtifactCellManager(
                 new double[]{0.766, 0.486, 0.78},
                 new double[]{1.000, 0.709, 0.746}
@@ -197,17 +180,18 @@ public class Robot8034 extends LinearOpMode {
         //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+        //TODO: What does this servo do?
         out2 = hardwareMap.get(CRServo.class, "ServoFive");
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
-        telemetry.addLine("x: Servo One Up/Down");
-        telemetry.addLine("y: Servo Two Up/Down");
-        telemetry.addLine("b: Servo Three Up/Down");
+        telemetry.addLine("x: Open left cell");
+        telemetry.addLine("y: Open center cell");
+        telemetry.addLine("b: Open right cell");
         telemetry.addLine("Right Trigger: Intake On");
         telemetry.addLine("Right Bumper: Intake Off");
-        telemetry.addLine("Left Trigger: Outtake On");
-        telemetry.addLine("Left Bumper: Outtake Off");
+        telemetry.addLine("Left Trigger: Launch On");
+        telemetry.addLine("Left Bumper: Launch Off");
         telemetry.update();
 
         // Ready for start of OpMode
@@ -216,7 +200,8 @@ public class Robot8034 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            aReader.readValue();
+            // Read gamepad inputs
+            gamePadEx.readButtons();
 
             // Look for the Apriltag to get distance and heading to target.
             // Only do this when the A button is held down.
@@ -240,76 +225,44 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Intake and Launch controls
-            if (input.GetKeyDown(KeyCode.rt)) {
-                intakepower = true;
-                itnull = false;
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                intakeManager.intakeOn();
             }
 
-            if (input.GetKeyDown(KeyCode.rb)) {
-                intakepower = false;
-                itnull = false;
+            if (rightTriggerReader.wasJustReleased()) {
+                intakeManager.intakeOff();
             }
 
-            if (input.GetKeyDown(KeyCode.up)) {
-                outshothigh = true;
-                intakepower1 = true;
-                it1null = false;
+            // Launch controls
+            //TODO: Adjust launch power as needed, maybe make a constant
+            if (gamePadEx.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                launchManager.launchOn(0.85);
             }
 
-            if (input.GetKeyDown(KeyCode.down)) {
-                outshothigh = false;
-                intakepower1 = true;
-                it1null = false;
+            if (leftTriggerReader.wasJustReleased()) {
+                launchManager.launchOff();
             }
+//TODO: Implement 2 position shooting?
+/**            if (input.GetKeyDown(KeyCode.up)) {
+ outshothigh = true;
+ intakepower1 = true;
+ it1null = false;
+ }
 
-            if (input.GetKeyDown(KeyCode.lt)) {
-                intakepower1 = true;
-                it1null = false;
-            }
-
-            if (input.GetKeyDown(KeyCode.lb)) {
-                intakepower1 = false;
-                it1null = false;
-            }
-
+ if (input.GetKeyDown(KeyCode.down)) {
+ outshothigh = false;
+ intakepower1 = true;
+ it1null = false;
+ }
+ */
             // Send drive power to the wheels
             mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                     isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
                     isSlowMode ? gamePadEx.getRightY() * SLOW_MODE_FACTOR : gamePadEx.getRightY());
 
-            if (!itnull) {
-                if (intakepower) {
-                    IOsys.inon();
-                } else {
-                    IOsys.inoff();
-                }
-                itnull = true;
-            }
-            if (!it1null) {
-                if (intakepower1) {
-                    if (outshothigh) {
-                        IOsys.out1on();
-                        out2.setPower(-1);
-                    } else {
-                        IOsys.outon();
-                        out2.setPower(-1);
-                    }
-                    intakepower1 = false;
-                } else {
-                    IOsys.outoff();
-                    out2.setPower(0);
-                }
-                it1null = true;
-            }
-
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry.addData("Shoot Long", "%s", outshothigh ? "ON" : "OFF");
-            telemetry.addData("Intake", "%s", intakepower ? "ON" : "OFF");
-            telemetry.addData("ShotPower", "%4.2f", IOsys.getMotpow3());
-            telemetry.addData("ShotSpeed:", "%4.2f", IOsys.getMotpow3());
-            telemetry.addData("ShotMod", "%4.2f", IOsys.getMod());
             telemetry.update();
         }
     }
