@@ -112,10 +112,10 @@ public class Robot8034 extends LinearOpMode {
     private MecanumDrive mecanumDrive;
     private double SLOW_MODE_FACTOR = 0.4;
 
-    private DcMotor Intake1;
-    private DcMotor Intake2;
-    private DcMotor Shoot1;
-    private DcMotor Shoot2;
+    private MotorEx leftIntakeMotor;
+    private MotorEx rightIntakeMotor;
+    private MotorEx leftLaunchMotor;
+    private MotorEx rightLaunchMotor;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
