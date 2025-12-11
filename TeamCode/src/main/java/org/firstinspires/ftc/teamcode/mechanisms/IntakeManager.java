@@ -4,7 +4,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 public class IntakeManager {
-   public IntakeManager(MotorEx leftIntakeMotor, MotorEx rightIntakeMotor) {
+    public IntakeManager(MotorEx leftIntakeMotor, MotorEx rightIntakeMotor) {
         this.leftIntakeMotor = leftIntakeMotor;
         this.rightIntakeMotor = rightIntakeMotor;
     }
@@ -16,9 +16,9 @@ public class IntakeManager {
 
     public void intakeOn() {
         intakeMotors.set(INTAKE_ON_POWER);
-   }
+    }
 
-   public void intakeOff(){
+    public void intakeOff() {
         intakeMotors.set(0);
-   }
+    }
 }

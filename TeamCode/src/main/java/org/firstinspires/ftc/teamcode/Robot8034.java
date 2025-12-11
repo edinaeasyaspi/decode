@@ -167,6 +167,14 @@ public class Robot8034 extends LinearOpMode {
         rightIntakeMotor.setRunMode(Motor.RunMode.VelocityControl);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
+        leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.RPM_435);
+        rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.RPM_435);
+        leftLaunchMotor.setInverted(true);
+        rightLaunchMotor.setInverted(false);
+        leftLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
+        rightLaunchMotor.setRunMode(Motor.RunMode.VelocityControl);
+        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor);
+
         input = new Input(gamepad1);
         InOutSys IOsys = new InOutSys(
                 hardwareMap.get(DcMotor.class, "MotorFive"),
