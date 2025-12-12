@@ -150,7 +150,6 @@ public class Robot8034 extends LinearOpMode {
         //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
         //TODO: What does this servo do?
-        out2 = hardwareMap.get(CRServo.class, "ServoFive");
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
