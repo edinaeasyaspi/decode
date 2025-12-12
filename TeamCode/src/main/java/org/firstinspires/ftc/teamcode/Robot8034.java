@@ -91,6 +91,9 @@ public class Robot8034 extends LinearOpMode {
     private MotorEx leftLaunchMotor;
     private MotorEx rightLaunchMotor;
     private LaunchManager launchManager;
+    private boolean SHOOT_FAR = false;
+    private final double SHORT_SHOT = 0.41;
+    private final double LONG_SHOT = 0.45;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
@@ -204,7 +207,19 @@ public class Robot8034 extends LinearOpMode {
             // Launch controls
             //TODO: Adjust launch power as needed, maybe make a constant
             if (gamePadEx.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                launchManager.launchOn(0.85);
+                //Depending on where we are trying to shoot from
+                if (SHOOT_FAR) {
+                    launchManager.launchOn(LONG_SHOT);
+                } else {
+                    launchManager.launchOn(SHORT_SHOT);
+                }
+            }
+
+            //Distance toggles
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
+                SHOOT_FAR = true;
+            } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
+                SHOOT_FAR = false;
             }
 
             if (leftTriggerReader.wasJustReleased()) {
