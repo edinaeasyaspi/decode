@@ -165,7 +165,6 @@ public class Robot8034 extends LinearOpMode {
 
 
         //TODO: What does this servo do?
-        out2 = hardwareMap.get(CRServo.class, "ServoFive");
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
