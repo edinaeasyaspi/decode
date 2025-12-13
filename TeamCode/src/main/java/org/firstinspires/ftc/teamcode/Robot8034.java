@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -42,6 +43,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.teamcode.inputsys.Input;
 import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
+import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
@@ -92,6 +94,8 @@ public class Robot8034 extends LinearOpMode {
     private MotorEx rightLaunchMotor;
     private LaunchManager launchManager;
     private boolean SHOOT_FAR = false;
+
+    //TODO: Adjust shot variables as needed
     private final double SHORT_SHOT = 0.41;
     private final double LONG_SHOT = 0.45;
 
@@ -99,6 +103,9 @@ public class Robot8034 extends LinearOpMode {
     private ServoEx centerCell;
     private ServoEx rightCell;
     ArtifactCellManager cellManager;
+    public ColorSensor colorSensorOne;
+    public ColorSensor colorSensorTwo;
+    public ColorSensor colorSensorThree;
 
     private CRServo out2;
 
@@ -142,16 +149,21 @@ public class Robot8034 extends LinearOpMode {
         leftCell = new ServoEx(hardwareMap, "cellLeft");
         centerCell = new ServoEx(hardwareMap, "cellCenter");
         rightCell = new ServoEx(hardwareMap, "cellRight");
+        colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
+        colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
+        colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+
         //TODO: Adjust positions as needed
         // Maybe move these to constants in ArtifactCellManager
         cellManager = new ArtifactCellManager(
                 new double[]{0.766, 0.486, 0.78},
-                new double[]{1.000, 0.709, 0.746}
+                new double[]{1.000, 0.709, 0.746},
+                colorSensorOne,
+                colorSensorTwo,
+                colorSensorThree
         );
 
-        //ColorSensor colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
-        //ColorSensor colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
-        //ColorSensor colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+
         //TODO: What does this servo do?
         out2 = hardwareMap.get(CRServo.class, "ServoFive");
 
@@ -174,6 +186,9 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
+
+            // Check color sensors
+            cellManager.checkColors();
 
             // Look for the Apriltag to get distance and heading to target.
             // Only do this when the A button is held down.
@@ -206,7 +221,6 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Launch controls
-            //TODO: Adjust launch power as needed, maybe make a constant
             if (gamePadEx.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 //Depending on where we are trying to shoot from
                 if (SHOOT_FAR) {
@@ -226,19 +240,6 @@ public class Robot8034 extends LinearOpMode {
             if (leftTriggerReader.wasJustReleased()) {
                 launchManager.launchOff();
             }
-//TODO: Implement 2 position shooting?
-/**            if (input.GetKeyDown(KeyCode.up)) {
- outshothigh = true;
- intakepower1 = true;
- it1null = false;
- }
-
- if (input.GetKeyDown(KeyCode.down)) {
- outshothigh = false;
- intakepower1 = true;
- it1null = false;
- }
-*/
             // Send drive power to the wheels
             mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                     isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
