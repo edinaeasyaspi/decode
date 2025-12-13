@@ -21,7 +21,7 @@ public class IntakeManager {
 
     public void intakeOn() {
         leftIntakeMotor.set(1);
-        rightIntakeMotor.set(0.75);
+        rightIntakeMotor.set(1);
     }
 
     public void intakeOff() {

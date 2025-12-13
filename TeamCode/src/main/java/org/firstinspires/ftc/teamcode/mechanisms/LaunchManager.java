@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
+import java.util.List;
+
 public class LaunchManager {
     public LaunchManager(MotorEx leftLaunchMotor, MotorEx rightLaunchMotor, CRServo launchServo) {
         this.leftLaunchMotor = leftLaunchMotor;
@@ -19,7 +21,7 @@ public class LaunchManager {
     private final CRServo launchServo;
     private final MotorEx leftLaunchMotor;
     private final MotorEx rightLaunchMotor;
-    private final MotorGroup launchMotors;
+    public final MotorGroup launchMotors;
 
     // Launch power allows a variable speed launch.
     public void launchOn(double launchPower) {

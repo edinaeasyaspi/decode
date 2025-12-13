@@ -96,8 +96,8 @@ public class Robot8034 extends LinearOpMode {
     private boolean SHOOT_FAR = false;
 
     //TODO: Adjust shot variables as needed
-    private final double LONG_SHOT = 0.45;
     private final double SHORT_SHOT = 0.20;
+    private final double LONG_SHOT = 0.25;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
@@ -200,14 +200,11 @@ public class Robot8034 extends LinearOpMode {
             cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
 
-            // Look for the Apriltag to get distance and heading to target.
-            // Only do this when the A button is held down.
+            // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
-                isLauncherReady = checkIsLauncherReady();
+                isSlowMode = !isSlowMode;
             }
 
-            // Toggle slow mode
-            isSlowMode = aReader.getState();
 
             // Activate the appropriate cell servo
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
@@ -226,18 +223,16 @@ public class Robot8034 extends LinearOpMode {
                 intakeManager.intakeOn();
             }
 
-            if (rightTriggerReader.wasJustReleased()) {
-                intakeManager.intakeOff();
-            }
-
             // Launch controls
-            if (gamePadEx.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            if (rightTriggerReader.isDown()) { //You have to hold it down
                 //Depending on where we are trying to shoot from
                 if (SHOOT_FAR) {
                     launchManager.launchOn(LONG_SHOT);
                 } else {
                     launchManager.launchOn(SHORT_SHOT);
                 }
+            } else {
+                launchManager.launchOff();
             }
 
             //Distance toggles
@@ -245,10 +240,6 @@ public class Robot8034 extends LinearOpMode {
                 SHOOT_FAR = true;
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
-            }
-
-            if (leftTriggerReader.wasJustReleased()) {
-                launchManager.launchOff();
             }
             // Send drive power to the wheels
             mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
@@ -259,6 +250,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
+            telemetry.addData("Velocities", launchManager.launchMotors.getVelocities());
             telemetry.update();
         }
     }
