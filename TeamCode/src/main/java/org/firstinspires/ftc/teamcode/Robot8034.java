@@ -31,8 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -107,7 +107,7 @@ public class Robot8034 extends LinearOpMode {
     public ColorSensor colorSensorTwo;
     public ColorSensor colorSensorThree;
 
-    private CRServo out2;
+    private CRServo launchServo;
 
     boolean isSlowMode = false;
     boolean isLauncherReady = false;
@@ -143,7 +143,8 @@ public class Robot8034 extends LinearOpMode {
 
         leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
         rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
-        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor);
+        launchServo = hardwareMap.get(CRServo.class, "launchservo");
+        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
         // Initialize the artifact cell servos and manager
         leftCell = new ServoEx(hardwareMap, "cellLeft");
