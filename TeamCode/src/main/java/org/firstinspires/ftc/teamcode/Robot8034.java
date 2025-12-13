@@ -112,10 +112,10 @@ public class Robot8034 extends LinearOpMode {
     boolean isSlowMode = false;
     boolean isLauncherReady = false;
 
-    GamepadEx gamePadEx = new GamepadEx(gamepad1);
-    ToggleButtonReader aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
-    TriggerReader leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
-    TriggerReader rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
+    GamepadEx gamePadEx;
+    ToggleButtonReader aReader;
+    TriggerReader leftTriggerReader;
+    TriggerReader rightTriggerReader;
 
     @Override
     public void runOpMode() {
@@ -126,6 +126,12 @@ public class Robot8034 extends LinearOpMode {
         initAprilTag();
         setManualExposure(6, 250);
 
+        //Define gamepad
+        gamePadEx = new GamepadEx(gamepad1);
+        aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
+        leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
+        rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
+
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
         frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_435);
@@ -134,6 +140,8 @@ public class Robot8034 extends LinearOpMode {
         backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_435);
         frontLeftDrive.setInverted(true);
         backLeftDrive.setInverted(true);
+        frontRightDrive.setInverted(true);
+        backRightDrive.setInverted(true);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
         //TODO: Adjust motor types.
@@ -157,8 +165,8 @@ public class Robot8034 extends LinearOpMode {
         //TODO: Adjust positions as needed
         // Maybe move these to constants in ArtifactCellManager
         cellManager = new ArtifactCellManager(
-                new double[]{0.766, 0.486, 0.78},
-                new double[]{1.000, 0.709, 0.746},
+                new double[]{0.766, 0.486, 0.78},//ups
+                new double[]{1.000, 0.709, 0.746},//downs
                 colorSensorOne,
                 colorSensorTwo,
                 colorSensorThree
@@ -187,8 +195,10 @@ public class Robot8034 extends LinearOpMode {
             // Read gamepad inputs
             gamePadEx.readButtons();
 
-            // Check color sensors
+            // Check color sensors and passive effects
             cellManager.checkColors();
+            cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
+
 
             // Look for the Apriltag to get distance and heading to target.
             // Only do this when the A button is held down.
@@ -243,11 +253,12 @@ public class Robot8034 extends LinearOpMode {
             // Send drive power to the wheels
             mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                     isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
-                    isSlowMode ? gamePadEx.getRightY() * SLOW_MODE_FACTOR : gamePadEx.getRightY());
+                    isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
+            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
             telemetry.update();
         }
     }

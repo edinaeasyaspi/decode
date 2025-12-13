@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 /*
  * This OpMode scans a single servo back and forward until Stop is pressed.
@@ -49,15 +50,12 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 @TeleOp(name = "ServoTesting")
-@Disabled
+//@Disabled
 public class ServoTesting extends LinearOpMode {
     static final double INCREMENT   = 0.001;
-    static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  1.00;     // Maximum rotational position
-    static final double MIN_POS     =  0.00;     // Minimum rotational position
 
     // Define class members
-    Servo   servo;
+    ServoEx   servo;
     double  position = 0; // Start at halfway position
     boolean rampUp = true;
 
@@ -67,10 +65,24 @@ public class ServoTesting extends LinearOpMode {
 
         // Connect to servo (Assume Robot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        servo = hardwareMap.get(Servo.class, "ServoOne");
-        position = servo.getPosition();
+        while (true) {
+            if (gamepad1.a) {
+                servo = new ServoEx(hardwareMap, "cellLeft");
+                break;
+            } else if (gamepad1.b) {
+                servo = new ServoEx(hardwareMap, "cellCenter");
+                break;
+            } else if (gamepad1.y) {
+                servo = new ServoEx(hardwareMap, "cellRight");
+                break;
+            }
+            telemetry.addLine("A: for left, B: for center, Y: for right");
+            telemetry.update();
+            sleep(100);
+        }
+        position = servo.get();
         // Wait for the start button
-        telemetry.addData(">", "Press Start to scan Servo." );
+        telemetry.addData(">", "LOADED!" );
         telemetry.update();
         waitForStart();
         // Scan servo till stop pressed.
@@ -97,8 +109,8 @@ public class ServoTesting extends LinearOpMode {
             telemetry.update();
 
             // Set the servo to the new position and pause;
-            servo.setPosition(position);
-            position = servo.getPosition();
+            servo.set(position);
+            position = servo.get();
             sleep(100);
             idle();
         }

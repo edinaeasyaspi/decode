@@ -8,9 +8,9 @@ public class LaunchManager {
     public LaunchManager(MotorEx leftLaunchMotor, MotorEx rightLaunchMotor, CRServo launchServo) {
         this.leftLaunchMotor = leftLaunchMotor;
         this.rightLaunchMotor = rightLaunchMotor;
-        this.leftLaunchMotor.setInverted(true);
-        this.rightLaunchMotor.setInverted(false);
         this.launchServo = launchServo;
+        this.leftLaunchMotor.setInverted(false);
+        this.rightLaunchMotor.setInverted(true);
 
         this.launchMotors = new MotorGroup(leftLaunchMotor, rightLaunchMotor);
         this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);

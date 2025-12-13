@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
@@ -83,19 +84,19 @@ public class EdinaFTCOmniMecanumTest extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must
         // correspond to the names assigned during the robot configuration step on
         // the DS or RC devices.
-        DcMotorEx leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftfrontdrive");
-        DcMotorEx leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftbackdrive");
-        DcMotorEx rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightfrontdrive");
-        DcMotorEx rightBackDrive = hardwareMap.get(DcMotorEx.class, "riightbackdrive");
+        DcMotorEx leftFrontDrive = hardwareMap.get(DcMotorEx.class, "frontleftdrive");
+        DcMotorEx leftBackDrive = hardwareMap.get(DcMotorEx.class, "backleftdrive");
+        DcMotorEx rightFrontDrive = hardwareMap.get(DcMotorEx.class, "frontrightdrive");
+        DcMotorEx rightBackDrive = hardwareMap.get(DcMotorEx.class, "backrightdrive");
 
         // Most robots need the motors on one side to be reversed to drive forward.
         // When you first test your robot, push the left joystick forward
         // and flip the direction ( FORWARD <-> REVERSE ) of any wheel that runs
         // backwards
-        leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
         leftFrontDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);

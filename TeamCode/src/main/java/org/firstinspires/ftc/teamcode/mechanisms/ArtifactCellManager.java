@@ -20,9 +20,9 @@ public class ArtifactCellManager {
     public CELL_STATE centerCellState = CELL_STATE.Idle;
     public CELL_STATE rightCellState = CELL_STATE.Idle;
     //Color sensor
-    public CELL_COLOR rightCellColor = CELL_COLOR.None;
-    public CELL_COLOR centerCellColor = CELL_COLOR.None;
-    public CELL_COLOR leftCellColor = CELL_COLOR.None;
+    public static CELL_COLOR rightCellColor = CELL_COLOR.None;
+    public static CELL_COLOR centerCellColor = CELL_COLOR.None;
+    public static CELL_COLOR leftCellColor = CELL_COLOR.None;
     public ColorSensor leftColorSensor;
     public ColorSensor centerColorSensor;
     public ColorSensor rightColorSensor;
@@ -46,8 +46,8 @@ public class ArtifactCellManager {
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
     private final double[] cellPositions;
     private final double[] cellDownPositions;
-    private final double UP_WAIT_TIME = 0.5;
-    private final double DOWN_WAIT_TIME = 0.5;
+    private final double UP_WAIT_TIME = 0.1;
+    private final double DOWN_WAIT_TIME = 0.1;
     private final ElapsedTime timer = new ElapsedTime();
 
     public void execute(CELL cell, ServoEx servo) {
@@ -81,6 +81,23 @@ public class ArtifactCellManager {
         rightCellColor = checkColor(rightColorSensor);
     }
 
+    public static String colorToString(CELL_COLOR cellColor) {
+        if (cellColor == CELL_COLOR.Green) {
+            return "G";
+        } else if (cellColor == CELL_COLOR.Purple) {
+            return "P";
+        } else {
+            return "N";
+        }
+    }
+    public static String colors() {
+        String end;
+        end = colorToString(leftCellColor);
+        end += colorToString(centerCellColor);
+        end += colorToString(rightCellColor);
+        return end;
+    }
+
     private void processCell(CELL cell, CELL_STATE state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
         double servoDownPosition = cellDownPositions[cell.ordinal()];
@@ -92,10 +109,8 @@ public class ArtifactCellManager {
                 state = CELL_STATE.Up;
                 break;
             case Up:
-                if (timer.seconds() > UP_WAIT_TIME) {
-                    timer.reset();
-                    state = CELL_STATE.Down;
-                }
+                timer.reset();
+                state = CELL_STATE.Down;
                 break;
             case Down:
                 if (timer.seconds() > DOWN_WAIT_TIME) {
@@ -117,5 +132,37 @@ public class ArtifactCellManager {
                 rightCellState = state;
                 break;
         }
+    }
+    private void passiveCell(CELL cell, CELL_STATE state, ServoEx servo) {
+        double servoUpPosition = cellPositions[cell.ordinal()];
+        double servoDownPosition = cellDownPositions[cell.ordinal()];
+
+        switch (state) {
+            case Up:
+                timer.reset();
+                state = CELL_STATE.Down;
+                break;
+            case Down:
+                    servo.set(servoDownPosition);
+                    state = CELL_STATE.Idle;
+                    break;
+            default:
+        }
+        switch (cell) {
+            case Left:
+                leftCellState = state;
+                break;
+            case Center:
+                centerCellState = state;
+                break;
+            case Right:
+                rightCellState = state;
+                break;
+        }
+    }
+    public void passiveProccessAll(ServoEx servoOne, ServoEx servoTwo, ServoEx servoThree) {
+        passiveCell(CELL.Left,leftCellState,servoOne);
+        passiveCell(CELL.Center,rightCellState,servoTwo);
+        passiveCell(CELL.Right,rightCellState,servoThree);
     }
 }

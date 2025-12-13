@@ -20,7 +20,8 @@ public class IntakeManager {
     private final double INTAKE_ON_POWER = 0.8;
 
     public void intakeOn() {
-        intakeMotors.set(INTAKE_ON_POWER);
+        leftIntakeMotor.set(1);
+        rightIntakeMotor.set(0.75);
     }
 
     public void intakeOff() {
