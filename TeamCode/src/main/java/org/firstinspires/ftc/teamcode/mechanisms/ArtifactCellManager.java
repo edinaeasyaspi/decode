@@ -181,6 +181,7 @@ public class ArtifactCellManager {
         }
     }
 
+    //TODO: Is this needed?
     public void passiveProccessAll(ServoEx servoOne, ServoEx servoTwo, ServoEx servoThree) {
         passiveCell(CELL.Left, leftCellState, servoOne);
         passiveCell(CELL.Center, rightCellState, servoTwo);

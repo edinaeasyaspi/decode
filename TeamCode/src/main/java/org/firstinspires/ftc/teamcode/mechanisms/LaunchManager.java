@@ -8,19 +8,15 @@ import java.util.List;
 
 public class LaunchManager {
     public LaunchManager(MotorEx leftLaunchMotor, MotorEx rightLaunchMotor, CRServo launchServo) {
-        this.leftLaunchMotor = leftLaunchMotor;
-        this.rightLaunchMotor = rightLaunchMotor;
         this.launchServo = launchServo;
-        this.leftLaunchMotor.setInverted(false);
-        this.rightLaunchMotor.setInverted(true);
+        leftLaunchMotor.setInverted(false);
+        rightLaunchMotor.setInverted(true);
 
         this.launchMotors = new MotorGroup(leftLaunchMotor, rightLaunchMotor);
         this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);
     }
 
     private final CRServo launchServo;
-    private final MotorEx leftLaunchMotor;
-    private final MotorEx rightLaunchMotor;
     public final MotorGroup launchMotors;
 
     // Launch power allows a variable speed launch.

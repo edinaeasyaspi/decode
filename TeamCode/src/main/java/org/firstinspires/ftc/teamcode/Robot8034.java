@@ -70,7 +70,6 @@ import java.util.concurrent.TimeUnit;
  */
 @TeleOp(name = "Robot8034")
 public class Robot8034 extends LinearOpMode {
-
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     final double DESIRED_DISTANCE = 24.0;
@@ -110,7 +109,6 @@ public class Robot8034 extends LinearOpMode {
     private CRServo launchServo;
 
     boolean isSlowMode = false;
-    boolean isLauncherReady = false;
 
     GamepadEx gamePadEx;
     ToggleButtonReader aReader;
@@ -203,16 +201,15 @@ public class Robot8034 extends LinearOpMode {
             // Check all cell states
             cellManager.execute();
 
+            //TODO: Is the color providing any benefit?
             // Check color sensors and passive effects
             cellManager.checkColors();
             cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
-
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isSlowMode = !isSlowMode;
             }
-
 
             // Activate the appropriate cell servo
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
@@ -250,6 +247,7 @@ public class Robot8034 extends LinearOpMode {
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
             }
+
             // Send drive power to the wheels
             mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                     isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
@@ -259,7 +257,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
-            telemetry.addData("Velocities", launchManager.launchMotors.getVelocities());
+            telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
+            telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.update();
         }
     }
