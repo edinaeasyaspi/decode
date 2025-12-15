@@ -126,7 +126,7 @@ public class Robot8034 extends LinearOpMode {
         initAprilTag();
         setManualExposure(6, 250);
 
-        //Define gamepad
+        //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
         aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
@@ -144,20 +144,23 @@ public class Robot8034 extends LinearOpMode {
         backRightDrive.setInverted(true);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
-        //TODO: Adjust motor types.
+        //TODO: device name consistency (the motor string start with front/back).
         leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
         rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
+        //TODO: device name consistency (the motor string start with front/back).
         leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
         rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
         launchServo = hardwareMap.get(CRServo.class, "launchservo");
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
         // Initialize the artifact cell servos and manager
+        //TODO: device name consistency (the motor string start with front/back).
         leftCell = new ServoEx(hardwareMap, "cellLeft");
         centerCell = new ServoEx(hardwareMap, "cellCenter");
         rightCell = new ServoEx(hardwareMap, "cellRight");
+        //TODO: device name consistency (the motor string start with front/back).
         colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
@@ -169,7 +172,10 @@ public class Robot8034 extends LinearOpMode {
                 new double[]{1.000, 0.709, 0.746},//downs
                 colorSensorOne,
                 colorSensorTwo,
-                colorSensorThree
+                colorSensorThree,
+                leftCell,
+                centerCell,
+                rightCell
         );
 
 
@@ -194,6 +200,8 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
+            // Check all cell states
+            cellManager.execute();
 
             // Check color sensors and passive effects
             cellManager.checkColors();
@@ -208,14 +216,15 @@ public class Robot8034 extends LinearOpMode {
 
             // Activate the appropriate cell servo
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
-                cellManager.execute(ArtifactCellManager.CELL.Left, leftCell);
+                cellManager.openCell(ArtifactCellManager.CELL.Left);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
-                cellManager.execute(ArtifactCellManager.CELL.Center, centerCell);
+                cellManager.openCell(ArtifactCellManager.CELL.Center);
             }
+
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
-                cellManager.execute(ArtifactCellManager.CELL.Right, rightCell);
+                cellManager.openCell(ArtifactCellManager.CELL.Right);
             }
 
             // Intake and Launch controls
