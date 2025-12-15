@@ -229,6 +229,10 @@ public class Robot8034 extends LinearOpMode {
                 intakeManager.intakeOn();
             }
 
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                intakeManager.intakeOff();
+            }
+
             // Launch controls
             if (rightTriggerReader.isDown()) { //You have to hold it down
                 //Depending on where we are trying to shoot from
