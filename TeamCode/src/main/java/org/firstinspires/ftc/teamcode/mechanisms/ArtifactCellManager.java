@@ -21,7 +21,7 @@ public class ArtifactCellManager {
 
     public CELL_STATE leftCellState = CELL_STATE.Idle;
     public CELL_STATE centerCellState = CELL_STATE.Idle;
-    public CELL_STATE rightCellState = CELL_STATE.Idle;
+    public static CELL_STATE rightCellState = CELL_STATE.Idle;
     // Servos for cells
     private ServoEx leftCellServo;
     private ServoEx centerCellServo;
@@ -44,6 +44,10 @@ public class ArtifactCellManager {
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
         this.rightColorSensor = csThree;
+        //def servos
+        this.leftCellServo = leftServo;
+        this.centerCellServo = centerServo;
+        this.rightCellServo = rightServo;
     }
 
     public enum CELL {
@@ -57,13 +61,8 @@ public class ArtifactCellManager {
     private final double[] cellDownPositions;
     private final double UP_WAIT_TIME = 0.1;
     private final double DOWN_WAIT_TIME = 0.1;
-    private final ElapsedTime timer = new ElapsedTime();
+    public static final ElapsedTime timer = new ElapsedTime();
 
-    public void execute() {
-        leftCellState = processCell(CELL.Left, leftCellState, leftCellServo);
-        centerCellState = processCell(CELL.Center, centerCellState, centerCellServo);
-        rightCellState = processCell(CELL.Right, rightCellState, rightCellServo);
-    }
 
     // Opens the specified cell with designated wait times
     public void openCell(CELL cell) {
@@ -116,55 +115,39 @@ public class ArtifactCellManager {
         return end;
     }
 
-    // Processes the state of a cell and updates its servo position accordingly
-    private CELL_STATE processCell(CELL cell, CELL_STATE state, ServoEx servo) {
-        double servoUpPosition = cellPositions[cell.ordinal()];
-        double servoDownPosition = cellDownPositions[cell.ordinal()];
-
-        switch (state) {
-            case Idle:
-                break;
-            case MovingToUp:
-                servo.set(servoUpPosition);
-                timer.reset();
-                state = CELL_STATE.Up;
-                break;
-            case Up:
-                if (timer.seconds() > UP_WAIT_TIME) {
-                    timer.reset();
-                    state = CELL_STATE.MovingToDown;
-                    break;
-                }
-                break;
-            case MovingToDown:
-                servo.set(servoDownPosition);
-                timer.reset();
-                state = CELL_STATE.Down;
-                break;
-            case Down:
-                if (timer.seconds() > DOWN_WAIT_TIME) {
-                    servo.set(servoDownPosition);
-                    state = CELL_STATE.Idle;
-                    break;
-                }
-            default:
+    private void directSwitch(CELL cell, CELL_STATE state) {
+        switch (cell) {
+            case Left:
+                leftCellState = state;
+            case Center:
+                centerCellState = state;
+            case Right:
+                rightCellState = state;
         }
-
-        return state;
     }
-
     private void passiveCell(CELL cell, CELL_STATE state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
         double servoDownPosition = cellDownPositions[cell.ordinal()];
 
         switch (state) {
-            case Up:
+            case MovingToUp:
+                servo.set(servoUpPosition);
                 timer.reset();
-                state = CELL_STATE.Down;
+                directSwitch(cell, CELL_STATE.Up);
                 break;
+            case Up:
+                if (timer.seconds() > 1) {
+                    directSwitch(cell, CELL_STATE.MovingToDown);
+                    servo.set(servoDownPosition);
+                    timer.reset();
+                    break;
+                }
+            case MovingToDown:
+                if (timer.seconds() > 5) {
+                    directSwitch(cell, CELL_STATE.Down);
+                }
             case Down:
-                servo.set(servoDownPosition);
-                state = CELL_STATE.Idle;
+                directSwitch(cell, CELL_STATE.Idle);
                 break;
             default:
         }

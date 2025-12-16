@@ -198,8 +198,6 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
-            // Check all cell states
-            cellManager.execute();
 
             //TODO: Is the color providing any benefit?
             // Check color sensors and passive effects
@@ -263,6 +261,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
+            telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
+            telemetry.addData("Status", ArtifactCellManager.rightCellState);
             telemetry.update();
         }
     }
