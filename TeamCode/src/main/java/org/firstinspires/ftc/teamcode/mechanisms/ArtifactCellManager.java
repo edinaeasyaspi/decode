@@ -55,7 +55,7 @@ public class ArtifactCellManager {
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
     private final double[] cellPositions;
     private final double[] cellDownPositions;
-    private final double UP_WAIT_TIME = 0.1;
+    private final double UP_WAIT_TIME = 0.4;
     private final double DOWN_WAIT_TIME = 0.1;
     public static final ElapsedTime timer = new ElapsedTime();
 

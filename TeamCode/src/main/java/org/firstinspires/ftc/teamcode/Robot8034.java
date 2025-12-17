@@ -166,7 +166,7 @@ public class Robot8034 extends LinearOpMode {
         //TODO: Adjust positions as needed
         // Maybe move these to constants in ArtifactCellManager
         cellManager = new ArtifactCellManager(
-                new double[]{0.766, 0.486, 0.78},//ups
+                new double[]{0.786, 0.486, 0.78},//ups
                 new double[]{1.000, 0.709, 0.746},//downs
                 colorSensorOne,
                 colorSensorTwo,
@@ -199,10 +199,9 @@ public class Robot8034 extends LinearOpMode {
             // Read gamepad inputs
             gamePadEx.readButtons();
 
-            //TODO: Is the color providing any benefit?
-            // Check color sensors and passive effects
-//            cellManager.checkColors();
-//            cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
+//          No real reason to check the color sensors, just that we can say we ahve the code
+//          cellManager.checkColors();
+//          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
             //launch
             if (SHOOT_FAR) {
