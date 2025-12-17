@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -12,31 +13,25 @@ import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 
+/// **
+/*
+ * This is NOT an opmode.
+ * This class can be used to define all the specific hardware for a single robot.
+ * Only gamepad need to live in opmodes that require user input.
+ */
 public class RobotHardware {
     /* Declare OpMode members. */
     private OpMode myOpMode = null;   // gain access to methods in the calling OpMode.
-    private MotorEx frontLeftDrive;
-    private MotorEx backLeftDrive;
-    private MotorEx frontRightDrive;
-    private MotorEx backRightDrive;
+    // Servo positions for each cell, [0] = left, [1] = center, [2] = right
+    private final double[] cellPositions = new double[]{0.786, 0.486, 0.78}; //ups
+    private final double[] cellDownPositions = new double[]{1.000, 0.709, 0.746}; //downs
     public MecanumDrive mecanumDrive;
-    private MotorEx leftIntakeMotor;
-    private MotorEx rightIntakeMotor;
     public IntakeManager intakeManager;
-
-    private MotorEx leftLaunchMotor;
-    private MotorEx rightLaunchMotor;
     public LaunchManager launchManager;
-    private CRServo launchServo;
-
-    private ServoEx leftCell;
-    private ServoEx centerCell;
-    private ServoEx rightCell;
     public ArtifactCellManager cellManager;
-
-    public ColorSensor colorSensorOne;
-    public ColorSensor colorSensorTwo;
-    public ColorSensor colorSensorThree;
+    public ColorSensor leftColorSensor;
+    public ColorSensor centerCOlorSensor;
+    public ColorSensor rightColorSensor;
 
     public RobotHardware(OpMode opmode) {
         myOpMode = opmode;
@@ -46,35 +41,39 @@ public class RobotHardware {
         //TODO: Adjust motor types. Verify the motor type for each motor.
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
-        frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
-        backLeftDrive = new MotorEx(myOpMode.hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
-        frontRightDrive = new MotorEx(myOpMode.hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
-        backRightDrive = new MotorEx(myOpMode.hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
+        MotorEx frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
+        MotorEx backLeftDrive = new MotorEx(myOpMode.hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
+        MotorEx frontRightDrive = new MotorEx(myOpMode.hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
+        MotorEx backRightDrive = new MotorEx(myOpMode.hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
         frontLeftDrive.setInverted(true);
         backLeftDrive.setInverted(true);
         frontRightDrive.setInverted(true);
         backRightDrive.setInverted(true);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
-        leftIntakeMotor = new MotorEx(myOpMode.hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
-        rightIntakeMotor = new MotorEx(myOpMode.hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
+        MotorEx leftIntakeMotor = new MotorEx(myOpMode.hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
+        MotorEx rightIntakeMotor = new MotorEx(myOpMode.hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
-        leftLaunchMotor = new MotorEx(myOpMode.hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
-        rightLaunchMotor = new MotorEx(myOpMode.hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
-        launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
+        MotorEx leftLaunchMotor = new MotorEx(myOpMode.hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
+        MotorEx rightLaunchMotor = new MotorEx(myOpMode.hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
+        CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
+        leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor"));
+        centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "centerColorSensor"));
+        rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor"));
+
         // Initialize the artifact cell servos and manager
-        leftCell = new ServoEx(myOpMode.hardwareMap, "cellLeft");
-        centerCell = new ServoEx(myOpMode.hardwareMap, "cellCenter");
-        rightCell = new ServoEx(myOpMode.hardwareMap, "cellRight");
+        ServoEx leftCell = new ServoEx(myOpMode.hardwareMap, "cellLeft");
+        ServoEx centerCell = new ServoEx(myOpMode.hardwareMap, "cellCenter");
+        ServoEx rightCell = new ServoEx(myOpMode.hardwareMap, "cellRight");
         cellManager = new ArtifactCellManager(
-                new double[]{0.786, 0.486, 0.78},//ups
-                new double[]{1.000, 0.709, 0.746},//downs
-                colorSensorOne,
-                colorSensorTwo,
-                colorSensorThree,
+                cellPositions, //ups
+                cellDownPositions, //downs
+                leftColorSensor,
+                centerCOlorSensor,
+                rightColorSensor,
                 leftCell,
                 centerCell,
                 rightCell

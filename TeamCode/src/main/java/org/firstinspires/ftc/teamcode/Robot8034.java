@@ -177,9 +177,6 @@ public class Robot8034 extends LinearOpMode {
                 rightCell
         );
 
-
-        //TODO: What does this servo do?
-
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
         telemetry.addLine("x: Open left cell");
