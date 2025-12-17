@@ -132,10 +132,10 @@ public class Robot8034 extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
-        frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_435);
-        backLeftDrive = new MotorEx(hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_435);
-        frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_435);
-        backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_435);
+        frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
+        backLeftDrive = new MotorEx(hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
+        frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
+        backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
         frontLeftDrive.setInverted(true);
         backLeftDrive.setInverted(true);
         frontRightDrive.setInverted(true);
@@ -143,8 +143,8 @@ public class Robot8034 extends LinearOpMode {
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
         //TODO: device name consistency (the motor string start with front/back).
-        leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
-        rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
+        leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_312);
+        rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.BARE);
         intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
 
         //TODO: device name consistency (the motor string start with front/back).
@@ -186,8 +186,8 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("b: Open right cell");
         telemetry.addLine("Right Trigger: Intake On");
         telemetry.addLine("Right Bumper: Intake Off");
-        telemetry.addLine("Left Trigger: Launch On");
-        telemetry.addLine("Left Bumper: Launch Off");
+        telemetry.addLine("D-Pad Up: Long shot");
+        telemetry.addLine("D-Pad Down: Short shot");
         telemetry.update();
 
         // Ready for start of OpMode
@@ -201,8 +201,16 @@ public class Robot8034 extends LinearOpMode {
 
             //TODO: Is the color providing any benefit?
             // Check color sensors and passive effects
-            cellManager.checkColors();
-            cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
+//            cellManager.checkColors();
+//            cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
+
+            //launch
+            if (SHOOT_FAR) {
+                launchManager.launchOn(LONG_SHOT);
+            } else {
+                launchManager.launchOn(SHORT_SHOT);
+            }
+
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -223,24 +231,12 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Intake and Launch controls
-            if (gamePadEx.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+            if (rightTriggerReader.wasJustReleased()) {
                 intakeManager.intakeOn();
             }
 
-            if (gamePadEx.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
                 intakeManager.intakeOff();
-            }
-
-            // Launch controls
-            if (rightTriggerReader.isDown()) { //You have to hold it down
-                //Depending on where we are trying to shoot from
-                if (SHOOT_FAR) {
-                    launchManager.launchOn(LONG_SHOT);
-                } else {
-                    launchManager.launchOn(SHORT_SHOT);
-                }
-            } else {
-                launchManager.launchOff();
             }
 
             //Distance toggles
@@ -262,7 +258,6 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
-            telemetry.addData("Status", ArtifactCellManager.rightCellState);
             telemetry.update();
         }
     }
