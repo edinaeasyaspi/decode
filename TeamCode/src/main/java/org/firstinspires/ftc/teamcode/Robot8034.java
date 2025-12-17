@@ -121,8 +121,9 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-        initAprilTag();
-        setManualExposure(6, 250);
+        //TODO: Un-comment this when it is time to implement auto-aiming
+//        initAprilTag();
+//        setManualExposure(6, 250);
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
@@ -198,6 +199,8 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
+            // Update the cell manager
+            cellManager.execute();
 
 //          No real reason to check the color sensors, just that we can say we ahve the code
 //          cellManager.checkColors();
@@ -209,7 +212,6 @@ public class Robot8034 extends LinearOpMode {
             } else {
                 launchManager.launchOn(SHORT_SHOT);
             }
-
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {

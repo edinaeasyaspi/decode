@@ -23,9 +23,9 @@ public class ArtifactCellManager {
     public CELL_STATE centerCellState = CELL_STATE.Idle;
     public CELL_STATE rightCellState = CELL_STATE.Idle;
     // Servos for cells
-    private ServoEx leftCellServo;
-    private ServoEx centerCellServo;
-    private ServoEx rightCellServo;
+    private final ServoEx leftCellServo;
+    private final ServoEx centerCellServo;
+    private final ServoEx rightCellServo;
 
     //Color sensor
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
@@ -40,6 +40,9 @@ public class ArtifactCellManager {
                                ServoEx leftServo, ServoEx centerServo, ServoEx rightServo) {
         this.cellPositions = cellPositions;
         this.cellDownPositions = cellDownPositions;
+        this.leftCellServo = leftServo;
+        this.centerCellServo = centerServo;
+        this.rightCellServo = rightServo;
         //Put in sensors
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
@@ -153,6 +156,7 @@ public class ArtifactCellManager {
         return state;
     }
 
+    //TODO: This should probably be removed
     private void passiveCell(CELL cell, CELL_STATE state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
         double servoDownPosition = cellDownPositions[cell.ordinal()];
@@ -181,7 +185,7 @@ public class ArtifactCellManager {
         }
     }
 
-    //TODO: Is this needed?
+    //TODO: This should probably be removed
     public void passiveProccessAll(ServoEx servoOne, ServoEx servoTwo, ServoEx servoThree) {
         passiveCell(CELL.Left, leftCellState, servoOne);
         passiveCell(CELL.Center, rightCellState, servoTwo);
