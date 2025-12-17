@@ -231,7 +231,7 @@ public class Robot8034 extends LinearOpMode {
                 cellManager.openCell(ArtifactCellManager.CELL.Right);
             }
 
-            // Intake and Launch controls
+            // Intake controls
             if (rightTriggerReader.wasJustReleased()) {
                 intakeManager.intakeOn();
             }
@@ -255,7 +255,7 @@ public class Robot8034 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
+//            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
