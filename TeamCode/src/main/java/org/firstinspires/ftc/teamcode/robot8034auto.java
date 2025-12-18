@@ -57,10 +57,10 @@ public class robot8034auto extends LinearOpMode {
         double turn = 0;
         initAprilTag();
         setManualExposure(6, 250);
-        fl = hardwareMap.get(DcMotor.class, "MotorOne");
-        bl = hardwareMap.get(DcMotor.class, "MotorTwo");
-        fr = hardwareMap.get(DcMotor.class, "MotorThree");
-        br = hardwareMap.get(DcMotor.class, "MotorFour");
+        fl = hardwareMap.get(DcMotor.class, "frontleftdrive");
+        bl = hardwareMap.get(DcMotor.class, "backleftdrive");
+        fr = hardwareMap.get(DcMotor.class, "frontrightdrive");
+        br = hardwareMap.get(DcMotor.class, "backrightdrive");
         frontLeftDrive = bl;
         backLeftDrive = fl;
         frontRightDrive = br;
@@ -70,23 +70,23 @@ public class robot8034auto extends LinearOpMode {
         fr.setDirection(DcMotor.Direction.FORWARD);
         br.setDirection(DcMotor.Direction.FORWARD);
         servoOne = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellLeft"),
                 1.000,0.766);
         servoTwo = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellCenter"),
                 0.709, 0.486);
         servoThree = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellRight"),
                 0.746, 0.78);
         IOsys = new InOutSys(
-                hardwareMap.get(DcMotor.class, "MotorFive"),
-                hardwareMap.get(DcMotor.class, "MotorSix"),
-                hardwareMap.get(DcMotor.class, "MotorSeven"),
-                hardwareMap.get(DcMotor.class, "MotorEight"),
+                hardwareMap.get(DcMotor.class, "leftintakemotor"),
+                hardwareMap.get(DcMotor.class, "rightintakemotor"),
+                hardwareMap.get(DcMotor.class, "leftlaunchmotor"),
+                hardwareMap.get(DcMotor.class, "rightlaunchmotor"),
                 hardwareMap.get(VoltageSensor.class, "Control Hub"),
                 telemetry
         );
-        servoFour = hardwareMap.get(CRServo.class, "ServoFive");
+        servoFour = hardwareMap.get(CRServo.class, "launchservo");
         waitForStart();
         forward(1);
         sleep(700);
