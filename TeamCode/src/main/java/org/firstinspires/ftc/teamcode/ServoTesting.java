@@ -49,14 +49,14 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "ServoTesting")
+@TeleOp(name = "ServoTesting", group = "Test")
 //@Disabled
 public class ServoTesting extends LinearOpMode {
-    static final double INCREMENT   = 0.001;
+    static final double INCREMENT = 0.001;
 
     // Define class members
-    ServoEx   servo;
-    double  position = 0; // Start at halfway position
+    ServoEx servo;
+    double position = 0; // Start at halfway position
     boolean rampUp = true;
 
 
@@ -82,30 +82,30 @@ public class ServoTesting extends LinearOpMode {
         }
         position = servo.get();
         // Wait for the start button
-        telemetry.addData(">", "LOADED!" );
+        telemetry.addData(">", "LOADED!");
         telemetry.update();
         waitForStart();
         // Scan servo till stop pressed.
-        while(opModeIsActive()){
+        while (opModeIsActive()) {
 
             // slew the servo, according to the rampUp (direction) variable.
             if (gamepad1.a) {
                 // Keep stepping up until we hit the max value.
-                position += INCREMENT ;
+                position += INCREMENT;
             }
             if (gamepad1.b) {
                 // Keep stepping down until we hit the min value.
-                position -= INCREMENT ;
+                position -= INCREMENT;
             }
 
-            if(gamepad1.x)
+            if (gamepad1.x)
                 position = 1;
             else if (gamepad1.y)
                 position = 0;
 
             // Display the current value
             telemetry.addData("Servo Position", "%f", position);
-            telemetry.addData(">", "Press Stop to end test." );
+            telemetry.addData(">", "Press Stop to end test.");
             telemetry.update();
 
             // Set the servo to the new position and pause;

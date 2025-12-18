@@ -21,7 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="BasicMotor")
+@Autonomous(name="BasicMotor", group="Autonomous")
 public class robot8034auto extends LinearOpMode {
     final double DESIRED_DISTANCE = 24.0;
     final double SPEED_GAIN  =  0.02;

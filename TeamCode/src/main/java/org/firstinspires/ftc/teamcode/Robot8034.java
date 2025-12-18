@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
 /*
  * This OpMode is the main teleOp for Decode.
  */
-@TeleOp(name = "Robot8034")
+@TeleOp(name = "Robot8034", group = "TeleOp")
 public class Robot8034 extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
