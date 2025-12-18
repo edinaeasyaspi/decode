@@ -81,18 +81,10 @@ public class Robot8034 extends LinearOpMode {
 
     private RobotHardware robot = new RobotHardware(this);
 
-    private MotorEx frontLeftDrive;
-    private MotorEx backLeftDrive;
-    private MotorEx frontRightDrive;
-    private MotorEx backRightDrive;
     private MecanumDrive mecanumDrive;
     private double SLOW_MODE_FACTOR = 0.4;
 
-    private MotorEx leftIntakeMotor;
-    private MotorEx rightIntakeMotor;
     private IntakeManager intakeManager;
-    private MotorEx leftLaunchMotor;
-    private MotorEx rightLaunchMotor;
     private LaunchManager launchManager;
     private boolean SHOOT_FAR = false;
 
@@ -100,15 +92,7 @@ public class Robot8034 extends LinearOpMode {
     private final double SHORT_SHOT = 0.20;
     private final double LONG_SHOT = 0.25;
 
-    private ServoEx leftCell;
-    private ServoEx centerCell;
-    private ServoEx rightCell;
     ArtifactCellManager cellManager;
-    public ColorSensor colorSensorOne;
-    public ColorSensor colorSensorTwo;
-    public ColorSensor colorSensorThree;
-
-    private CRServo launchServo;
 
     boolean isSlowMode = false;
 
@@ -133,54 +117,9 @@ public class Robot8034 extends LinearOpMode {
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration the DS.
-//        frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
-//        backLeftDrive = new MotorEx(hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
-//        frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
-//        backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
-//        frontLeftDrive.setInverted(true);
-//        backLeftDrive.setInverted(true);
-//        frontRightDrive.setInverted(true);
-//        backRightDrive.setInverted(true);
-//        mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
         mecanumDrive = robot.mecanumDrive;
-
-        //TODO: device name consistency (the motor string start with front/back).
-//        leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_312);
-//        rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.BARE);
-//        intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
         intakeManager = robot.intakeManager;
-
-        //TODO: device name consistency (the motor string start with front/back).
-//        leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
-//        rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
-//        launchServo = hardwareMap.get(CRServo.class, "launchservo");
-//        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
         launchManager = robot.launchManager;
-
-        // Initialize the artifact cell servos and manager
-        //TODO: device name consistency (the motor string start with front/back).
-//        leftCell = new ServoEx(hardwareMap, "cellLeft");
-//        centerCell = new ServoEx(hardwareMap, "cellCenter");
-//        rightCell = new ServoEx(hardwareMap, "cellRight");
-//        //TODO: device name consistency (the motor string start with front/back).
-//        colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
-//        colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
-//        colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
-//
-//        //TODO: Adjust positions as needed
-//        // Maybe move these to constants in ArtifactCellManager
-//        cellManager = new ArtifactCellManager(
-//                new double[]{0.786, 0.486, 0.78},//ups
-//                new double[]{1.000, 0.709, 0.746},//downs
-//                colorSensorOne,
-//                colorSensorTwo,
-//                colorSensorThree,
-//                leftCell,
-//                centerCell,
-//                rightCell
-//        );
         cellManager = robot.cellManager;
 
         telemetry.addData("Status", "Initialized");
