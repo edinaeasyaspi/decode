@@ -333,9 +333,11 @@ public class Robot8034 extends LinearOpMode {
 
                     if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
                         aligned = true;
+                    } else {
+                        //TODO: Make sure the directions are correct
+                        mecanumDrive.driveRobotCentric(0, rangeError, bearingError);
                     }
-                    //TODO: Make sure the directions are correct
-                    mecanumDrive.driveRobotCentric(0, rangeError, bearingError);
+
                     break; // No need to check further tags
                 }
             }
