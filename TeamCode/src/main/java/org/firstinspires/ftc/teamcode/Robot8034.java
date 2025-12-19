@@ -115,7 +115,7 @@ public class Robot8034 extends LinearOpMode {
 
     //TODO: Adjust shot variables as needed
     private final double SHORT_SHOT = 0.20;
-    private final double LONG_SHOT = 0.25;
+    private final double LONG_SHOT = 0.24;
 
     ArtifactCellManager cellManager;
 
