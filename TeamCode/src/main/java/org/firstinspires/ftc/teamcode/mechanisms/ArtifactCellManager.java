@@ -44,6 +44,10 @@ public class ArtifactCellManager {
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
         this.rightColorSensor = csThree;
+        //Define servos
+        this.leftCellServo = leftServo;
+        this.centerCellServo = centerServo;
+        this.rightCellServo = rightServo;
     }
 
     public enum CELL {
