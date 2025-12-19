@@ -224,15 +224,17 @@ public class Robot8034 extends LinearOpMode {
                 isAprilTagAligned();
             }
 
-            // Send drive power to the wheels
-            mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
-                    isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
-                    isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
+            // Send drive power to the wheels when not Auto-aligning.
+            //TODO: Verify this behavior with drivers.
+            if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
+                mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
+                        isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
+                        isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-//            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
@@ -337,8 +339,9 @@ public class Robot8034 extends LinearOpMode {
                     if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
                         aligned = true;
                     } else {
-                        //TODO: Make sure the directions are correct
-                        mecanumDrive.driveRobotCentric(0, rangeError, bearingError);
+                        //TODO: Make sure the directions are correct.
+                        // The parameters are set to only center. You may want to add range control as well.
+                        mecanumDrive.driveRobotCentric(0, 0, bearingError);
                     }
 
                     break; // No need to check further tags
