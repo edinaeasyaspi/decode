@@ -128,6 +128,8 @@ public class Robot8034 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Initialize the robot hardware
+        robot.init();
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
