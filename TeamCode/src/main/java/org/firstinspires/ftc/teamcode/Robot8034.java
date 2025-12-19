@@ -202,7 +202,6 @@ public class Robot8034 extends LinearOpMode {
             // Update the cell manager
             cellManager.execute();
 
-            ArtifactCellManager.execute();
 
 //          No real reason to check the color sensors, just that we can say we ahve the code
 //          cellManager.checkColors();
