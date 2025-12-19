@@ -199,6 +199,8 @@ public class Robot8034 extends LinearOpMode {
             // Read gamepad inputs
             gamePadEx.readButtons();
 
+            ArtifactCellManager.execute();
+
 //          No real reason to check the color sensors, just that we can say we ahve the code
 //          cellManager.checkColors();
 //          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
