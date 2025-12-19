@@ -201,7 +201,7 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Intake controls
-            if (rightTriggerReader.wasJustReleased()) {
+            if (gamePadEx.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
                 intakeManager.intakeOn();
             }
 
