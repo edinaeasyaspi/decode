@@ -19,13 +19,13 @@ public class ArtifactCellManager {
         Purple
     }
 
-    public static CELL_STATE leftCellState = CELL_STATE.Idle;
-    public static CELL_STATE centerCellState = CELL_STATE.Idle;
-    public static CELL_STATE rightCellState = CELL_STATE.Idle;
+    public CELL_STATE leftCellState = CELL_STATE.Idle;
+    public CELL_STATE centerCellState = CELL_STATE.Idle;
+    public CELL_STATE rightCellState = CELL_STATE.Idle;
     // Servos for cells
-    private static ServoEx leftCellServo;
-    private static ServoEx centerCellServo;
-    private static ServoEx rightCellServo;
+    private ServoEx leftCellServo;
+    private ServoEx centerCellServo;
+    private ServoEx rightCellServo;
 
     //Color sensor
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
@@ -44,10 +44,6 @@ public class ArtifactCellManager {
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
         this.rightColorSensor = csThree;
-        //Define servos
-        this.leftCellServo = leftServo;
-        this.centerCellServo = centerServo;
-        this.rightCellServo = rightServo;
     }
 
     public enum CELL {
@@ -57,13 +53,13 @@ public class ArtifactCellManager {
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
-    private static double[] cellPositions = new double[0];
-    private static double[] cellDownPositions = new double[0];
-    private static final double UP_WAIT_TIME = 0.4;
-    private static final double DOWN_WAIT_TIME = 0.1;
+    private final double[] cellPositions;
+    private final double[] cellDownPositions;
+    private final double UP_WAIT_TIME = 0.4;
+    private final double DOWN_WAIT_TIME = 0.1;
     public static final ElapsedTime timer = new ElapsedTime();
 
-    public static void execute() {
+    public void execute() {
         leftCellState = processCell(CELL.Left, leftCellState, leftCellServo);
         centerCellState = processCell(CELL.Center, centerCellState, centerCellServo);
         rightCellState = processCell(CELL.Right, rightCellState, rightCellServo);
@@ -121,7 +117,7 @@ public class ArtifactCellManager {
     }
 
     // Processes the state of a cell and updates its servo position accordingly
-    private static CELL_STATE processCell(CELL cell, CELL_STATE state, ServoEx servo) {
+    private CELL_STATE processCell(CELL cell, CELL_STATE state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
         double servoDownPosition = cellDownPositions[cell.ordinal()];
 

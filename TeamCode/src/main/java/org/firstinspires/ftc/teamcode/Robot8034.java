@@ -121,8 +121,9 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-        initAprilTag();
-        setManualExposure(6, 250);
+        //TODO: Un-comment this when it is time to implement auto-aiming
+//        initAprilTag();
+//        setManualExposure(6, 250);
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
@@ -198,6 +199,8 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
+            // Update the cell manager
+            cellManager.execute();
 
             ArtifactCellManager.execute();
 
@@ -211,7 +214,6 @@ public class Robot8034 extends LinearOpMode {
             } else {
                 launchManager.launchOn(SHORT_SHOT);
             }
-
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -231,7 +233,7 @@ public class Robot8034 extends LinearOpMode {
                 cellManager.openCell(ArtifactCellManager.CELL.Right);
             }
 
-            // Intake and Launch controls
+            // Intake controls
             if (rightTriggerReader.wasJustReleased()) {
                 intakeManager.intakeOn();
             }
@@ -255,7 +257,7 @@ public class Robot8034 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
+//            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
