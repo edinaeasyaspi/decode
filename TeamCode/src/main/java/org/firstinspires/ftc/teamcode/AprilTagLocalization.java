@@ -71,20 +71,20 @@ public class AprilTagLocalization extends LinearOpMode {
     /**
      * Variables to store the position and orientation of the camera on the robot. Setting these
      * values requires a definition of the axes of the camera and robot:
-     *
+     * <p>
      * Camera axes:
      * Origin location: Center of the lens
      * Axes orientation: +x right, +y down, +z forward (from camera's perspective)
-     *
+     * <p>
      * Robot axes (this is typical, but you can define this however you want):
      * Origin location: Center of the robot at field height
      * Axes orientation: +x right, +y forward, +z upward
-     *
+     * <p>
      * Position:
      * If all values are zero (no translation), that implies the camera is at the center of the
      * robot. Suppose your camera is positioned 5 inches to the left, 7 inches forward, and 12
      * inches above the ground - you would need to set the position to (-5, 7, 12).
-     *
+     * <p>
      * Orientation:
      * If all values are zero (no rotation), that implies the camera is pointing straight up. In
      * most cases, you'll need to set the pitch to -90 degrees (rotation about the x-axis), meaning
@@ -230,6 +230,9 @@ public class AprilTagLocalization extends LinearOpMode {
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
                             detection.robotPose.getPosition().z));
+                    telemetry.addLine(String.format("RB %6.1f (inches) %6.1f (deg) ",
+                            detection.ftcPose.range,
+                            detection.ftcPose.bearing));
                     telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)",
                             detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
                             detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
@@ -243,6 +246,7 @@ public class AprilTagLocalization extends LinearOpMode {
 
         // Add "key" information to telemetry
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("RB  = Range (dist.), Bearing (angle)");
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
 
     }   // end method telemetryAprilTag()
