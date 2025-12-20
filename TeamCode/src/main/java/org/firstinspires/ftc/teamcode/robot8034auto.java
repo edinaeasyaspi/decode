@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Autonomous(name="BasicMotor")
+@Disabled
+//TODO: we are probably better off rewriting the whole thing
 public class robot8034auto extends LinearOpMode {
     final double DESIRED_DISTANCE = 24.0;
     final double SPEED_GAIN  =  0.02;
@@ -35,10 +38,6 @@ public class robot8034auto extends LinearOpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
-    private DcMotor frontLeftDrive;
-    private DcMotor backLeftDrive;
-    private DcMotor frontRightDrive;
-    private DcMotor backRightDrive;
     private DcMotor fl;
     private DcMotor bl;
     private DcMotor fr;
@@ -61,10 +60,6 @@ public class robot8034auto extends LinearOpMode {
         bl = hardwareMap.get(DcMotor.class, "MotorTwo");
         fr = hardwareMap.get(DcMotor.class, "MotorThree");
         br = hardwareMap.get(DcMotor.class, "MotorFour");
-        frontLeftDrive = bl;
-        backLeftDrive = fl;
-        frontRightDrive = br;
-        backRightDrive = fr;
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
         fr.setDirection(DcMotor.Direction.FORWARD);
@@ -217,10 +212,10 @@ public class robot8034auto extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        backLeftDrive.setPower(frontLeftPower);
-        backRightDrive.setPower(frontRightPower);
-        frontLeftDrive.setPower(backLeftPower);
-        frontRightDrive.setPower(backRightPower);
+        bl.setPower(frontLeftPower);
+        br.setPower(frontRightPower);
+        fl.setPower(backLeftPower);
+        fr.setPower(backRightPower);
     }
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.
