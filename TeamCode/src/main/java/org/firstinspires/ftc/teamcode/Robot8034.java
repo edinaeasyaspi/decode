@@ -167,7 +167,7 @@ public class Robot8034 extends LinearOpMode {
         //TODO: Adjust positions as needed
         // Maybe move these to constants in ArtifactCellManager
         cellManager = new ArtifactCellManager(
-                new double[]{0.786, 0.486, 0.78},//ups
+                new double[]{0.756, 0.486, 0.785},//ups
                 new double[]{1.000, 0.709, 0.746},//downs
                 colorSensorOne,
                 colorSensorTwo,
