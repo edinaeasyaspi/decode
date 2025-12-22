@@ -327,7 +327,8 @@ public class Robot8034 extends LinearOpMode {
                 if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
                     // Check if the tag is within alignment tolerances
                     double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
-                    double bearingError = Math.abs(detection.ftcPose.bearing);
+                    double bearing = detection.ftcPose.bearing;
+                    double bearingError = Math.abs(bearing);
                     double yawError = Math.abs(detection.ftcPose.yaw);
 
                     //TODO: Adjust tolerances as needed
@@ -336,12 +337,16 @@ public class Robot8034 extends LinearOpMode {
                     double bearingTolerance = 5.0; // degrees
                     double yawTolerance = 12.0; // degrees
 
-                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
+//TODO: Decide if you want to use range and yaw corrections as well
+//                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
+//                        aligned = true;
+//                    } else {
+                    // Only correct for bearing for now
+                    if (bearingError <= bearingTolerance) {
                         aligned = true;
                     } else {
-                        //TODO: Make sure the directions are correct.
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, bearingError);
+                        mecanumDrive.driveRobotCentric(0, 0, -bearing);
                     }
 
                     break; // No need to check further tags
