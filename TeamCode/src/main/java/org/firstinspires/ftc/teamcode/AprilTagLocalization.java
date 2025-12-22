@@ -29,9 +29,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -93,7 +98,7 @@ public class AprilTagLocalization extends LinearOpMode {
      * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
      */
     private Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 9, 12, 0);
+            0, 0, 0, 0);
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, -90, 0, 0);
 
@@ -101,36 +106,51 @@ public class AprilTagLocalization extends LinearOpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
+    final double DESIRED_SHORT_DISTANCE = 24.0;
+    private static final int DESIRED_TAG_ID = -1;
 
     /**
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
+    // Flag to indicate if we are showing navigation info.
+    private boolean isNavigate = false;
+    private ToggleButtonReader navigateToggle;
 
     @Override
     public void runOpMode() {
-
+        final GamepadEx gamepadEx = new GamepadEx(gamepad1);
+        navigateToggle = new ToggleButtonReader(gamepadEx, GamepadKeys.Button.A);
         initAprilTag();
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+        telemetry.addLine("Press D-pad Up to resume streaming");
+        telemetry.addLine("Press D-pad Down to pause streaming");
+        telemetry.addLine("a: Toggle navigation info");
         telemetry.addData(">", "Touch START to start OpMode");
-        telemetry.addLine("Press DPad Down to pause streaming");
-        telemetry.addLine("Press DPad Up to resume streaming");
         telemetry.update();
         waitForStart();
 
         while (opModeIsActive()) {
+            gamepadEx.readButtons();
+            navigateToggle.readValue();
 
-            telemetryAprilTag();
+            if (isNavigate) {
+                isAprilTagAligned();
+            } else {
+                telemetryAprilTag();
+            }
 
             // Push telemetry to the Driver Station.
             telemetry.update();
 
+            isNavigate = navigateToggle.getState();
+
             // Save CPU resources; can resume streaming when needed.
-            if (gamepad1.dpad_down) {
+            if (gamepadEx.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 visionPortal.stopStreaming();
-            } else if (gamepad1.dpad_up) {
+            } else if (gamepadEx.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 visionPortal.resumeStreaming();
             }
 
@@ -152,9 +172,10 @@ public class AprilTagLocalization extends LinearOpMode {
         aprilTag = new AprilTagProcessor.Builder()
 
                 // The following default settings are available to un-comment and edit as needed.
-                //.setDrawAxes(false)
-                //.setDrawCubeProjection(false)
-                //.setDrawTagOutline(true)
+                .setDrawAxes(false)
+                .setDrawCubeProjection(true)
+                .setDrawTagOutline(true)
+                .setDrawTagID(true)
                 //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                 //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
@@ -226,6 +247,10 @@ public class AprilTagLocalization extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 // Only use tags that don't have Obelisk in them
                 if (!detection.metadata.name.contains("Obelisk")) {
+                    telemetry.addData("Navigate", isNavigate);
+                    telemetry.addData("id", detection.id);
+                    telemetry.addData("tag orientation", detection.metadata.fieldOrientation);
+                    telemetry.addData("tag position", detection.metadata.fieldPosition);
                     telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
@@ -251,4 +276,68 @@ public class AprilTagLocalization extends LinearOpMode {
 
     }   // end method telemetryAprilTag()
 
+    /**
+     * Check to see if we are aligned to the desired AprilTag.
+     *
+     * @return true if aligned.
+     */
+    @SuppressLint("DefaultLocale")
+    private boolean isAprilTagAligned() {
+        boolean aligned = false;
+        // Assume there are 2 launch distances: short and long
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if ((-1 < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    // Check if the tag is within alignment tolerances
+                    double rangeError = Math.abs(detection.ftcPose.range - DESIRED_SHORT_DISTANCE);
+                    double bearing = detection.ftcPose.bearing;
+                    double bearingError = Math.abs(bearing);
+                    double yawError = Math.abs(detection.ftcPose.yaw);
+
+                    //TODO: Adjust tolerances as needed
+                    // Define tolerances
+                    // Possibly enable range and yaw later.
+                    double rangeTolerance = 2.0; // inches
+                    double bearingTolerance = 5.0; // degrees
+                    double yawTolerance = 12.0; // degrees
+
+                    // Check for all tolerances.
+//                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
+//                        aligned = true;
+//                    }
+
+                    // Check bearing only for now
+                    if (bearingError <= bearingTolerance) {
+                        aligned = true;
+                    } else {
+//                        // Not aligned, so drive to correct
+//                        mecanumDrive.driveRobotCentric(0, 0, -bearing);
+                    }
+
+                    telemetry.addData("Navigate", isNavigate);
+                    telemetry.addData("Aligned", aligned);
+                    telemetry.addData("id", detection.id);
+                    telemetry.addData("tag orientation", detection.metadata.fieldOrientation);
+                    telemetry.addData("tag position", detection.metadata.fieldPosition);
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
+                            detection.robotPose.getPosition().x,
+                            detection.robotPose.getPosition().y,
+                            detection.robotPose.getPosition().z));
+                    telemetry.addLine(String.format("RBE %6.1f (inches) %6.1f (deg) %6.1f (deg)",
+                            detection.ftcPose.range,
+                            bearing,
+                            -bearing));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)",
+                            detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
+                            detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
+                            detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+
+                    break; // No need to check further tags
+                }
+            }
+        }
+
+        return aligned;
+    }
 }   // end class
