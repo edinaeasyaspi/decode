@@ -99,9 +99,11 @@ public class Robot8034 extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
+    public boolean aprilTagFound = false;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
+
 
 
     private RobotHardware robot = new RobotHardware(this);
@@ -238,6 +240,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
+            telemetry.addData("Found april tag?", aprilTagFound);
             telemetry.update();
         }
     }
@@ -317,6 +320,7 @@ public class Robot8034 extends LinearOpMode {
      *
      * @return true if aligned.
      */
+    //TODO: Something is causeing the robot to spin when this function is called, the mecanum drive is not the problem
     private boolean isAprilTagAligned() {
         boolean aligned = false;
         // Assume there are 2 launch distances: short and long
@@ -324,6 +328,7 @@ public class Robot8034 extends LinearOpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
+                aprilTagFound = true;
                 if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
                     // Check if the tag is within alignment tolerances
                     double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
@@ -351,6 +356,8 @@ public class Robot8034 extends LinearOpMode {
 
                     break; // No need to check further tags
                 }
+            } else {
+                aprilTagFound = false;
             }
         }
 

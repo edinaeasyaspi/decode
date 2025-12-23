@@ -60,9 +60,9 @@ public class RobotHardware {
         CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
-        leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor"));
-        centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "centerColorSensor"));
-        rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor"));
+        leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
+        centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
+        rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
 
         // Initialize the artifact cell servos and manager
         ServoEx leftCell = new ServoEx(myOpMode.hardwareMap, "cellLeft");
