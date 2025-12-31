@@ -213,6 +213,7 @@ public class Robot8034 extends LinearOpMode {
             } else {
                 launchManager.launchOn(SHORT_SHOT);
             }
+            launchManager.matchVelocities();
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -257,9 +258,11 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
 //            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
-            telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
-            telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
+            telemetry.addData("Launch Left:", launchManager.llm.getVelocity());
+            telemetry.addData("Launch Right:", launchManager.rlm.getVelocity());
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
+            telemetry.addData("Calibrating", launchManager.speedCheckConfimed);
+            telemetry.addData("Is it really calibrating?", launchManager.actuallyWorking);
             telemetry.update();
         }
     }
