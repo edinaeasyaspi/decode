@@ -95,8 +95,8 @@ public class Robot8034 extends LinearOpMode {
     private boolean SHOOT_FAR = false;
 
     //TODO: Adjust shot variables as needed
-    private final double SHORT_SHOT = 0.20;
-    private final double LONG_SHOT = 0.24;
+    private final double SHORT_SHOT = 750.0;
+    private final double LONG_SHOT = 850.0;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
@@ -195,6 +195,9 @@ public class Robot8034 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        //Start launch
+        launchManager.launchOn(SHORT_SHOT);
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Read gamepad inputs
@@ -208,12 +211,13 @@ public class Robot8034 extends LinearOpMode {
 //          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
             //launch
-            if (SHOOT_FAR) {
-                launchManager.launchOn(LONG_SHOT);
-            } else {
-                launchManager.launchOn(SHORT_SHOT);
-            }
-            launchManager.matchVelocities();
+//            if (SHOOT_FAR) {
+//                launchManager.launchOn(1050);
+//            } else {
+//                launchManager.launchOn(900);
+//            }
+            //For this to work we need to declare launchon only once per change
+            launchManager.getToExpectedVelocity();
 
             // toggle slow
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -244,8 +248,10 @@ public class Robot8034 extends LinearOpMode {
 
             //Distance toggles
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
-                SHOOT_FAR = true;
+                launchManager.launchOn(LONG_SHOT);
+                SHOOT_FAR = true; //For drivers
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
+                launchManager.launchOn(SHORT_SHOT);
                 SHOOT_FAR = false;
             }
 
@@ -261,8 +267,6 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch Left:", launchManager.llm.getVelocity());
             telemetry.addData("Launch Right:", launchManager.rlm.getVelocity());
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
-            telemetry.addData("Calibrating", launchManager.speedCheckConfimed);
-            telemetry.addData("Is it really calibrating?", launchManager.actuallyWorking);
             telemetry.update();
         }
     }
