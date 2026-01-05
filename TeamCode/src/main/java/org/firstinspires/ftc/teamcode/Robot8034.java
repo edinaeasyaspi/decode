@@ -105,7 +105,6 @@ public class Robot8034 extends LinearOpMode {
     private AprilTagDetection desiredTag = null;
 
 
-
     private RobotHardware robot = new RobotHardware(this);
 
     private MecanumDrive mecanumDrive;
@@ -171,27 +170,20 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
-            // Update the cell manager
+            // Update the cell manager and launch manager
             cellManager.execute();
-
+            launchManager.execute();
 
 //          No real reason to check the color sensors, just that we can say we ahve the code
 //          cellManager.checkColors();
 //          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
-            //launch
-            if (SHOOT_FAR) {
-                launchManager.launchOn(LONG_SHOT);
-            } else {
-                launchManager.launchOn(SHORT_SHOT);
-            }
-
-            // toggle slow
+            // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isSlowMode = !isSlowMode;
             }
 
-            // Activate the appropriate cell servo
+            // Activate the appropriate cell servo to launch an artifact
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
                 cellManager.openCell(ArtifactCellManager.CELL.Left);
             }
@@ -213,14 +205,18 @@ public class Robot8034 extends LinearOpMode {
                 intakeManager.intakeOff();
             }
 
-            //Distance toggles
+            //Distance control
+            //TODO: There should probably be a way to turn the launcher off.
+            // If there is time, the auto-centering coul also set the power for distance.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
+                launchManager.launchOn(LONG_SHOT);
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
+                launchManager.launchOn(SHORT_SHOT);
             }
 
-            //TODO: Verify how this should actually work. It tries to align to the tag while
+            //TODO: Verify how this should actually work. It aligns to the tag while
             // the D-Pad left is held down.
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 isAprilTagAligned();
