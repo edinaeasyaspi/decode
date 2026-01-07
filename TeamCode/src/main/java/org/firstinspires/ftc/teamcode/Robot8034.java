@@ -31,36 +31,28 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.teamcode.inputsys.Input;
-import org.firstinspires.ftc.teamcode.inputsys.KeyCode;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
-import org.firstinspires.ftc.teamcode.mechanisms.InOutSys;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.teamcode.mechanisms.ServoK;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
-import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,45 +60,65 @@ import java.util.concurrent.TimeUnit;
 /*
  * This OpMode is the main teleOp for Decode.
  */
-@TeleOp(name = "Robot8034")
+@TeleOp(name = "Robot8034", group = "TeleOp")
 public class Robot8034 extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-    final double DESIRED_DISTANCE = 24.0;
+    /**
+     * Variables to store the position and orientation of the camera on the robot. Setting these
+     * values requires a definition of the axes of the camera and robot:
+     * <p>
+     * Camera axes:
+     * Origin location: Center of the lens
+     * Axes orientation: +x right, +y down, +z forward (from camera's perspective)
+     * <p>
+     * Robot axes (this is typical, but you can define this however you want):
+     * Origin location: Center of the robot at field height
+     * Axes orientation: +x right, +y forward, +z upward
+     * <p>
+     * Position:
+     * If all values are zero (no translation), that implies the camera is at the center of the
+     * robot. Suppose your camera is positioned 5 inches to the left, 7 inches forward, and 12
+     * inches above the ground - you would need to set the position to (-5, 7, 12).
+     * <p>
+     * Orientation:
+     * If all values are zero (no rotation), that implies the camera is pointing straight up. In
+     * most cases, you'll need to set the pitch to -90 degrees (rotation about the x-axis), meaning
+     * the camera is horizontal. Use a yaw of 0 if the camera is pointing forwards, +90 degrees if
+     * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
+     * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
+     */
+    private Position cameraPosition = new Position(DistanceUnit.INCH,
+            0, 9, 12, 0);
+    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
+            0, -90, 0, 0);
+
+    //TODO: Adjust these for the actual desired distances
+    final double DESIRED_SHORT_DISTANCE = 24.0;
+    final double DESIRED_LONG_DISTANCE = 48.0;
+
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
+    public boolean aprilTagFound = false;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
 
-    private MotorEx frontLeftDrive;
-    private MotorEx backLeftDrive;
-    private MotorEx frontRightDrive;
-    private MotorEx backRightDrive;
+
+    private RobotHardware robot = new RobotHardware(this);
+
     private MecanumDrive mecanumDrive;
     private double SLOW_MODE_FACTOR = 0.4;
 
-    private MotorEx leftIntakeMotor;
-    private MotorEx rightIntakeMotor;
     private IntakeManager intakeManager;
-    private MotorEx leftLaunchMotor;
-    private MotorEx rightLaunchMotor;
     private LaunchManager launchManager;
     private boolean SHOOT_FAR = false;
 
     //TODO: Adjust shot variables as needed
-    private final double SHORT_SHOT = 850.0;
-    private final double LONG_SHOT = 950.0;
+    private final double SHORT_SHOT = 0.20;
+    private final double LONG_SHOT = 0.24;
 
-    private ServoEx leftCell;
-    private ServoEx centerCell;
-    private ServoEx rightCell;
     ArtifactCellManager cellManager;
-    public ColorSensor colorSensorOne;
-    public ColorSensor colorSensorTwo;
-    public ColorSensor colorSensorThree;
-
-    private CRServo launchServo;
 
     boolean isSlowMode = false;
 
@@ -117,12 +129,14 @@ public class Robot8034 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Initialize the robot hardware
+        robot.init();
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-        //TODO: Un-comment this when it is time to implement auto-aiming
-//        initAprilTag();
+        initAprilTag();
+        //TODO: Un-comment this if you want to set manual exposure/gain
 //        setManualExposure(6, 250);
 
         //Define gamepad (from SolversLib)
@@ -131,54 +145,10 @@ public class Robot8034 extends LinearOpMode {
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration the DS.
-        frontLeftDrive = new MotorEx(hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
-        backLeftDrive = new MotorEx(hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
-        frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
-        backRightDrive = new MotorEx(hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
-        frontLeftDrive.setInverted(true);
-        backLeftDrive.setInverted(true);
-        frontRightDrive.setInverted(true);
-        backRightDrive.setInverted(true);
-        mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
-
-        //TODO: device name consistency (the motor string start with front/back).
-        leftIntakeMotor = new MotorEx(hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_312);
-        rightIntakeMotor = new MotorEx(hardwareMap, "rightintakemotor", Motor.GoBILDA.BARE);
-        intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
-
-        //TODO: device name consistency (the motor string start with front/back).
-        leftLaunchMotor = new MotorEx(hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
-        rightLaunchMotor = new MotorEx(hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
-        launchServo = hardwareMap.get(CRServo.class, "launchservo");
-        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
-
-        // Initialize the artifact cell servos and manager
-        //TODO: device name consistency (the motor string start with front/back).
-        leftCell = new ServoEx(hardwareMap, "cellLeft");
-        centerCell = new ServoEx(hardwareMap, "cellCenter");
-        rightCell = new ServoEx(hardwareMap, "cellRight");
-        //TODO: device name consistency (the motor string start with front/back).
-        colorSensorOne = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
-        colorSensorTwo = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
-        colorSensorThree = new ColorSensor(hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
-
-        //TODO: Adjust positions as needed
-        // Maybe move these to constants in ArtifactCellManager
-        cellManager = new ArtifactCellManager(
-                new double[]{0.756, 0.486, 0.785},//ups
-                new double[]{1.000, 0.709, 0.746},//downs
-                colorSensorOne,
-                colorSensorTwo,
-                colorSensorThree,
-                leftCell,
-                centerCell,
-                rightCell
-        );
-
-
-        //TODO: What does this servo do?
+        mecanumDrive = robot.mecanumDrive;
+        intakeManager = robot.intakeManager;
+        launchManager = robot.launchManager;
+        cellManager = robot.cellManager;
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
@@ -189,42 +159,31 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("Right Bumper: Intake Off");
         telemetry.addLine("D-Pad Up: Long shot");
         telemetry.addLine("D-Pad Down: Short shot");
+        telemetry.addLine("D-Pad Left: Auto Aim");
         telemetry.update();
 
         // Ready for start of OpMode
         waitForStart();
         runtime.reset();
 
-        //Start launch
-        launchManager.launchOn(SHORT_SHOT);
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
-            // Update the cell manager
+            // Update the cell manager and launch manager
             cellManager.execute();
-
+            launchManager.execute();
 
 //          No real reason to check the color sensors, just that we can say we ahve the code
 //          cellManager.checkColors();
 //          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
-            //launch
-//            if (SHOOT_FAR) {
-//                launchManager.launchOn(1050);
-//            } else {
-//                launchManager.launchOn(900);
-//            }
-            //For this to work we need to declare launchon only once per change
-            launchManager.getToExpectedVelocity();
-
-            // toggle slow
+            // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isSlowMode = !isSlowMode;
             }
 
-            // Activate the appropriate cell servo
+            // Activate the appropriate cell servo to launch an artifact
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
                 cellManager.openCell(ArtifactCellManager.CELL.Left);
             }
@@ -246,27 +205,38 @@ public class Robot8034 extends LinearOpMode {
                 intakeManager.intakeOff();
             }
 
-            //Distance toggles
+            //Distance control
+            //TODO: There should probably be a way to turn the launcher off.
+            // If there is time, the auto-centering coul also set the power for distance.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
+                SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
-                SHOOT_FAR = true; //For drivers
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
-                launchManager.launchOn(SHORT_SHOT);
                 SHOOT_FAR = false;
+                launchManager.launchOn(SHORT_SHOT);
             }
 
-            // Send drive power to the wheels
-            mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
-                    isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
-                    isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
+            //TODO: Verify how this should actually work. It aligns to the tag while
+            // the D-Pad left is held down.
+            if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
+                isAprilTagAligned();
+            }
+
+            // Send drive power to the wheels when not Auto-aligning.
+            //TODO: Verify this behavior with drivers.
+            if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
+                mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
+                        isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
+                        isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-//            telemetry.addData("Colors", "%s", ArtifactCellManager.colors());
-            telemetry.addData("Launch Left:", launchManager.llm.getVelocity());
-            telemetry.addData("Launch Right:", launchManager.rlm.getVelocity());
+            telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
+            telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
+            telemetry.addData("Found april tag?", aprilTagFound);
             telemetry.update();
         }
     }
@@ -276,7 +246,10 @@ public class Robot8034 extends LinearOpMode {
      */
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.
-        aprilTag = new AprilTagProcessor.Builder().build();
+        //TODO: Adjust the camera position and orientation values to match your robot
+        aprilTag = new AprilTagProcessor.Builder()
+                .setCameraPose(cameraPosition, cameraOrientation)
+                .build();
 
         // Adjust Image Decimation to trade-off detection-range for detection-rate.
         // e.g. Some typical detection data using a Logitech C920 WebCam
@@ -339,6 +312,55 @@ public class Robot8034 extends LinearOpMode {
     }
 
     /**
+     * Check to see if we are aligned to the desired AprilTag.
+     *
+     * @return true if aligned.
+     */
+    //TODO: Something is causeing the robot to spin when this function is called, the mecanum drive is not the problem
+    private boolean isAprilTagAligned() {
+        boolean aligned = false;
+        // Assume there are 2 launch distances: short and long
+        double desiredRange = SHOOT_FAR ? DESIRED_LONG_DISTANCE : DESIRED_SHORT_DISTANCE;
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                aprilTagFound = true;
+                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    // Check if the tag is within alignment tolerances
+                    double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
+                    double bearing = detection.ftcPose.bearing;
+                    double bearingError = Math.abs(bearing);
+                    double yawError = Math.abs(detection.ftcPose.yaw);
+
+                    //TODO: Adjust tolerances as needed
+                    // Define tolerances
+                    double rangeTolerance = 2.0; // inches
+                    double bearingTolerance = 5.0; // degrees
+                    double yawTolerance = 12.0; // degrees
+
+//TODO: Decide if you want to use range and yaw corrections as well
+//                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
+//                        aligned = true;
+//                    } else {
+                    // Only correct for bearing for now
+                    if (bearingError <= bearingTolerance) {
+                        aligned = true;
+                    } else {
+                        // The parameters are set to only center. You may want to add range control as well.
+                        mecanumDrive.driveRobotCentric(0, 0, -bearing);
+                    }
+
+                    break; // No need to check further tags
+                }
+            } else {
+                aprilTagFound = false;
+            }
+        }
+
+        return aligned;
+    }
+
+    /**
      * Check to see if the launcher should be activated.
      *
      * @return true if the launcher is ready.
@@ -383,7 +405,7 @@ public class Robot8034 extends LinearOpMode {
         // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
         if (targetFound) {
             // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+            double rangeError = (desiredTag.ftcPose.range - DESIRED_SHORT_DISTANCE);
             double headingError = desiredTag.ftcPose.bearing;
             double yawError = desiredTag.ftcPose.yaw;
 

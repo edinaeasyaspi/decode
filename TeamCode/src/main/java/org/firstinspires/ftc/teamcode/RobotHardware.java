@@ -1,0 +1,82 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
+
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
+import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
+import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
+import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
+
+/// **
+/*
+ * This is NOT an opmode.
+ * This class can be used to define all the specific hardware for a single robot.
+ * Only gamepad need to live in opmodes that require user input.
+ */
+public class RobotHardware {
+    /* Declare OpMode members. */
+    private OpMode myOpMode = null;   // gain access to methods in the calling OpMode.
+    // Servo positions for each cell, [0] = left, [1] = center, [2] = right
+    private final double[] cellPositions = new double[]{0.786, 0.486, 0.78}; //ups
+    private final double[] cellDownPositions = new double[]{1.000, 0.709, 0.746}; //downs
+    public MecanumDrive mecanumDrive;
+    public IntakeManager intakeManager;
+    public LaunchManager launchManager;
+    public ArtifactCellManager cellManager;
+    public ColorSensor leftColorSensor;
+    public ColorSensor centerCOlorSensor;
+    public ColorSensor rightColorSensor;
+
+    public RobotHardware(OpMode opmode) {
+        myOpMode = opmode;
+    }
+
+    public void init() {
+        //TODO: Adjust motor types. Verify the motor type for each motor.
+        // Initialize the hardware variables. Note that the strings used here must correspond
+        // to the names assigned during the robot configuration the DS.
+        MotorEx frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
+        MotorEx backLeftDrive = new MotorEx(myOpMode.hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
+        MotorEx frontRightDrive = new MotorEx(myOpMode.hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
+        MotorEx backRightDrive = new MotorEx(myOpMode.hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
+        frontLeftDrive.setInverted(true);
+        backLeftDrive.setInverted(true);
+        frontRightDrive.setInverted(true);
+        backRightDrive.setInverted(true);
+        mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
+
+        MotorEx leftIntakeMotor = new MotorEx(myOpMode.hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
+        MotorEx rightIntakeMotor = new MotorEx(myOpMode.hardwareMap, "rightintakemotor", Motor.GoBILDA.RPM_435);
+        intakeManager = new IntakeManager(leftIntakeMotor, rightIntakeMotor);
+
+        MotorEx leftLaunchMotor = new MotorEx(myOpMode.hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
+        MotorEx rightLaunchMotor = new MotorEx(myOpMode.hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
+        CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
+        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
+
+        leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
+        centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
+        rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+
+        // Initialize the artifact cell servos and manager
+        ServoEx leftCell = new ServoEx(myOpMode.hardwareMap, "cellLeft");
+        ServoEx centerCell = new ServoEx(myOpMode.hardwareMap, "cellCenter");
+        ServoEx rightCell = new ServoEx(myOpMode.hardwareMap, "cellRight");
+        cellManager = new ArtifactCellManager(
+                cellPositions, //ups
+                cellDownPositions, //downs
+                leftColorSensor,
+                centerCOlorSensor,
+                rightColorSensor,
+                leftCell,
+                centerCell,
+                rightCell
+        );
+    }
+}
