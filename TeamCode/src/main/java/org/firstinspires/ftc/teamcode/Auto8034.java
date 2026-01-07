@@ -52,7 +52,6 @@ public class Auto8034 extends OpMode {
     private IntakeManager intakeManager;
     private LaunchManager launchManager;
     private ArtifactCellManager cellManager;
-    private GamepadEx gamepadEx;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -64,8 +63,7 @@ public class Auto8034 extends OpMode {
         telemetry.addData("Status", "Initialized");
         // Initialize the robot hardware
         robot.init();
-        gamepadEx = new GamepadEx(gamepad1);
-        autonomousConfiguration.init(this.gamepadEx, this.telemetry, hardwareMap.appContext);
+        autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         mecanumDrive = robot.mecanumDrive;
         intakeManager = robot.intakeManager;
         launchManager = robot.launchManager;
