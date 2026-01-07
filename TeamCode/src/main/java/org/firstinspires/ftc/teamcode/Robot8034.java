@@ -229,6 +229,7 @@ public class Robot8034 extends LinearOpMode {
 
             // Send drive power to the wheels when not Auto-aligning.
             //TODO: Verify this behavior with drivers.
+            // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
             if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
