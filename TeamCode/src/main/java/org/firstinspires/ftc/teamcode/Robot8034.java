@@ -115,8 +115,8 @@ public class Robot8034 extends LinearOpMode {
     private boolean SHOOT_FAR = false;
 
     //TODO: Adjust shot variables as needed
-    private final double SHORT_SHOT = 0.20;
-    private final double LONG_SHOT = 0.24;
+    private final double SHORT_SHOT = 0.60;
+    private final double LONG_SHOT = 0.80;
 
     ArtifactCellManager cellManager;
 
@@ -160,6 +160,7 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("D-Pad Up: Long shot");
         telemetry.addLine("D-Pad Down: Short shot");
         telemetry.addLine("D-Pad Left: Auto Aim");
+        telemetry.addLine("D-Pad Right: turn off launch motors");
         telemetry.update();
 
         // Ready for start of OpMode
@@ -220,6 +221,10 @@ public class Robot8034 extends LinearOpMode {
             // the D-Pad left is held down.
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 isAprilTagAligned();
+            }
+
+            if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                launchManager.launchOff();
             }
 
             // Send drive power to the wheels when not Auto-aligning.
