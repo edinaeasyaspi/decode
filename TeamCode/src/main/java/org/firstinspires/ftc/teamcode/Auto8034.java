@@ -33,6 +33,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
+import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
+import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 
 /*
  * Demonstrates an empty iterative OpMode
@@ -40,50 +46,83 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Auto8034", group = "Autonomous")
 //@Disabled
 public class Auto8034 extends OpMode {
+    private RobotHardware robot = new RobotHardware(this);
+    AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
+    private MecanumDrive mecanumDrive;
+    private IntakeManager intakeManager;
+    private LaunchManager launchManager;
+    private ArtifactCellManager cellManager;
+    private GamepadEx gamepadEx;
 
-  private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
-  /**
-   * This method will be called once, when the INIT button is pressed.
-   */
-  @Override
-  public void init() {
-    telemetry.addData("Status", "Initialized");
-  }
+    /**
+     * This method will be called once, when the INIT button is pressed.
+     */
+    @Override
+    public void init() {
+        telemetry.addData("Status", "Initialized");
+        // Initialize the robot hardware
+        robot.init();
+        gamepadEx = new GamepadEx(gamepad1);
+        autonomousConfiguration.init(this.gamepadEx, this.telemetry, hardwareMap.appContext);
+        mecanumDrive = robot.mecanumDrive;
+        intakeManager = robot.intakeManager;
+        launchManager = robot.launchManager;
+        cellManager = robot.cellManager;
+    }
 
-  /**
-   * This method will be called repeatedly during the period between when
-   * the INIT button is pressed and when the START button is pressed (or the
-   * OpMode is stopped).
-   */
-  @Override
-  public void init_loop() {
-  }
+    /**
+     * This method will be called repeatedly during the period between when
+     * the INIT button is pressed and when the START button is pressed (or the
+     * OpMode is stopped).
+     */
+    @Override
+    public void init_loop() {
+        // Call the autonomous configuration init loop to allow option selection
+        autonomousConfiguration.init_loop();
+    }
 
-  /**
-   * This method will be called once, when the START button is pressed.
-   */
-  @Override
-  public void start() {
-    runtime.reset();
-  }
+    /**
+     * This method will be called once, when the START button is pressed.
+     */
+    @Override
+    public void start() {
+        if (!autonomousConfiguration.getReadyToStart()) {
+            telemetry.addData("Alert", "Not ready to start!");
+            telemetry.speak("Not ready to start!");
+            runtime.reset();
+            while (runtime.seconds() < 2) {
+            }
+            requestOpModeStop();
+        }
 
-  /**
-   * This method will be called repeatedly during the period between when
-   * the START button is pressed and when the OpMode is stopped.
-   */
-  @Override
-  public void loop() {
-    telemetry.addData("Status", "Run Time: " + runtime.toString());
-  }
+        runtime.reset();
+    }
 
-  /**
-   * This method will be called once, when this OpMode is stopped.
-   * <p>
-   * Your ability to control hardware from this method will be limited.
-   */
-  @Override
-  public void stop() {
+    /**
+     * This method will be called repeatedly during the period between when
+     * the START button is pressed and when the OpMode is stopped.
+     */
+    @Override
+    public void loop() {
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
+        telemetry.addData("Start Position", autonomousConfiguration.getStartPosition());
+        telemetry.addData("Retrieve from Spike", autonomousConfiguration.getRetrieveFromSpike());
+        telemetry.addData("Delay Start", autonomousConfiguration.getDelayStartSeconds());
+        telemetry.addData("Ready to Start", autonomousConfiguration.getReadyToStart());
+        telemetry.update();
 
-  }
+    }
+
+    /**
+     * This method will be called once, when this OpMode is stopped.
+     * <p>
+     * Your ability to control hardware from this method will be limited.
+     */
+    @Override
+    public void stop() {
+
+    }
 }
