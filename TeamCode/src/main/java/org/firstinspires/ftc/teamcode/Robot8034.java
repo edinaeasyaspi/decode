@@ -95,8 +95,8 @@ public class Robot8034 extends LinearOpMode {
     private boolean SHOOT_FAR = false;
 
     //TODO: Adjust shot variables as needed
-    private final double SHORT_SHOT = 750.0;
-    private final double LONG_SHOT = 850.0;
+    private final double SHORT_SHOT = 850.0;
+    private final double LONG_SHOT = 950.0;
 
     private ServoEx leftCell;
     private ServoEx centerCell;
