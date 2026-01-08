@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -25,6 +26,14 @@ public class RobotHardware {
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
     private final double[] cellPositions = new double[]{0.786, 0.486, 0.78}; //ups
     private final double[] cellDownPositions = new double[]{1.000, 0.709, 0.746}; //downs
+    // Feedforward constants
+    // The feedfoward controller is used by the launch manager to maintain consistent launch speed.
+    public static double FF_S = 0.1;
+    public static double FF_V = 1.0;
+    public static double FF_A = 0.0;
+    private SimpleMotorFeedforward feedforward =
+            new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
+
     public MecanumDrive mecanumDrive;
     public IntakeManager intakeManager;
     public LaunchManager launchManager;
@@ -58,7 +67,7 @@ public class RobotHardware {
         MotorEx leftLaunchMotor = new MotorEx(myOpMode.hardwareMap, "leftlaunchmotor", Motor.GoBILDA.BARE);
         MotorEx rightLaunchMotor = new MotorEx(myOpMode.hardwareMap, "rightlaunchmotor", Motor.GoBILDA.BARE);
         CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
-        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
+        launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo, feedforward);
 
         leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
