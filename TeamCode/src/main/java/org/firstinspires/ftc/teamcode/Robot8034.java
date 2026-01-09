@@ -29,10 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -93,7 +95,8 @@ public class Robot8034 extends LinearOpMode {
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, -90, 0, 0);
 
-    //TODO: Adjust these for the actual desired distances
+    //TODO: Define desired distances for short and long shots.
+    // This is used for auto-alignment. Currently not implemented!
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
 
@@ -104,7 +107,6 @@ public class Robot8034 extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
 
-
     private RobotHardware robot = new RobotHardware(this);
 
     private MecanumDrive mecanumDrive;
@@ -112,14 +114,18 @@ public class Robot8034 extends LinearOpMode {
 
     private IntakeManager intakeManager;
     private LaunchManager launchManager;
-    private boolean SHOOT_FAR = false;
-
-    //TODO: Adjust shot variables as needed
-    private final double SHORT_SHOT = 0.20;
-    private final double LONG_SHOT = 0.24;
-
     ArtifactCellManager cellManager;
 
+    //TODO: Adjust shot variables as needed
+    public static double SHORT_SHOT = 0.44;
+    public static double LONG_SHOT = 0.45;
+    // Track whether we are shooting far or short.
+    // If there is time, implement the AprilTag to calculate a variable distance.
+    private boolean SHOOT_FAR = false;
+
+    FtcDashboard dashboard;
+    Telemetry telemetry;
+    // Control the slow mode for driving.
     boolean isSlowMode = false;
 
     GamepadEx gamePadEx;
@@ -138,6 +144,10 @@ public class Robot8034 extends LinearOpMode {
         initAprilTag();
         //TODO: Un-comment this if you want to set manual exposure/gain
 //        setManualExposure(6, 250);
+
+        // FtcDashboard setup
+        dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
@@ -160,6 +170,7 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("D-Pad Up: Long shot");
         telemetry.addLine("D-Pad Down: Short shot");
         telemetry.addLine("D-Pad Left: Auto Aim");
+        telemetry.addLine("D-Pad Right: turn off launch motors");
         telemetry.update();
 
         // Ready for start of OpMode
@@ -206,8 +217,7 @@ public class Robot8034 extends LinearOpMode {
             }
 
             //Distance control
-            //TODO: There should probably be a way to turn the launcher off.
-            // If there is time, the auto-centering coul also set the power for distance.
+            // If there is time, the auto-centering could also set the power for distance.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
@@ -222,8 +232,14 @@ public class Robot8034 extends LinearOpMode {
                 isAprilTagAligned();
             }
 
+            // Turn off the launch motors to save the battery.
+            if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                launchManager.launchOff();
+            }
+
             // Send drive power to the wheels when not Auto-aligning.
             //TODO: Verify this behavior with drivers.
+            // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
             if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
