@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,7 +22,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="BasicMotor", group="Autonomous")
+@Autonomous(name="BasicMotor")
+@Disabled
+//TODO: we are probably better off rewriting the whole thing
 public class robot8034auto extends LinearOpMode {
     final double DESIRED_DISTANCE = 24.0;
     final double SPEED_GAIN  =  0.02;
@@ -35,10 +38,6 @@ public class robot8034auto extends LinearOpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
-    private DcMotor frontLeftDrive;
-    private DcMotor backLeftDrive;
-    private DcMotor frontRightDrive;
-    private DcMotor backRightDrive;
     private DcMotor fl;
     private DcMotor bl;
     private DcMotor fr;
@@ -57,36 +56,32 @@ public class robot8034auto extends LinearOpMode {
         double turn = 0;
         initAprilTag();
         setManualExposure(6, 250);
-        fl = hardwareMap.get(DcMotor.class, "frontleftdrive");
-        bl = hardwareMap.get(DcMotor.class, "backleftdrive");
-        fr = hardwareMap.get(DcMotor.class, "frontrightdrive");
-        br = hardwareMap.get(DcMotor.class, "backrightdrive");
-        frontLeftDrive = bl;
-        backLeftDrive = fl;
-        frontRightDrive = br;
-        backRightDrive = fr;
+        fl = hardwareMap.get(DcMotor.class, "MotorOne");
+        bl = hardwareMap.get(DcMotor.class, "MotorTwo");
+        fr = hardwareMap.get(DcMotor.class, "MotorThree");
+        br = hardwareMap.get(DcMotor.class, "MotorFour");
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
         fr.setDirection(DcMotor.Direction.FORWARD);
         br.setDirection(DcMotor.Direction.FORWARD);
         servoOne = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellLeft"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoOne"),
                 1.000,0.766);
         servoTwo = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellCenter"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoTwo"),
                 0.709, 0.486);
         servoThree = new ServoK(
-                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "cellRight"),
+                hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, "ServoThree"),
                 0.746, 0.78);
         IOsys = new InOutSys(
-                hardwareMap.get(DcMotor.class, "leftintakemotor"),
-                hardwareMap.get(DcMotor.class, "rightintakemotor"),
-                hardwareMap.get(DcMotor.class, "leftlaunchmotor"),
-                hardwareMap.get(DcMotor.class, "rightlaunchmotor"),
+                hardwareMap.get(DcMotor.class, "MotorFive"),
+                hardwareMap.get(DcMotor.class, "MotorSix"),
+                hardwareMap.get(DcMotor.class, "MotorSeven"),
+                hardwareMap.get(DcMotor.class, "MotorEight"),
                 hardwareMap.get(VoltageSensor.class, "Control Hub"),
                 telemetry
         );
-        servoFour = hardwareMap.get(CRServo.class, "launchservo");
+        servoFour = hardwareMap.get(CRServo.class, "ServoFive");
         waitForStart();
         forward(1);
         sleep(700);
@@ -217,10 +212,10 @@ public class robot8034auto extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        backLeftDrive.setPower(frontLeftPower);
-        backRightDrive.setPower(frontRightPower);
-        frontLeftDrive.setPower(backLeftPower);
-        frontRightDrive.setPower(backRightPower);
+        bl.setPower(frontLeftPower);
+        br.setPower(frontRightPower);
+        fl.setPower(backLeftPower);
+        fr.setPower(backRightPower);
     }
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.

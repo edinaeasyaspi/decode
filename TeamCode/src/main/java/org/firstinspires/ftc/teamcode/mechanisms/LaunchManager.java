@@ -21,7 +21,7 @@ public class LaunchManager {
         leftLaunchMotor.setInverted(false);
         rightLaunchMotor.setInverted(true);
 
-        this.launchMotors = new MotorGroup(leftLaunchMotor, rightLaunchMotor);
+        this.launchMotors = new MotorGroup(rightLaunchMotor, leftLaunchMotor);
         this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);
         this.feedforward = feedforward;
     }
@@ -39,7 +39,7 @@ public class LaunchManager {
     }
 
     public void launchOff() {
-        launchMotors.set(0);
+        launchMotors.stopMotor();
         launchServo.setPower(0);
     }
 
