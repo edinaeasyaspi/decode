@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -7,6 +8,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 import java.util.List;
 
+@Config
 public class LaunchManager {
     /**
      * Manages the launch mechanism, which consists of two motors and a continuous rotation servo.
@@ -15,21 +17,31 @@ public class LaunchManager {
      */
     public LaunchManager(MotorEx leftLaunchMotor,
                          MotorEx rightLaunchMotor,
-                         CRServo launchServo,
-                         SimpleMotorFeedforward feedforward) {
+                         CRServo launchServo) {
         this.launchServo = launchServo;
         leftLaunchMotor.setInverted(false);
         rightLaunchMotor.setInverted(true);
 
         this.launchMotors = new MotorGroup(rightLaunchMotor, leftLaunchMotor);
         this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);
-        this.feedforward = feedforward;
     }
 
     private final CRServo launchServo;
     public final MotorGroup launchMotors;
-    private double launchPower = 0.0;
-    private SimpleMotorFeedforward feedforward;
+    public static double launchPower = 0.0;
+    // Feedforward constants
+    // The feedfoward controller is used by the launch manager to maintain consistent launch speed.
+    public static double FF_S = 0.1;
+    public static double FF_V = 1.0;
+    public static double FF_A = 0.0;
+    public static double launchMotorLeftVelocity;
+    public static double launchMotorRightVelocity;
+    public double launchMotorLeftSpeed;
+    public double launchMotorRightSpeed;
+
+    private SimpleMotorFeedforward feedforward =
+            new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
+
 
     // Launch power allows a variable speed launch.
     public void launchOn(double launchPower) {
@@ -45,6 +57,14 @@ public class LaunchManager {
 
     // Call this method periodically to maintain the desired launch power using feedforward control.
     public void execute() {
+        //TODO: This is for debugging, remove later.
+        List<Double> velocities = launchMotors.getVelocities();
+        launchMotorLeftVelocity = velocities.get(0);
+        launchMotorRightVelocity = velocities.get(1);
+        List<Double> speeds = launchMotors.getSpeeds();
+        launchMotorLeftSpeed = speeds.get(0);
+        launchMotorRightSpeed = speeds.get(1);
+
         launchMotors.set(feedforward.calculate(this.launchPower));
     }
 }
