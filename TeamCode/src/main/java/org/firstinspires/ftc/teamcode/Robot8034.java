@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -62,6 +63,7 @@ import java.util.concurrent.TimeUnit;
 /*
  * This OpMode is the main teleOp for Decode.
  */
+@Config
 @TeleOp(name = "Robot8034", group = "TeleOp")
 public class Robot8034 extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
