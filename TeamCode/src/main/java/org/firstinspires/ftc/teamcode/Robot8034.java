@@ -103,7 +103,6 @@ public class Robot8034 extends LinearOpMode {
     final double DESIRED_LONG_DISTANCE = 48.0;
 
     private static final boolean USE_WEBCAM = true;
-    private static final int DESIRED_TAG_ID = -1;
     public boolean isAprilTagAligned = false;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
@@ -347,7 +346,7 @@ public class Robot8034 extends LinearOpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                if (detection.id == 20 || detection.id == 24) {
                     // Check if the tag is within alignment tolerances
                     double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
                     // Use static variable for dashboard tuning
