@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -7,6 +8,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 import java.util.List;
 
+@Config
 public class LaunchManager {
     /**
      * Manages the launch mechanism, which consists of two motors and a continuous rotation servo.
@@ -15,21 +17,27 @@ public class LaunchManager {
      */
     public LaunchManager(MotorEx leftLaunchMotor,
                          MotorEx rightLaunchMotor,
-                         CRServo launchServo,
-                         SimpleMotorFeedforward feedforward) {
+                         CRServo launchServo) {
         this.launchServo = launchServo;
         leftLaunchMotor.setInverted(false);
         rightLaunchMotor.setInverted(true);
 
         this.launchMotors = new MotorGroup(rightLaunchMotor, leftLaunchMotor);
         this.launchMotors.setRunMode(MotorEx.RunMode.VelocityControl);
-        this.feedforward = feedforward;
     }
 
     private final CRServo launchServo;
     public final MotorGroup launchMotors;
     private double launchPower = 0.0;
-    private SimpleMotorFeedforward feedforward;
+    // Feedforward constants
+    // The feedfoward controller is used by the launch manager to maintain consistent launch speed.
+    public static double FF_S = 0.1;
+    public static double FF_V = 1.0;
+    public static double FF_A = 0.0;
+
+    private SimpleMotorFeedforward feedforward =
+            new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
+
 
     // Launch power allows a variable speed launch.
     public void launchOn(double launchPower) {
