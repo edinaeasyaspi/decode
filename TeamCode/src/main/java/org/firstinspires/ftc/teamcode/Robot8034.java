@@ -369,7 +369,7 @@ public class Robot8034 extends LinearOpMode {
                         aligned = true;
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, -bearing);
+                        mecanumDrive.driveRobotCentric(0, 0, -Math.max(1, Math.min(-1, bearing)));
                     }
 
                     break; // No need to check further tags
