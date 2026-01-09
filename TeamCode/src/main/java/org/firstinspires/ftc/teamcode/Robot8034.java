@@ -119,8 +119,8 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.44;
-    public static double LONG_SHOT = 0.45;
+    public static double SHORT_SHOT = 0.26;
+    public static double LONG_SHOT = 0.33;
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;

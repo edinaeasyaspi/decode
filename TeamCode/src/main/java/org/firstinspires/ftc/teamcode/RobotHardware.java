@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
  * This class can be used to define all the specific hardware for a single robot.
  * Only gamepad need to live in opmodes that require user input.
  */
+    @Config
 public class RobotHardware {
     /* Declare OpMode members. */
     private OpMode myOpMode = null;   // gain access to methods in the calling OpMode.
