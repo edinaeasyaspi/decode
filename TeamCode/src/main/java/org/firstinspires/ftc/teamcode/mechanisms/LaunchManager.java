@@ -34,6 +34,8 @@ public class LaunchManager {
     public static double FF_S = 0.1;
     public static double FF_V = 1.0;
     public static double FF_A = 0.0;
+    public static double launchMotorLeftVelocity;
+    public static double launchMotorRightVelocity;
 
     private SimpleMotorFeedforward feedforward =
             new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
@@ -53,6 +55,11 @@ public class LaunchManager {
 
     // Call this method periodically to maintain the desired launch power using feedforward control.
     public void execute() {
+        //TODO: This is for debugging, remove later.
+        List<Double> velocities = launchMotors.getVelocities();
+        launchMotorLeftVelocity = velocities.get(0);
+        launchMotorRightVelocity = velocities.get(1);
+
         launchMotors.set(feedforward.calculate(this.launchPower));
     }
 }

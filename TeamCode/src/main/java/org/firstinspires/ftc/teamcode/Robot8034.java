@@ -104,10 +104,15 @@ public class Robot8034 extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;
     private static final int DESIRED_TAG_ID = -1;
-    public boolean aprilTagFound = false;
+    public boolean isAprilTagAligned = false;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
+
+    // Auto align debug variables for use with ftc dashboard.
+    public static double bearing = 0;
+    public static double bearingTolerance = 5.0;
+
 
     private RobotHardware robot = new RobotHardware(this);
 
@@ -231,7 +236,7 @@ public class Robot8034 extends LinearOpMode {
             //TODO: Verify how this should actually work. It aligns to the tag while
             // the D-Pad left is held down.
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
-                isAprilTagAligned();
+                isAprilTagAligned = isAprilTagAligned();
             }
 
             // Turn off the launch motors to save the battery.
@@ -254,7 +259,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
             telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
             telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
-            telemetry.addData("Found april tag?", aprilTagFound);
+            telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
         }
     }
@@ -342,18 +347,18 @@ public class Robot8034 extends LinearOpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                aprilTagFound = true;
                 if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
                     // Check if the tag is within alignment tolerances
                     double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
-                    double bearing = detection.ftcPose.bearing;
-                    double bearingError = Math.abs(bearing);
+                    // Use static variable for dashboard tuning
+                    bearing = detection.ftcPose.bearing;
                     double yawError = Math.abs(detection.ftcPose.yaw);
 
                     //TODO: Adjust tolerances as needed
                     // Define tolerances
                     double rangeTolerance = 2.0; // inches
-                    double bearingTolerance = 5.0; // degrees
+                    // Use static variable for dashboard tuning
+                    bearingTolerance = 5.0; // degrees
                     double yawTolerance = 12.0; // degrees
 
 //TODO: Decide if you want to use range and yaw corrections as well
@@ -361,7 +366,7 @@ public class Robot8034 extends LinearOpMode {
 //                        aligned = true;
 //                    } else {
                     // Only correct for bearing for now
-                    if (bearingError <= bearingTolerance) {
+                    if (Math.abs(bearing) <= bearingTolerance) {
                         aligned = true;
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
@@ -370,81 +375,80 @@ public class Robot8034 extends LinearOpMode {
 
                     break; // No need to check further tags
                 }
-            } else {
-                aprilTagFound = false;
             }
         }
 
         return aligned;
     }
 
+    //TODO: This is probably replaced by the isAprilTagAligned function, delete later if so.
     /**
      * Check to see if the launcher should be activated.
      *
      * @return true if the launcher is ready.
      */
-    private boolean checkIsLauncherReady() {
-        boolean targetFound = false;
-        desiredTag = null;
-        if (!targetFound) {
-            // Step through the list of detected tags and look for a matching tag
-            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                // Look to see if we have size info on this tag.
-                if (detection.metadata != null) {
-                    //  Check to see if we want to track towards this tag.
-                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-                        // Yes, we want to use this tag.
-                        targetFound = true;
-                        desiredTag = detection;
-                        break;  // don't look any further.
-                    } else {
-                        // This tag is in the library, but we do not want to track it right now.
-                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                    }
-                } else {
-                    // This tag is NOT in the library, so we don't have enough information to track to it.
-                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-                }
-            }
-        }
-
-        // Tell the driver what we see, and what to do.
-        if (targetFound) {
-            telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
-            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
-        } else {
-            telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
-        }
-
-        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-        if (targetFound) {
-            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double rangeError = (desiredTag.ftcPose.range - DESIRED_SHORT_DISTANCE);
-            double headingError = desiredTag.ftcPose.bearing;
-            double yawError = desiredTag.ftcPose.yaw;
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-//            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-//            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-//            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-//            telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-        } else {
-            // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-//            drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-//            strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
-//            turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
-//            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-        }
-        telemetry.update();
-
-        // Apply desired axes motions to the drivetrain.
-        mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
-        sleep(10);
-        return true;
-    }
+//    private boolean checkIsLauncherReady() {
+//        boolean targetFound = false;
+//        desiredTag = null;
+//        if (!targetFound) {
+//            // Step through the list of detected tags and look for a matching tag
+//            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+//            for (AprilTagDetection detection : currentDetections) {
+//                // Look to see if we have size info on this tag.
+//                if (detection.metadata != null) {
+//                    //  Check to see if we want to track towards this tag.
+//                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+//                        // Yes, we want to use this tag.
+//                        targetFound = true;
+//                        desiredTag = detection;
+//                        break;  // don't look any further.
+//                    } else {
+//                        // This tag is in the library, but we do not want to track it right now.
+//                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+//                    }
+//                } else {
+//                    // This tag is NOT in the library, so we don't have enough information to track to it.
+//                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+//                }
+//            }
+//        }
+//
+//        // Tell the driver what we see, and what to do.
+//        if (targetFound) {
+//            telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
+//            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+//            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+//            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+//            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
+//        } else {
+//            telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
+//        }
+//
+//        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
+//        if (targetFound) {
+//            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+//            double rangeError = (desiredTag.ftcPose.range - DESIRED_SHORT_DISTANCE);
+//            double headingError = desiredTag.ftcPose.bearing;
+//            double yawError = desiredTag.ftcPose.yaw;
+//
+//            // Use the speed and turn "gains" to calculate how we want the robot to move.
+////            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+////            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+////            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+//
+////            telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+//        } else {
+//            // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
+////            drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
+////            strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
+////            turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
+////            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+//        }
+//        telemetry.update();
+//
+//        // Apply desired axes motions to the drivetrain.
+//        mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
+//        sleep(10);
+//        return true;
+//    }
 }
