@@ -109,7 +109,8 @@ public class Robot8034 extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private AprilTagDetection desiredTag = null;
 
-    // Auto align debug variables for use with ftc dashboard.
+    //TODO: Auto align debug variables for use with ftc dashboard.
+    // Remove after debugging.
     public static double bearing = 0;
     public static double bearingTolerance = 5.0;
 
@@ -256,9 +257,8 @@ public class Robot8034 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry.addData("Launch Left:", launchManager.launchMotors.getVelocities().get(0));
-            telemetry.addData("Launch Right:", launchManager.launchMotors.getVelocities().get(1));
-            telemetry.addData("Timer", ArtifactCellManager.timer.seconds());
+            telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
+            telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
         }

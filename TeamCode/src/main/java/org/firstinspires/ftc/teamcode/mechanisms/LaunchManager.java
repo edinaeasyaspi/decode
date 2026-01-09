@@ -28,7 +28,7 @@ public class LaunchManager {
 
     private final CRServo launchServo;
     public final MotorGroup launchMotors;
-    private double launchPower = 0.0;
+    public static double launchPower = 0.0;
     // Feedforward constants
     // The feedfoward controller is used by the launch manager to maintain consistent launch speed.
     public static double FF_S = 0.1;
@@ -36,6 +36,8 @@ public class LaunchManager {
     public static double FF_A = 0.0;
     public static double launchMotorLeftVelocity;
     public static double launchMotorRightVelocity;
+    public double launchMotorLeftSpeed;
+    public double launchMotorRightSpeed;
 
     private SimpleMotorFeedforward feedforward =
             new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
@@ -59,6 +61,9 @@ public class LaunchManager {
         List<Double> velocities = launchMotors.getVelocities();
         launchMotorLeftVelocity = velocities.get(0);
         launchMotorRightVelocity = velocities.get(1);
+        List<Double> speeds = launchMotors.getSpeeds();
+        launchMotorLeftSpeed = speeds.get(0);
+        launchMotorRightSpeed = speeds.get(1);
 
         launchMotors.set(feedforward.calculate(this.launchPower));
     }
