@@ -149,8 +149,7 @@ public class Robot8034 extends LinearOpMode {
         double strafe = 0;
         double turn = 0;
         initAprilTag();
-        //TODO: Un-comment this if you want to set manual exposure/gain
-//        setManualExposure(6, 250);
+        setManualExposure(6, 250);
 
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
@@ -259,6 +258,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
+            telemetry.addData("April tag bearing", bearing);
             telemetry.update();
         }
     }
@@ -299,39 +299,35 @@ public class Robot8034 extends LinearOpMode {
     /*
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-//    */
-//    private void setManualExposure(int exposureMS, int gain) {
-//        // Wait for the camera to be open, then use the controls
-//
-//        if (visionPortal == null) {
-//            return;
-//        }
-//
-//        // Make sure camera is streaming before we try to set the exposure controls
-//        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-//            telemetry.addData("Camera", "Waiting");
-//            telemetry.update();
-//            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-//                sleep(20);
-//            }
-//            telemetry.addData("Camera", "Ready");
-//            telemetry.update();
-//        }
-//
-//        // Set camera controls unless we are stopping.
-//        if (!isStopRequested()) {
-//            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-//            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-//                exposureControl.setMode(ExposureControl.Mode.Manual);
-//                sleep(50);
-//            }
-//            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-//            sleep(20);
-//            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-//            gainControl.setGain(gain);
-//            sleep(20);
-//        }
-//    }
+    */
+    private void setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
+
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested()) {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+        }
+    }
 
     /**
      * Check to see if we are aligned to the desired AprilTag.
@@ -357,7 +353,7 @@ public class Robot8034 extends LinearOpMode {
                     // Define tolerances
                     double rangeTolerance = 2.0; // inches
                     // Use static variable for dashboard tuning
-                    bearingTolerance = 5.0; // degrees
+                    bearingTolerance = 2.5; // degrees
                     double yawTolerance = 12.0; // degrees
 
 //TODO: Decide if you want to use range and yaw corrections as well
@@ -367,6 +363,7 @@ public class Robot8034 extends LinearOpMode {
                     // Only correct for bearing for now
                     if (Math.abs(bearing) <= bearingTolerance) {
                         aligned = true;
+                        mecanumDrive.driveRobotCentric(0,0,0);
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
                         mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1.,1));
