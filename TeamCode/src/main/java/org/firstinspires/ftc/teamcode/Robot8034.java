@@ -299,39 +299,39 @@ public class Robot8034 extends LinearOpMode {
     /*
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    */
-    private void setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
-
-        if (visionPortal == null) {
-            return;
-        }
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested()) {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-    }
+//    */
+//    private void setManualExposure(int exposureMS, int gain) {
+//        // Wait for the camera to be open, then use the controls
+//
+//        if (visionPortal == null) {
+//            return;
+//        }
+//
+//        // Make sure camera is streaming before we try to set the exposure controls
+//        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+//            telemetry.addData("Camera", "Waiting");
+//            telemetry.update();
+//            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+//                sleep(20);
+//            }
+//            telemetry.addData("Camera", "Ready");
+//            telemetry.update();
+//        }
+//
+//        // Set camera controls unless we are stopping.
+//        if (!isStopRequested()) {
+//            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+//            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+//                exposureControl.setMode(ExposureControl.Mode.Manual);
+//                sleep(50);
+//            }
+//            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
+//            sleep(20);
+//            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+//            gainControl.setGain(gain);
+//            sleep(20);
+//        }
+//    }
 
     /**
      * Check to see if we are aligned to the desired AprilTag.
@@ -369,7 +369,7 @@ public class Robot8034 extends LinearOpMode {
                         aligned = true;
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -180, 180, -1.,1));
+                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1.,1));
                     }
 
                     break; // No need to check further tags
@@ -391,75 +391,4 @@ public class Robot8034 extends LinearOpMode {
         }
         return result;
     }
-
-    //TODO: This is probably replaced by the isAprilTagAligned function, delete later if so.
-    /**
-     * Check to see if the launcher should be activated.
-     *
-     * @return true if the launcher is ready.
-     */
-//    private boolean checkIsLauncherReady() {
-//        boolean targetFound = false;
-//        desiredTag = null;
-//        if (!targetFound) {
-//            // Step through the list of detected tags and look for a matching tag
-//            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-//            for (AprilTagDetection detection : currentDetections) {
-//                // Look to see if we have size info on this tag.
-//                if (detection.metadata != null) {
-//                    //  Check to see if we want to track towards this tag.
-//                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-//                        // Yes, we want to use this tag.
-//                        targetFound = true;
-//                        desiredTag = detection;
-//                        break;  // don't look any further.
-//                    } else {
-//                        // This tag is in the library, but we do not want to track it right now.
-//                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-//                    }
-//                } else {
-//                    // This tag is NOT in the library, so we don't have enough information to track to it.
-//                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-//                }
-//            }
-//        }
-//
-//        // Tell the driver what we see, and what to do.
-//        if (targetFound) {
-//            telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
-//            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-//            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-//            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-//            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
-//        } else {
-//            telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
-//        }
-//
-//        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-//        if (targetFound) {
-//            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-//            double rangeError = (desiredTag.ftcPose.range - DESIRED_SHORT_DISTANCE);
-//            double headingError = desiredTag.ftcPose.bearing;
-//            double yawError = desiredTag.ftcPose.yaw;
-//
-//            // Use the speed and turn "gains" to calculate how we want the robot to move.
-////            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-////            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-////            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-//
-////            telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-//        } else {
-//            // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-////            drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-////            strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
-////            turn = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
-////            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-//        }
-//        telemetry.update();
-//
-//        // Apply desired axes motions to the drivetrain.
-//        mecanumDrive.driveRobotCentric(gamePadEx.getLeftY(), gamePadEx.getLeftX(), gamePadEx.getRightY());
-//        sleep(10);
-//        return true;
-//    }
 }
