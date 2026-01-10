@@ -369,7 +369,7 @@ public class Robot8034 extends LinearOpMode {
                         aligned = true;
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, -Math.max(1, Math.min(-1, bearing)));
+                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -180, 180, -1.,1));
                     }
 
                     break; // No need to check further tags
@@ -378,6 +378,18 @@ public class Robot8034 extends LinearOpMode {
         }
 
         return aligned;
+    }
+
+    // Scale a value from one range to another.
+    private static double scale(double value, double inMin, double inMax, double outMin, double outMax) {
+        double result = (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+
+        if (result < outMin) {
+            return outMin;
+        } else if (result > outMax) {
+            return outMax;
+        }
+        return result;
     }
 
     //TODO: This is probably replaced by the isAprilTagAligned function, delete later if so.
