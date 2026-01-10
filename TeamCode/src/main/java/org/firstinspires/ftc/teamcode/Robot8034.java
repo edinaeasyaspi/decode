@@ -149,7 +149,7 @@ public class Robot8034 extends LinearOpMode {
         double strafe = 0;
         double turn = 0;
         initAprilTag();
-        setManualExposure(6, 250);
+        setManualExposure(3, 25);
 
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
