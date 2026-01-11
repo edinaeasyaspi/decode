@@ -79,6 +79,23 @@ public class AutonomousConfiguration {
         return autonomousOptions.getDelayStartSeconds();
     }
 
+    // Get camera settings
+    public int getExposureBlue() {
+        return autonomousOptions.getExposureBlue();
+    }
+
+    public int getGainBlue() {
+        return autonomousOptions.getGainBlue();
+    }
+
+    public int getExposureRed() {
+        return autonomousOptions.getExposureRed();
+    }
+
+    public int getGainRed() {
+        return autonomousOptions.getGainRed();
+    }
+
     public boolean getReadyToStart() {
         return readyToStart;
     }
