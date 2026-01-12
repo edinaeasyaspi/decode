@@ -30,15 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
-import com.seattlesolvers.solverslib.purepursuit.Path;
-import com.seattlesolvers.solverslib.purepursuit.Waypoint;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
@@ -50,7 +47,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
  //TODOs:
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
-@TeleOp(name = "Auto8034", group = "Autonomous")
+@Autonomous(name = "Auto8034", group = "Autonomous")
 //@Disabled
 public class Auto8034 extends OpMode {
     private RobotHardware robot = new RobotHardware(this);
