@@ -29,12 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
@@ -54,6 +55,21 @@ public class Auto8034 extends OpMode {
     private ArtifactCellManager cellManager;
 
     private ElapsedTime runtime = new ElapsedTime();
+    // Get the alliance color from the autonomous configuration
+    private AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+    private Follower follower;
+    private Timer pathTimer, actionTimer, opmodeTimer;
+
+    private int pathState;
+    private double allianceGoalOffset =
+            autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
+    private double allianceAudienceOffset =
+            autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
+    private final Pose startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
+    private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
+    private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
+    private final Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
+
 
     /**
      * This method will be called once, when the INIT button is pressed.
@@ -121,6 +137,14 @@ public class Auto8034 extends OpMode {
      */
     @Override
     public void stop() {
+
+    }
+
+    public void buildPaths() {
+
+    }
+
+    public void updatePaths() {
 
     }
 }
