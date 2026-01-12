@@ -30,19 +30,25 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
+import com.seattlesolvers.solverslib.purepursuit.Path;
+import com.seattlesolvers.solverslib.purepursuit.Waypoint;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 
 /*
- * Demonstrates an empty iterative OpMode
+ * Auto opMode for FTC Team 8034.
+ * It has some parts of PedroPathing, but due to time constraints it is not fully implemented.
+ //TODOs:
+ * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
 @TeleOp(name = "Auto8034", group = "Autonomous")
 //@Disabled
@@ -69,6 +75,7 @@ public class Auto8034 extends OpMode {
     private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
     private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
     private final Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
+    private final Pose scorePose = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
 
 
     /**
