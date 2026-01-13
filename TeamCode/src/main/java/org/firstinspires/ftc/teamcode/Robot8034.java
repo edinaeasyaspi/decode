@@ -98,7 +98,7 @@ public class Robot8034 extends LinearOpMode {
             0, -90, 0, 0);
 
     //TODO: Define desired distances for short and long shots.
-    // This is used for auto-alignment. Currently not implemented!
+    // This is used for auto-alignment.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
 
@@ -262,8 +262,6 @@ public class Robot8034 extends LinearOpMode {
             telemetry.update();
         }
     }
-
-    //TODO: move the ApriTag code to a separate class for re-use in Auto8034.
 
     /**
      * Initialize the AprilTag processor.
