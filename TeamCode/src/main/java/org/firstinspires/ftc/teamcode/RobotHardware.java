@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
@@ -33,6 +34,7 @@ public class RobotHardware {
     public IntakeManager intakeManager;
     public LaunchManager launchManager;
     public ArtifactCellManager cellManager;
+    public AprilTagManager aprilTagManager;
     public ColorSensor leftColorSensor;
     public ColorSensor centerCOlorSensor;
     public ColorSensor rightColorSensor;
@@ -64,6 +66,7 @@ public class RobotHardware {
         CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
+        aprilTagManager = new AprilTagManager();
         leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
         rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
