@@ -3,13 +3,18 @@ package org.firstinspires.ftc.teamcode;
 import java.io.Serializable;
 
 /**
-This class stores autonomous options for use by autonomous or teleop op modes.
-It is currently set for the Decode season but can be modified for upcoming seasons.
-It is a Java Serializable class to it can be saved to a file.
+ * This class stores autonomous options for use by autonomous or teleop op modes.
+ * It is currently set for the Decode season but can be modified for upcoming seasons.
+ * It is a Java Serializable class to it can be saved to a file.
  */
 public class AutonomousOptions implements Serializable {
     private static final long serialVersionUID = 7829136421241571165L;
 
+    // Default values for camera settings.
+    private int exposureRed = 3;
+    private int gainRed = 25;
+    private int exposureBlue = 3;
+    private int gainBlue = 25;
     private int delayStartSeconds;
     private AllianceColor allianceColor;
     private StartPosition startPosition;
@@ -37,6 +42,40 @@ public class AutonomousOptions implements Serializable {
 
     public void setRetrieveFromSpike(RetrieveFromSpike retrieveFromSpike) {
         this.retrieveFromSpike = retrieveFromSpike;
+    }
+
+    // Blue camera settings
+    public int getExposureBlue() {
+        return exposureBlue;
+    }
+
+    public void setExposureBlue(int exposureBlue) {
+        this.exposureBlue = exposureBlue;
+    }
+
+    public int getGainBlue() {
+        return gainBlue;
+    }
+
+    public void setGainBlue(int gainBlue) {
+        this.gainBlue = gainBlue;
+    }
+
+    // Red camera settings
+    public int getExposureRed() {
+        return exposureRed;
+    }
+
+    public void setExposureRed(int exposureRed) {
+        this.exposureRed = exposureRed;
+    }
+
+    public int getGainRed() {
+        return gainRed;
+    }
+
+    public void setGainRed(int gainRed) {
+        this.gainRed = gainRed;
     }
 
     public int getDelayStartSeconds() {

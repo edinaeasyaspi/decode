@@ -79,6 +79,39 @@ public class AutonomousConfiguration {
         return autonomousOptions.getDelayStartSeconds();
     }
 
+    // Get camera settings
+    public int getExposureBlue() {
+        return autonomousOptions.getExposureBlue();
+    }
+
+    public void setExposureBlue(int exposure) {
+        autonomousOptions.setExposureBlue(exposure);
+    }
+
+    public int getGainBlue() {
+        return autonomousOptions.getGainBlue();
+    }
+
+    public void setGainBlue(int gain) {
+        autonomousOptions.setGainBlue(gain);
+    }
+
+    public int getExposureRed() {
+        return autonomousOptions.getExposureRed();
+    }
+
+    public void setExposureRed(int exposure) {
+        autonomousOptions.setExposureRed(exposure);
+    }
+
+    public int getGainRed() {
+        return autonomousOptions.getGainRed();
+    }
+
+    public void setGainRed(int gain) {
+        autonomousOptions.setGainRed(gain);
+    }
+
     public boolean getReadyToStart() {
         return readyToStart;
     }

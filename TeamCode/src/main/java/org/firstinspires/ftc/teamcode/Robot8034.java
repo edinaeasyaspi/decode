@@ -97,6 +97,8 @@ public class Robot8034 extends LinearOpMode {
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, -90, 0, 0);
 
+    private AutonomousConfiguration autonomousConfiguration;
+
     //TODO: Define desired distances for short and long shots.
     // This is used for auto-alignment.
     final double DESIRED_SHORT_DISTANCE = 24.0;
@@ -144,12 +146,17 @@ public class Robot8034 extends LinearOpMode {
     public void runOpMode() {
         // Initialize the robot hardware
         robot.init();
+        // Initialize the autonomous configuration to get camera settings.
+        autonomousConfiguration = new AutonomousConfiguration();
+        autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
         double turn = 0;
+
         initAprilTag();
-        setManualExposure(3, 25);
+        // Set the exposure and gain for the camera.
+        setManualExposure();
 
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
@@ -300,9 +307,37 @@ public class Robot8034 extends LinearOpMode {
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
     */
-    private void setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
+    private void setManualExposure() {
+        // The default camera settings initially are set in AutonomousOptions and saved to the
+        // autonomous configuration file.
+        int exposureMS = 3;
+        int gain = 25;
+        switch (autonomousConfiguration.getAlliance()) {
+            case Blue:
+                exposureMS = autonomousConfiguration.getExposureBlue();
+                gain = autonomousConfiguration.getGainBlue();
+                break;
+            case Red:
+                exposureMS = autonomousConfiguration.getExposureRed();
+                gain = autonomousConfiguration.getGainRed();
+                break;
+            default:
+                break;
+        }
+        switch (autonomousConfiguration.getAlliance()) {
+            case Blue:
+                exposureMS = autonomousConfiguration.getExposureBlue();
+                gain = autonomousConfiguration.getGainBlue();
+                break;
+            case Red:
+                exposureMS = autonomousConfiguration.getExposureRed();
+                gain = autonomousConfiguration.getGainRed();
+                break;
+            default:
+                break;
+        }
 
+        // Wait for the camera to be open, then use the controls
         if (visionPortal == null) {
             return;
         }
