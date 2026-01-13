@@ -65,7 +65,9 @@ public class Auto8034 extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
+    // State variable
     private int pathState;
+
     private double allianceGoalOffset =
             autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
     private double allianceAudienceOffset =
@@ -147,6 +149,43 @@ public class Auto8034 extends OpMode {
     @Override
     public void stop() {
 
+    }
+
+    // State machine for autonomous path following and actions
+    public void autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:
+                setPathState(1);
+                break;
+            case 1:
+                // Just an example
+
+                if (robot.aprilTagManager.execute(true)) {
+                    cellManager.openCell(ArtifactCellManager.CELL.Left);
+                    cellManager.openCell(ArtifactCellManager.CELL.Center);
+                    cellManager.openCell(ArtifactCellManager.CELL.Right);
+                } else {
+                    break;
+                }
+
+                setPathState(2);
+                break;
+            case 2:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if (!follower.isBusy()) {
+                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
+                    setPathState(-1);
+                }
+                break;
+        }
+    }
+
+    /**
+     * These change the states of the paths and actions. It will also reset the timers of the individual switches
+     **/
+    public void setPathState(int pState) {
+        pathState = pState;
+        pathTimer.resetTimer();
     }
 
     public void buildPaths() {
