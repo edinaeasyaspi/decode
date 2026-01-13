@@ -40,6 +40,7 @@ import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 /*
  * Auto opMode for FTC Team 8034.
@@ -88,6 +89,7 @@ public class Auto8034 extends OpMode {
         intakeManager = robot.intakeManager;
         launchManager = robot.launchManager;
         cellManager = robot.cellManager;
+        follower = Constants.createFollower(hardwareMap);
     }
 
     /**
@@ -124,6 +126,8 @@ public class Auto8034 extends OpMode {
      */
     @Override
     public void loop() {
+        follower.update();
+
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
         telemetry.addData("Start Position", autonomousConfiguration.getStartPosition());

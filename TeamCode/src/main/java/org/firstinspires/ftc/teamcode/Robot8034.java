@@ -263,6 +263,8 @@ public class Robot8034 extends LinearOpMode {
         }
     }
 
+    //TODO: move the ApriTag code to a separate class for re-use in Auto8034.
+
     /**
      * Initialize the AprilTag processor.
      */
@@ -363,10 +365,10 @@ public class Robot8034 extends LinearOpMode {
                     // Only correct for bearing for now
                     if (Math.abs(bearing) <= bearingTolerance) {
                         aligned = true;
-                        mecanumDrive.driveRobotCentric(0,0,0);
+                        mecanumDrive.driveRobotCentric(0, 0, 0);
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1.,1));
+                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1., 1));
                     }
 
                     break; // No need to check further tags
