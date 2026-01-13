@@ -73,11 +73,10 @@ public class AprilTagManager {
     // This is used for auto-alignment.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
-    public static double bearing = 0;
-    public static double bearingTolerance = 5.0;
 
-    public void execute(boolean shootFar) {
-        isAprilTagAligned(shootFar);
+    // Execute the AprilTag alignment process.
+    public boolean execute(boolean shootFar) {
+       return isAprilTagAligned(shootFar);
     }
 
     /**
@@ -166,14 +165,14 @@ public class AprilTagManager {
                     // Check if the tag is within alignment tolerances
                     double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
                     // Use static variable for dashboard tuning
-                    bearing = detection.ftcPose.bearing;
+                    double bearing = detection.ftcPose.bearing;
                     double yawError = Math.abs(detection.ftcPose.yaw);
 
                     //TODO: Adjust tolerances as needed
                     // Define tolerances
                     double rangeTolerance = 2.0; // inches
                     // Use static variable for dashboard tuning
-                    bearingTolerance = 2.5; // degrees
+                    double bearingTolerance = 2.5; // degrees
                     double yawTolerance = 12.0; // degrees
 
 //TODO: Decide if you want to use range and yaw corrections as well
