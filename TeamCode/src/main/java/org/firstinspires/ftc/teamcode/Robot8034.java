@@ -106,15 +106,6 @@ public class Robot8034 extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;
     public boolean isAprilTagAligned = false;
-    private VisionPortal visionPortal;
-    private AprilTagProcessor aprilTag;
-    private AprilTagDetection desiredTag = null;
-
-    //TODO: Auto align debug variables for use with ftc dashboard.
-    // Remove after debugging.
-    public static double bearing = 0;
-    public static double bearingTolerance = 5.0;
-
 
     private RobotHardware robot = new RobotHardware(this);
 
@@ -126,16 +117,17 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.26;
-    public static double LONG_SHOT = 0.33;
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
+    public static double SHORT_SHOT = 0.26;
+    public static double LONG_SHOT = 0.33;
+
+    // Control the slow mode for driving.
+    boolean isSlowMode = false;
 
     FtcDashboard dashboard;
     Telemetry telemetry;
-    // Control the slow mode for driving.
-    boolean isSlowMode = false;
 
     GamepadEx gamePadEx;
     ToggleButtonReader aReader;
@@ -153,10 +145,6 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-
-        initAprilTag();
-        // Set the exposure and gain for the camera.
-        setManualExposure();
 
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
@@ -239,10 +227,9 @@ public class Robot8034 extends LinearOpMode {
                 launchManager.launchOn(SHORT_SHOT);
             }
 
-            //TODO: Verify how this should actually work. It aligns to the tag while
-            // the D-Pad left is held down.
+            // Auto-align to AprilTag when D-Pad left is pressed.
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
-                isAprilTagAligned = isAprilTagAligned();
+                isAprilTagAligned = robot.aprilTagManager.execute(SHOOT_FAR);
             }
 
             // Turn off the launch motors to save the battery.
@@ -250,8 +237,6 @@ public class Robot8034 extends LinearOpMode {
                 launchManager.launchOff();
             }
 
-            // Send drive power to the wheels when not Auto-aligning.
-            //TODO: Verify this behavior with drivers.
             // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
             if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
@@ -265,162 +250,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
-            telemetry.addData("April tag bearing", bearing);
             telemetry.update();
         }
-    }
-
-    /**
-     * Initialize the AprilTag processor.
-     */
-    private void initAprilTag() {
-        // Create the AprilTag processor by using a builder.
-        //TODO: Adjust the camera position and orientation values to match your robot
-        aprilTag = new AprilTagProcessor.Builder()
-                .setCameraPose(cameraPosition, cameraOrientation)
-                .build();
-
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-        // e.g. Some typical detection data using a Logitech C920 WebCam
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
-        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
-        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
-        // Note: Decimation can be changed on-the-fly to adapt during a match.
-        aprilTag.setDecimation(2);
-
-        // Create the vision portal by using a builder.
-        if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessor(aprilTag)
-                    .build();
-        } else {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessor(aprilTag)
-                    .build();
-        }
-    }
-
-    /*
-     Manually set the camera gain and exposure.
-     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    */
-    private void setManualExposure() {
-        // The default camera settings initially are set in AutonomousOptions and saved to the
-        // autonomous configuration file.
-        int exposureMS = 3;
-        int gain = 25;
-        switch (autonomousConfiguration.getAlliance()) {
-            case Blue:
-                exposureMS = autonomousConfiguration.getExposureBlue();
-                gain = autonomousConfiguration.getGainBlue();
-                break;
-            case Red:
-                exposureMS = autonomousConfiguration.getExposureRed();
-                gain = autonomousConfiguration.getGainRed();
-                break;
-            default:
-                break;
-        }
-        switch (autonomousConfiguration.getAlliance()) {
-            case Blue:
-                exposureMS = autonomousConfiguration.getExposureBlue();
-                gain = autonomousConfiguration.getGainBlue();
-                break;
-            case Red:
-                exposureMS = autonomousConfiguration.getExposureRed();
-                gain = autonomousConfiguration.getGainRed();
-                break;
-            default:
-                break;
-        }
-
-        // Wait for the camera to be open, then use the controls
-        if (visionPortal == null) {
-            return;
-        }
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested()) {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-    }
-
-    /**
-     * Check to see if we are aligned to the desired AprilTag.
-     *
-     * @return true if aligned.
-     */
-    //TODO: Something is causeing the robot to spin when this function is called, the mecanum drive is not the problem
-    private boolean isAprilTagAligned() {
-        boolean aligned = false;
-        // Assume there are 2 launch distances: short and long
-        double desiredRange = SHOOT_FAR ? DESIRED_LONG_DISTANCE : DESIRED_SHORT_DISTANCE;
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                if (detection.id == 20 || detection.id == 24) {
-                    // Check if the tag is within alignment tolerances
-                    double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
-                    // Use static variable for dashboard tuning
-                    bearing = detection.ftcPose.bearing;
-                    double yawError = Math.abs(detection.ftcPose.yaw);
-
-                    //TODO: Adjust tolerances as needed
-                    // Define tolerances
-                    double rangeTolerance = 2.0; // inches
-                    // Use static variable for dashboard tuning
-                    bearingTolerance = 2.5; // degrees
-                    double yawTolerance = 12.0; // degrees
-
-//TODO: Decide if you want to use range and yaw corrections as well
-//                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
-//                        aligned = true;
-//                    } else {
-                    // Only correct for bearing for now
-                    if (Math.abs(bearing) <= bearingTolerance) {
-                        aligned = true;
-                        mecanumDrive.driveRobotCentric(0, 0, 0);
-                    } else {
-                        // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1., 1));
-                    }
-
-                    break; // No need to check further tags
-                }
-            }
-        }
-
-        return aligned;
-    }
-
-    // Scale a value from one range to another.
-    private static double scale(double value, double inMin, double inMax, double outMin, double outMax) {
-        double result = (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-
-        if (result < outMin) {
-            return outMin;
-        } else if (result > outMax) {
-            return outMax;
-        }
-        return result;
     }
 }

@@ -70,7 +70,7 @@ public class AprilTagManager {
 
     private ElapsedTime delyayTimer = new ElapsedTime();
     //TODO: Define desired distances for short and long shots.
-    // This is used for auto-alignment.
+    // This is only used for auto-alignment when range is implemented.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
 
@@ -153,7 +153,6 @@ public class AprilTagManager {
      *
      * @return true if aligned.
      */
-    //TODO: Something is causeing the robot to spin when this function is called, the mecanum drive is not the problem
     private boolean isAprilTagAligned(boolean shootFar) {
         boolean aligned = false;
         // Assume there are 2 launch distances: short and long
