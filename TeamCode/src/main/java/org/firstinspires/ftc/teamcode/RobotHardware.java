@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -26,7 +25,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 @Config
 public class RobotHardware {
     /* Declare OpMode members. */
-    private OpMode myOpMode = null;   // gain access to methods in the calling OpMode.
+    private final OpMode myOpMode;   // gain access to methods in the calling OpMode.
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
     private final double[] cellPositions = new double[]{0.766, 0.486, 0.79}; //ups
     private final double[] cellDownPositions = new double[]{1.000, 0.709, 0.746}; //downs
@@ -68,7 +67,7 @@ public class RobotHardware {
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
         final WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
-        aprilTagManager = new AprilTagManager(webcamName, mecanumDrive);
+        aprilTagManager = new AprilTagManager(myOpMode, webcamName, mecanumDrive);
 
         leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
         centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));

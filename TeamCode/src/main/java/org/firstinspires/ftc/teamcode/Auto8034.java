@@ -130,6 +130,7 @@ public class Auto8034 extends OpMode {
     @Override
     public void loop() {
         follower.update();
+        autonomousPathUpdate();
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Alliance", autonomousConfiguration.getAlliance());

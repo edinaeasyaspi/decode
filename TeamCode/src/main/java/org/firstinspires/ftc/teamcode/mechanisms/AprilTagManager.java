@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
@@ -10,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.AutonomousConfiguration;
+import org.firstinspires.ftc.teamcode.AutonomousOptions;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -25,12 +28,25 @@ import java.util.concurrent.TimeUnit;
 public class AprilTagManager {
     private WebcamName webcamName;
     private MecanumDrive mecanumDrive;
+    private OpMode opMode;
+    private AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
+    private AutonomousOptions.AllianceColor allianceColor;
+    private int exposure;
+    private int gain;
 
-    public AprilTagManager(WebcamName webcamName, MecanumDrive mecanumDrive) {
+    public AprilTagManager(OpMode opMode, WebcamName webcamName, MecanumDrive mecanumDrive) {
         this.webcamName = webcamName;
         this.mecanumDrive = mecanumDrive;
+        autonomousConfiguration.init(opMode.gamepad1, opMode.telemetry, opMode.hardwareMap.appContext);
+        this.opMode = opMode;
+        allianceColor = autonomousConfiguration.getAlliance();
+        exposure = allianceColor == AutonomousOptions.AllianceColor.Red ?
+                autonomousConfiguration.getExposureRed() : autonomousConfiguration.getExposureBlue();
+        gain = allianceColor == AutonomousOptions.AllianceColor.Red ?
+                autonomousConfiguration.getGainRed() : autonomousConfiguration.getGainBlue();
+
         initAprilTag();
-        setManualExposure(6, 100);
+        setManualExposure(exposure, gain);
     }
 
     /**
@@ -66,17 +82,15 @@ public class AprilTagManager {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
 
-    private AprilTagDetection desiredTag = null;
-
-    private ElapsedTime delyayTimer = new ElapsedTime();
+    private ElapsedTime cameraDelayTimer = new ElapsedTime();
     //TODO: Define desired distances for short and long shots.
-    // This is only used for auto-alignment when range is implemented.
+    // This is only used for auto-alignment if range is implemented.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
 
     // Execute the AprilTag alignment process.
     public boolean execute(boolean shootFar) {
-       return isAprilTagAligned(shootFar);
+        return isAprilTagAligned(shootFar);
     }
 
     /**
@@ -85,7 +99,7 @@ public class AprilTagManager {
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.
         //TODO: Adjust the camera position and orientation values to match your robot
-        AprilTagProcessor aprilTag = new AprilTagProcessor.Builder()
+        aprilTag = new AprilTagProcessor.Builder()
                 .setCameraPose(cameraPosition, cameraOrientation)
                 .build();
 
@@ -121,8 +135,8 @@ public class AprilTagManager {
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
             while ((visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                delyayTimer.reset();
-                while (delyayTimer.milliseconds() < 20) {
+                cameraDelayTimer.reset();
+                while (cameraDelayTimer.milliseconds() < 20) {
                 }
             }
         }
@@ -131,20 +145,20 @@ public class AprilTagManager {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
             exposureControl.setMode(ExposureControl.Mode.Manual);
-            delyayTimer.reset();
-            while (delyayTimer.milliseconds() < 50) {
+            cameraDelayTimer.reset();
+            while (cameraDelayTimer.milliseconds() < 50) {
             }
         }
 
         exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-        delyayTimer.reset();
-        while (delyayTimer.milliseconds() < 20) {
+        cameraDelayTimer.reset();
+        while (cameraDelayTimer.milliseconds() < 20) {
         }
 
         GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
         gainControl.setGain(gain);
-        delyayTimer.reset();
-        while (delyayTimer.milliseconds() < 20) {
+        cameraDelayTimer.reset();
+        while (cameraDelayTimer.milliseconds() < 20) {
         }
     }
 
