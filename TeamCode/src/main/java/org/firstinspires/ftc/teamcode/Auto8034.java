@@ -49,7 +49,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  //TODOs:
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
-@Autonomous(name = "Auto8034", group = "Autonomous")
+@Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
 //@Disabled
 public class Auto8034 extends OpMode {
     private RobotHardware robot = new RobotHardware(this);
@@ -60,13 +60,16 @@ public class Auto8034 extends OpMode {
     private ArtifactCellManager cellManager;
 
     private ElapsedTime runtime = new ElapsedTime();
-    // Get the alliance color from the autonomous configuration
-    private AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+    private ElapsedTime delayTimer = new ElapsedTime();
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
-    // State variable
+    // Used to track the current state of the autonomous path.
+    // For better documentation, consider using an enum.
+    // Get the alliance color from the autonomous configuration
     private int pathState;
+    private AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+    private int startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
 
     private double allianceGoalOffset =
             autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
@@ -120,6 +123,13 @@ public class Auto8034 extends OpMode {
             requestOpModeStop();
         }
 
+        // Apply any requested delay before starting
+        delayTimer.reset();
+        while (delayTimer.seconds() < startDelaySeconds) {
+        }
+
+        // Set the starting pose based on the selected starting position
+        setPathState(0);
         runtime.reset();
     }
 
@@ -156,11 +166,11 @@ public class Auto8034 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
+
                 setPathState(1);
                 break;
             case 1:
-                // Just an example
-
+                // This case will execute the AprilTag detection and open the artifact cells
                 if (robot.aprilTagManager.execute(true)) {
                     cellManager.openCell(ArtifactCellManager.CELL.Left);
                     cellManager.openCell(ArtifactCellManager.CELL.Center);
