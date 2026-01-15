@@ -36,29 +36,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode is the main teleOp for Decode.
@@ -67,53 +53,12 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Robot8034", group = "TeleOp")
 public class Robot8034 extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-    /**
-     * Variables to store the position and orientation of the camera on the robot. Setting these
-     * values requires a definition of the axes of the camera and robot:
-     * <p>
-     * Camera axes:
-     * Origin location: Center of the lens
-     * Axes orientation: +x right, +y down, +z forward (from camera's perspective)
-     * <p>
-     * Robot axes (this is typical, but you can define this however you want):
-     * Origin location: Center of the robot at field height
-     * Axes orientation: +x right, +y forward, +z upward
-     * <p>
-     * Position:
-     * If all values are zero (no translation), that implies the camera is at the center of the
-     * robot. Suppose your camera is positioned 5 inches to the left, 7 inches forward, and 12
-     * inches above the ground - you would need to set the position to (-5, 7, 12).
-     * <p>
-     * Orientation:
-     * If all values are zero (no rotation), that implies the camera is pointing straight up. In
-     * most cases, you'll need to set the pitch to -90 degrees (rotation about the x-axis), meaning
-     * the camera is horizontal. Use a yaw of 0 if the camera is pointing forwards, +90 degrees if
-     * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
-     * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
-     */
-    private Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 9, 12, 0);
-    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -90, 0, 0);
+    private final ElapsedTime runtime = new ElapsedTime();
 
-    private AutonomousConfiguration autonomousConfiguration;
-
-    //TODO: Define desired distances for short and long shots.
-    // This is used for auto-alignment.
-    final double DESIRED_SHORT_DISTANCE = 24.0;
-    final double DESIRED_LONG_DISTANCE = 48.0;
-
-    private static final boolean USE_WEBCAM = true;
     public boolean isAprilTagAligned = false;
 
-    private RobotHardware robot = new RobotHardware(this);
+    private final RobotHardware robot = new RobotHardware(this);
 
-    private MecanumDrive mecanumDrive;
-    private double SLOW_MODE_FACTOR = 0.4;
-
-    private IntakeManager intakeManager;
-    private LaunchManager launchManager;
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
@@ -139,12 +84,8 @@ public class Robot8034 extends LinearOpMode {
         // Initialize the robot hardware
         robot.init();
         // Initialize the autonomous configuration to get camera settings.
-        autonomousConfiguration = new AutonomousConfiguration();
+        AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
-        boolean targetFound = false;
-        double drive = 0;
-        double strafe = 0;
-        double turn = 0;
 
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
@@ -156,9 +97,9 @@ public class Robot8034 extends LinearOpMode {
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        mecanumDrive = robot.mecanumDrive;
-        intakeManager = robot.intakeManager;
-        launchManager = robot.launchManager;
+        MecanumDrive mecanumDrive = robot.mecanumDrive;
+        IntakeManager intakeManager = robot.intakeManager;
+        LaunchManager launchManager = robot.launchManager;
         cellManager = robot.cellManager;
 
         telemetry.addData("Status", "Initialized");
@@ -186,7 +127,7 @@ public class Robot8034 extends LinearOpMode {
             cellManager.execute();
             launchManager.execute();
 
-//          No real reason to check the color sensors, just that we can say we ahve the code
+//          No real reason to check the color sensors, just that we can say we have the code
 //          cellManager.checkColors();
 //          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
@@ -239,13 +180,14 @@ public class Robot8034 extends LinearOpMode {
 
             // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
             if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
+                double SLOW_MODE_FACTOR = 0.4;
                 mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
                         isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
             }
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status", "Run Time: " + runtime);
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
