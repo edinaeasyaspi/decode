@@ -30,14 +30,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
-import org.firstinspires.ftc.teamcode.mechanisms.AprilTagManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
@@ -79,7 +80,9 @@ public class Auto8034 extends OpMode {
     private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
     private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
     private final Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
-    private final Pose scorePose = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+    private final Pose scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+
+    private Path scorePreloadPath;
 
 
     /**
@@ -96,6 +99,8 @@ public class Auto8034 extends OpMode {
         launchManager = robot.launchManager;
         cellManager = robot.cellManager;
         follower = Constants.createFollower(hardwareMap);
+        buildPaths();
+        follower.setStartingPose(getStartPose());
     }
 
     /**
@@ -166,7 +171,7 @@ public class Auto8034 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-
+                follower.followPath(scorePreloadPath);
                 setPathState(1);
                 break;
             case 1:
@@ -182,6 +187,10 @@ public class Auto8034 extends OpMode {
                 setPathState(2);
                 break;
             case 2:
+                //TODO: Keep building paths while there is time.
+                setPathState(3);
+                break;
+            case 3:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (!follower.isBusy()) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
@@ -200,10 +209,29 @@ public class Auto8034 extends OpMode {
     }
 
     public void buildPaths() {
-
+        Pose startPose = getStartPose();
+        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
+        scorePreloadPath = new Path(new BezierLine(startPose, scorePreload));
+        scorePreloadPath.setLinearHeadingInterpolation(startPose.getHeading(), scorePreload.getHeading());
     }
 
     public void updatePaths() {
 
+    }
+
+    private Pose getStartPose() {
+        switch (autonomousConfiguration.getStartPosition()) {
+            case GoalGate:
+                return startPoseGoalGate;
+            case GoalWall:
+                return startPoseGoalWall;
+            case AudienceTeam:
+                return startPoseAudienceTeam;
+            case AudienceCenter:
+                return startPoseGoalAudienceCenter;
+            default:
+                // If something went wrong, return a default pose
+                return new Pose(0, 0, 0);
+        }
     }
 }
