@@ -53,15 +53,12 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
 //@Disabled
 public class Auto8034 extends OpMode {
-    private RobotHardware robot = new RobotHardware(this);
+    private final RobotHardware robot = new RobotHardware(this);
     AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
-    private MecanumDrive mecanumDrive;
-    private IntakeManager intakeManager;
-    private LaunchManager launchManager;
     private ArtifactCellManager cellManager;
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime delayTimer = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime delayTimer = new ElapsedTime();
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
@@ -69,12 +66,12 @@ public class Auto8034 extends OpMode {
     // For better documentation, consider using an enum.
     // Get the alliance color from the autonomous configuration
     private int pathState;
-    private AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
-    private int startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
+    private final AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+    private final int startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
 
-    private double allianceGoalOffset =
+    private final double allianceGoalOffset =
             autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
-    private double allianceAudienceOffset =
+    private final double allianceAudienceOffset =
             autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
     private final Pose startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
     private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
@@ -94,9 +91,9 @@ public class Auto8034 extends OpMode {
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
-        mecanumDrive = robot.mecanumDrive;
-        intakeManager = robot.intakeManager;
-        launchManager = robot.launchManager;
+        MecanumDrive mecanumDrive = robot.mecanumDrive;
+        IntakeManager intakeManager = robot.intakeManager;
+        LaunchManager launchManager = robot.launchManager;
         cellManager = robot.cellManager;
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -147,7 +144,7 @@ public class Auto8034 extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Status", "Run Time: " + runtime);
         telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
         telemetry.addData("Start Position", autonomousConfiguration.getStartPosition());
         telemetry.addData("Retrieve from Spike", autonomousConfiguration.getRetrieveFromSpike());
@@ -213,10 +210,6 @@ public class Auto8034 extends OpMode {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreloadPath = new Path(new BezierLine(startPose, scorePreload));
         scorePreloadPath.setLinearHeadingInterpolation(startPose.getHeading(), scorePreload.getHeading());
-    }
-
-    public void updatePaths() {
-
     }
 
     private Pose getStartPose() {
