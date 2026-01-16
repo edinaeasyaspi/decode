@@ -197,6 +197,7 @@ public class GetAuto extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            long starttime = System.nanoTime();
             // Read gamepad inputs
             gamePadEx.readButtons();
             // Update the cell manager and launch manager
@@ -264,6 +265,9 @@ public class GetAuto extends LinearOpMode {
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
                         isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
             }
+
+            long endtime = System.nanoTime();
+            long cycletime = endtime - starttime;
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
