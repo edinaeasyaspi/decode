@@ -388,7 +388,7 @@ public class Robot8034 extends LinearOpMode {
                     // Define tolerances
                     double rangeTolerance = 2.0; // inches
                     // Use static variable for dashboard tuning
-                    bearingTolerance = 2.5; // degrees
+                    bearingTolerance = 1; // degrees
                     double yawTolerance = 12.0; // degrees
 
 //TODO: Decide if you want to use range and yaw corrections as well
