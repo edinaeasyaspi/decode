@@ -160,7 +160,7 @@ public class GetAuto extends LinearOpMode {
         telemetry = dashboard.getTelemetry();
 
         movementTracker = new MovementTracker();
-        movementTracker.init(robot.frontLeftDrive,robot.backLeftDrive,robot.frontRightDrive,robot.backRightDrive);
+        movementTracker.init(robot.frontLeftDrive,robot.backLeftDrive,robot.frontRightDrive,robot.backRightDrive,hardwareMap.appContext);
 
         initAprilTag();
         // Set the exposure and gain for the camera.

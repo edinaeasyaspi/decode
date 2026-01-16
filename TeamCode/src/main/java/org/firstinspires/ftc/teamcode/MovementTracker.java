@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import java.util.ArrayList;
@@ -16,11 +18,14 @@ public class MovementTracker {
     private List<Double> frontRightSpeeds = new ArrayList<>();
     private List<Double> backRightSpeeds = new ArrayList<>();
 
-    public void init(MotorEx frontLeft, MotorEx backLeft, MotorEx frontRight, MotorEx backRight) {
+    private Context context;
+
+    public void init(MotorEx frontLeft, MotorEx backLeft, MotorEx frontRight, MotorEx backRight, Context context1) {
         frontLeftDrive = frontLeft;
         backLeftDrive = backLeft;
         frontRightDrive = frontRight;
         backRightDrive = backRight;
+        context = context1;
     }
 
     public void update() {
@@ -28,5 +33,12 @@ public class MovementTracker {
         backLeftSpeeds.add(backLeftDrive.get());
         frontRightSpeeds.add(frontRightDrive.get());
         backRightSpeeds.add(backRightDrive.get());
+    }
+
+    public void recordMovement() {
+        MovementPatternRetrieve movementPatternRetrieve = new MovementPatternRetrieve(context);
+        MovementPattern movementPattern = new MovementPattern();
+        movementPattern.init(frontLeftSpeeds,backLeftSpeeds,frontRightSpeeds,backRightSpeeds);
+        movementPatternRetrieve.storeObject(movementPattern);
     }
 }
