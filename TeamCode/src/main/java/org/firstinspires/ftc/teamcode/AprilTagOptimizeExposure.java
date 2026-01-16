@@ -140,19 +140,19 @@ public class AprilTagOptimizeExposure extends LinearOpMode {
 
             // look for clicks to change exposure
             if (thisExpUp && !lastExpUp) {
-                myExposure = Range.clip(myExposure + 1, minExposure, maxExposure);
+                myExposure = Range.clip(myExposure + 2, minExposure, maxExposure);
                 setManualExposure(myExposure, myGain);
             } else if (thisExpDn && !lastExpDn) {
-                myExposure = Range.clip(myExposure - 1, minExposure, maxExposure);
+                myExposure = Range.clip(myExposure - 2, minExposure, maxExposure);
                 setManualExposure(myExposure, myGain);
             }
 
             // look for clicks to change the gain
             if (thisGainUp && !lastGainUp) {
-                myGain = Range.clip(myGain + 1, minGain, maxGain);
+                myGain = Range.clip(myGain + 5, minGain, maxGain);
                 setManualExposure(myExposure, myGain);
             } else if (thisGainDn && !lastGainDn) {
-                myGain = Range.clip(myGain - 1, minGain, maxGain);
+                myGain = Range.clip(myGain - 5, minGain, maxGain);
                 setManualExposure(myExposure, myGain);
             }
 
