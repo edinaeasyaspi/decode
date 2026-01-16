@@ -205,6 +205,10 @@ public class AutonomousConfiguration {
         autonomousOptions.setStartPosition(AutonomousOptions.StartPosition.None);
         autonomousOptions.setRetrieveFromSpike(AutonomousOptions.RetrieveFromSpike.No);
         autonomousOptions.setDelayStartSeconds(0);
+        autonomousOptions.setExposureBlue(6);
+        autonomousOptions.setGainBlue(16);
+        autonomousOptions.setExposureRed(6);
+        autonomousOptions.setGainRed(16);
         readyToStart = false;
         savedToFile = false;
     }

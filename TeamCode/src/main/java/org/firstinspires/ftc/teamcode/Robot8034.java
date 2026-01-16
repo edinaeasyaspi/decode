@@ -52,7 +52,6 @@ import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 @Config
 @TeleOp(name = "Robot8034", group = "TeleOp")
 public class Robot8034 extends LinearOpMode {
-    // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
 
     public boolean isAprilTagAligned = false;
@@ -83,6 +82,9 @@ public class Robot8034 extends LinearOpMode {
     public void runOpMode() {
         // Initialize the robot hardware
         robot.init();
+        // FtcDashboard setup
+        dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
         // Initialize the autonomous configuration to get camera settings.
         AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
@@ -90,9 +92,6 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-        // FtcDashboard setup
-        dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);

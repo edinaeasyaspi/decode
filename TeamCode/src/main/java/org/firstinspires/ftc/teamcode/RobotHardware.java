@@ -44,7 +44,6 @@ public class RobotHardware {
     }
 
     public void init() {
-        //TODO: Adjust motor types. Verify the motor type for each motor.
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
         MotorEx frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
