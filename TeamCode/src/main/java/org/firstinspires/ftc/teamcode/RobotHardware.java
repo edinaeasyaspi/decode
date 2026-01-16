@@ -37,6 +37,11 @@ public class RobotHardware {
     public ColorSensor centerCOlorSensor;
     public ColorSensor rightColorSensor;
 
+    public MotorEx frontLeftDrive;
+    public MotorEx backLeftDrive;
+    public MotorEx frontRightDrive;
+    public MotorEx backRightDrive;
+
     public RobotHardware(OpMode opmode) {
         myOpMode = opmode;
     }
@@ -45,10 +50,10 @@ public class RobotHardware {
         //TODO: Adjust motor types. Verify the motor type for each motor.
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration the DS.
-        MotorEx frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
-        MotorEx backLeftDrive = new MotorEx(myOpMode.hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
-        MotorEx frontRightDrive = new MotorEx(myOpMode.hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
-        MotorEx backRightDrive = new MotorEx(myOpMode.hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
+        frontLeftDrive = new MotorEx(myOpMode.hardwareMap, "frontleftdrive", Motor.GoBILDA.RPM_312);
+        backLeftDrive = new MotorEx(myOpMode.hardwareMap, "backleftdrive", Motor.GoBILDA.RPM_312);
+        frontRightDrive = new MotorEx(myOpMode.hardwareMap, "frontrightdrive", Motor.GoBILDA.RPM_312);
+        backRightDrive = new MotorEx(myOpMode.hardwareMap, "backrightdrive", Motor.GoBILDA.RPM_312);
         frontLeftDrive.setInverted(true);
         backLeftDrive.setInverted(true);
         frontRightDrive.setInverted(true);
