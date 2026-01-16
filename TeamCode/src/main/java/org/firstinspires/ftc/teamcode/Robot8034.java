@@ -153,14 +153,14 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
+        // FtcDashboard setup
+        dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
 
         initAprilTag();
         // Set the exposure and gain for the camera.
         setManualExposure();
 
-        // FtcDashboard setup
-        dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
