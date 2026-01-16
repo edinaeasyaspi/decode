@@ -62,16 +62,11 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-<<<<<<< HEAD
-=======
     public static double SHORT_SHOT = 0.25;
     public static double LONG_SHOT = 0.315;
->>>>>>> development2
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
-    public static double SHORT_SHOT = 0.26;
-    public static double LONG_SHOT = 0.33;
 
     // Control the slow mode for driving.
     boolean isSlowMode = false;
@@ -91,8 +86,6 @@ public class Robot8034 extends LinearOpMode {
         // Initialize the autonomous configuration to get camera settings.
         AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
-<<<<<<< HEAD
-=======
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
@@ -100,12 +93,6 @@ public class Robot8034 extends LinearOpMode {
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
         telemetry = dashboard.getTelemetry();
-
-        initAprilTag();
-        // Set the exposure and gain for the camera.
-        setManualExposure();
->>>>>>> development2
-
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
