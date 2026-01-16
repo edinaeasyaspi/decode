@@ -126,8 +126,8 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.26;
-    public static double LONG_SHOT = 0.33;
+    public static double SHORT_SHOT = 0.25;
+    public static double LONG_SHOT = 0.315;
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
@@ -388,7 +388,7 @@ public class Robot8034 extends LinearOpMode {
                     // Define tolerances
                     double rangeTolerance = 2.0; // inches
                     // Use static variable for dashboard tuning
-                    bearingTolerance = 2.5; // degrees
+                    bearingTolerance = 1; // degrees
                     double yawTolerance = 12.0; // degrees
 
 //TODO: Decide if you want to use range and yaw corrections as well
