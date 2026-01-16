@@ -64,8 +64,8 @@ public class Auto8034 extends OpMode {
 
     // Used to track the current state of the autonomous path.
     // For better documentation, consider using an enum.
-    // Get the alliance color from the autonomous configuration
     private int pathState;
+    // Get the alliance color from the autonomous configuration
     private final AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
     private final int startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
 
@@ -78,8 +78,10 @@ public class Auto8034 extends OpMode {
     private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
     private final Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
     private final Pose scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+    private final Pose moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
     private Path scorePreloadPath;
+    private Path moveOffLaunchLinePath;
 
 
     /**
@@ -91,9 +93,6 @@ public class Auto8034 extends OpMode {
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
-        MecanumDrive mecanumDrive = robot.mecanumDrive;
-        IntakeManager intakeManager = robot.intakeManager;
-        LaunchManager launchManager = robot.launchManager;
         cellManager = robot.cellManager;
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -172,20 +171,25 @@ public class Auto8034 extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                // This case will execute the AprilTag detection and open the artifact cells
-                if (robot.aprilTagManager.execute(true)) {
-                    cellManager.openCell(ArtifactCellManager.CELL.Left);
-                    cellManager.openCell(ArtifactCellManager.CELL.Center);
-                    cellManager.openCell(ArtifactCellManager.CELL.Right);
-                } else {
-                    break;
-                }
+                if (!follower.isBusy()) {
+                    // This case will execute the AprilTag detection and open the artifact cells
+                    if (robot.aprilTagManager.execute(true)) {
+                        cellManager.openCell(ArtifactCellManager.CELL.Left);
+                        cellManager.openCell(ArtifactCellManager.CELL.Center);
+                        cellManager.openCell(ArtifactCellManager.CELL.Right);
+                    } else {
+                        break;
+                    }
 
-                setPathState(2);
+                    setPathState(2);
+                }
                 break;
             case 2:
-                //TODO: Keep building paths while there is time.
-                setPathState(3);
+                // This case will move the robot off the launch line
+                if (!follower.isBusy()) {
+                    follower.followPath(moveOffLaunchLinePath);
+                    setPathState(3);
+                }
                 break;
             case 3:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -210,6 +214,8 @@ public class Auto8034 extends OpMode {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreloadPath = new Path(new BezierLine(startPose, scorePreload));
         scorePreloadPath.setLinearHeadingInterpolation(startPose.getHeading(), scorePreload.getHeading());
+        moveOffLaunchLinePath = new Path(new BezierLine(scorePreload, moveOffLaunchLine));
+        moveOffLaunchLinePath.setLinearHeadingInterpolation(scorePreload.getHeading(), moveOffLaunchLine.getHeading());
     }
 
     private Pose getStartPose() {
