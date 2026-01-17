@@ -145,7 +145,7 @@ public class Auto8034 extends OpMode {
 
 
         // Set the starting pose based on the selected starting position
-        if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
+        if (startPosition == AutonomousOptions.StartPosition.GoalWall) {
             robot.launchManager.launchOn(0.25);
             setPathState(0);
         } else {
@@ -211,7 +211,12 @@ public class Auto8034 extends OpMode {
                 // This case will move the robot off the launch line
                 if (driveTimer.milliseconds() > 2000) {
                     if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
-                        robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                        if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
+                            robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                        } else {
+                            robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+
+                        }
                     } else {
                         robot.mecanumDrive.driveRobotCentric(0, -0.5, 0, false);
                     }
