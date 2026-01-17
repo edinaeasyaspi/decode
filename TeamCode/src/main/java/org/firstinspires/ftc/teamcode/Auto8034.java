@@ -217,7 +217,7 @@ public class Auto8034 extends OpMode {
      **/
     public void setPathState(int pState) {
         pathState = pState;
-        pathTimer.resetTimer();
+//        pathTimer.resetTimer();
     }
 
     public void buildPaths() {
