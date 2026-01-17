@@ -59,6 +59,7 @@ public class Auto8034 extends OpMode {
 
     private final ElapsedTime runtime = new ElapsedTime();
     private final ElapsedTime delayTimer = new ElapsedTime();
+    private ElapsedTime driveTimer;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
@@ -99,9 +100,10 @@ public class Auto8034 extends OpMode {
         allianceAudienceOffset =
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
         cellManager = robot.cellManager;
-        follower = Constants.createFollower(hardwareMap);
-        buildPaths();
-        follower.setStartingPose(getStartPose());
+        driveTimer = new ElapsedTime();
+//        follower = Constants.createFollower(hardwareMap);
+//        buildPaths();
+//        follower.setStartingPose(getStartPose());
     }
 
     /**
@@ -151,7 +153,7 @@ public class Auto8034 extends OpMode {
      */
     @Override
     public void loop() {
-        follower.update();
+//        follower.update();
         autonomousPathUpdate();
 
         telemetry.addData("Status", "Run Time: " + runtime);
@@ -161,7 +163,6 @@ public class Auto8034 extends OpMode {
         telemetry.addData("Delay Start", autonomousConfiguration.getDelayStartSeconds());
         telemetry.addData("Ready to Start", autonomousConfiguration.getReadyToStart());
         telemetry.update();
-
     }
 
     /**
@@ -178,11 +179,13 @@ public class Auto8034 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
+                robot.mecanumDrive.driveRobotCentric(0, -.5, 0, false);
                 follower.followPath(scorePreloadPath);
+                driveTimer.reset();
                 setPathState(1);
                 break;
             case 1:
-                if (!follower.isBusy()) {
+                if (driveTimer.milliseconds() < 750) {
                     // This case will execute the AprilTag detection and open the artifact cells
                     if (robot.aprilTagManager.execute(true)) {
                         cellManager.openCell(ArtifactCellManager.CELL.Left);
@@ -193,6 +196,7 @@ public class Auto8034 extends OpMode {
                     }
 
                     setPathState(2);
+                    driveTimer.reset();
                 }
                 break;
             case 2:
@@ -204,7 +208,7 @@ public class Auto8034 extends OpMode {
                 break;
             case 3:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (!follower.isBusy()) {
+                if (driveTimer.milliseconds() < 750) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
