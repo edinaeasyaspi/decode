@@ -6,6 +6,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
+import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
+
 import java.util.List;
 
 @Autonomous(name="teleopToAuto")
@@ -30,6 +32,11 @@ public class teleopToAuto extends OpMode {
 
     public boolean loaded = false;
 
+    public LaunchManager launchManager;
+    public final double longShot = 0.315;
+    public final double shortShot = 0.25;
+    public boolean shootShort = true;
+
     @Override
     public void init() {
         movementPatternRetrieve = new MovementPatternRetrieve(hardwareMap.appContext);
@@ -42,6 +49,11 @@ public class teleopToAuto extends OpMode {
         cycleTimes = movementPattern.cycleTime;
 
         gamepadEx = new GamepadEx(gamepad1);
+
+        RobotHardware robotHardware = new RobotHardware(this);
+        robotHardware.launchManager = launchManager;
+
+
     }
 
     @Override
@@ -94,6 +106,17 @@ public class teleopToAuto extends OpMode {
 
             loaded = true;
         }
+        if (gamepadEx.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            shootShort = false;
+        }
+        if (gamepadEx.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            shootShort = true;
+        }
+        telemetry.addLine("A: save one, B: save two, X: save three, Y: save four");
+        telemetry.addData("Loaded:", loaded);
+        telemetry.addLine("\nToggle short and long the same way you would the shooter");
+        telemetry.addData("Shooting Far", !shootShort);
+        telemetry.addData("Shooting Short", shootShort);
     }
     @Override
     public void start() {
@@ -109,6 +132,7 @@ public class teleopToAuto extends OpMode {
 
             loaded = true;
         }
+        if (shootShort) launchManager.launchOn(shortShot); else launchManager.launchOn(longShot);
     }
     @Override
     public void loop() {
