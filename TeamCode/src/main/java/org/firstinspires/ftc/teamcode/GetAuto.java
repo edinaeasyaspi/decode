@@ -260,6 +260,15 @@ public class GetAuto extends LinearOpMode {
                 if (gamePadEx.wasJustPressed(GamepadKeys.Button.A)) {
                     movementTracker.recordMovement(cycles, "saveOne.txt");
                 }
+                if (gamePadEx.wasJustPressed(GamepadKeys.Button.B)) {
+                    movementTracker.recordMovement(cycles,"saveTwo");
+                }
+                if (gamePadEx.wasJustPressed(GamepadKeys.Button.X)) {
+                    movementTracker.recordMovement(cycles,"saveThree");
+                }
+                if (gamePadEx.wasJustPressed(GamepadKeys.Button.Y)) {
+                    movementTracker.recordMovement(cycles,"saveFour");
+                }
             }
 
             // Send drive power to the wheels when not Auto-aligning.
