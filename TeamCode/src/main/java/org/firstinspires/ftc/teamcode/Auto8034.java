@@ -213,7 +213,7 @@ public class Auto8034 extends OpMode {
                     if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
                         robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
                     } else {
-                        robot.mecanumDrive.driveRobotCentric(0, .5, 0, false);
+                        robot.mecanumDrive.driveRobotCentric(0, -0.5, 0, false);
                     }
                     driveTimer.reset();
                     setPathState(4);
