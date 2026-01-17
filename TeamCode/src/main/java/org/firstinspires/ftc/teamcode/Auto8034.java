@@ -89,7 +89,6 @@ public class Auto8034 extends OpMode {
      */
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
