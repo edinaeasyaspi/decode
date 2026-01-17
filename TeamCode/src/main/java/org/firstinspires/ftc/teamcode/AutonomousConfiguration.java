@@ -149,12 +149,12 @@ public class AutonomousConfiguration {
         //Start Position
 
         if (gamepad.dpadRightWasReleased()) {
-            autonomousOptions.setStartPosition(AutonomousOptions.StartPosition.GoalWall);
-            telemetry.speak("start right");
+            autonomousOptions.setStartPosition(AutonomousOptions.StartPosition.GoalGate);
+            telemetry.speak("start goal");
         }
         if (gamepad.dpadLeftWasReleased()) {
-            autonomousOptions.setStartPosition(AutonomousOptions.StartPosition.GoalGate);
-            telemetry.speak("start left");
+            autonomousOptions.setStartPosition(AutonomousOptions.StartPosition.AudienceTeam);
+            telemetry.speak("start audience");
         }
         teleStartPosition.setValue(autonomousOptions.getStartPosition());
 
