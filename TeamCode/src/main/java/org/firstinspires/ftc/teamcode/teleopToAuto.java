@@ -22,7 +22,7 @@ public class teleopToAuto extends OpMode {
     public MotorEx backRightDrive;
 
     public int repCount = 0;
-    public long cycleTime;
+    public List<Long> cycleTimes;
 
     @Override
     public void init() {
@@ -39,7 +39,7 @@ public class teleopToAuto extends OpMode {
         frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive");
         backRightDrive = new MotorEx(hardwareMap, "backrightdrive");
 
-        cycleTime = movementPattern.cycleTime;
+        cycleTimes = movementPattern.cycleTime;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class teleopToAuto extends OpMode {
         backRightDrive.set(backRightSpeeds.get(repCount));
 
         long endTime = System.nanoTime();
-        while (!((endTime-startTime) > cycleTime)) {
+        while (!((endTime-startTime) > cycleTimes.get(repCount))) {
             endTime = System.nanoTime();
             try {
                 Thread.sleep(100);
@@ -60,5 +60,6 @@ public class teleopToAuto extends OpMode {
                 throw new RuntimeException(e);
             }
         }
+        repCount++;
     }
 }

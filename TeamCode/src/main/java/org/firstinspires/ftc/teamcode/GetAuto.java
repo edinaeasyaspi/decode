@@ -56,6 +56,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -143,6 +144,8 @@ public class GetAuto extends LinearOpMode {
     TriggerReader rightTriggerReader;
 
     MovementTracker movementTracker;
+
+    public List<Long> cycles = new ArrayList<>();
 
     @Override
     public void runOpMode() {
@@ -268,6 +271,7 @@ public class GetAuto extends LinearOpMode {
 
             long endtime = System.nanoTime();
             long cycletime = endtime - starttime;
+            cycles.add(cycletime);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

@@ -7,9 +7,9 @@ public class MovementPattern {
     private List<Double> backLeftSpeeds;
     private List<Double> frontRightSpeeds;
     private List<Double> backRightSpeeds;
-    public long cycleTime;
+    public List<Long> cycleTime;
 
-    public void init(List<Double>fls,List<Double>bls,List<Double>frs,List<Double>brs,long cycle) {
+    public void init(List<Double>fls,List<Double>bls,List<Double>frs,List<Double>brs,List<Long> cycle) {
         frontLeftSpeeds = fls;
         backLeftSpeeds = bls;
         frontRightSpeeds = frs;
