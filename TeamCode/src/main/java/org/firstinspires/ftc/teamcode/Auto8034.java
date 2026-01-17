@@ -101,7 +101,6 @@ public class Auto8034 extends OpMode {
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
         cellManager = robot.cellManager;
         driveTimer = new ElapsedTime();
-        robot.launchManager.launchOn(0.25);
 //        follower = Constants.createFollower(hardwareMap);
 //        buildPaths();
 //        follower.setStartingPose(getStartPose());
@@ -143,6 +142,8 @@ public class Auto8034 extends OpMode {
         while (delayTimer.seconds() < startDelaySeconds) {
         }
 
+        robot.launchManager.launchOn(0.25);
+        
         // Set the starting pose based on the selected starting position
         setPathState(0);
         runtime.reset();
