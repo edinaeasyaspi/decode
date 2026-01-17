@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MovementPattern {
+public class MovementPattern implements Serializable {
     private List<Double> frontLeftSpeeds;
     private List<Double> backLeftSpeeds;
     private List<Double> frontRightSpeeds;
