@@ -66,13 +66,11 @@ public class Auto8034 extends OpMode {
     // For better documentation, consider using an enum.
     private int pathState;
     // Get the alliance color from the autonomous configuration
-    private final AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
-    private final int startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
+    private AutonomousOptions.AllianceColor allianceColor;
+    private int startDelaySeconds;
 
-    private final double allianceGoalOffset =
-            autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
-    private final double allianceAudienceOffset =
-            autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
+    private double allianceGoalOffset;
+    private double allianceAudienceOffset;
     private final Pose startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
     private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
     private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
@@ -92,6 +90,14 @@ public class Auto8034 extends OpMode {
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
+        // Get the alliance color from the autonomous configuration
+        AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+        startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
+
+        allianceGoalOffset =
+                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
+        allianceAudienceOffset =
+                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
         cellManager = robot.cellManager;
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
