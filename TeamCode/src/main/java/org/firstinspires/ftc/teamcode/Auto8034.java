@@ -68,6 +68,7 @@ public class Auto8034 extends OpMode {
     private int pathState;
     // Get the alliance color from the autonomous configuration
     private AutonomousOptions.AllianceColor allianceColor;
+    private AutonomousOptions.StartPosition startPosition;
     private int startDelaySeconds;
 
     private double allianceGoalOffset;
@@ -94,7 +95,7 @@ public class Auto8034 extends OpMode {
         // Get the alliance color from the autonomous configuration
         AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
-
+        startPosition = autonomousConfiguration.getStartPosition();
         allianceGoalOffset =
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
         allianceAudienceOffset =
@@ -142,10 +143,15 @@ public class Auto8034 extends OpMode {
         while (delayTimer.seconds() < startDelaySeconds) {
         }
 
-        robot.launchManager.launchOn(0.25);
 
         // Set the starting pose based on the selected starting position
-        setPathState(0);
+        if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
+            robot.launchManager.launchOn(0.25);
+            setPathState(0);
+        } else {
+            robot.launchManager.launchOn(0.315);
+            setPathState(2);
+        }
         runtime.reset();
     }
 
@@ -204,7 +210,11 @@ public class Auto8034 extends OpMode {
             case 3:
                 // This case will move the robot off the launch line
                 if (driveTimer.milliseconds() > 2000) {
-                    robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                    if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
+                        robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                    } else {
+                        robot.mecanumDrive.driveRobotCentric(0, .5, 0, false);
+                    }
                     driveTimer.reset();
                     setPathState(4);
                 }
