@@ -133,8 +133,8 @@ public class GetAuto extends LinearOpMode {
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
 
-    FtcDashboard dashboard;
-    Telemetry telemetry;
+//    FtcDashboard dashboard;
+//    Telemetry telemetry;
     // Control the slow mode for driving.
     boolean isSlowMode = false;
 
@@ -146,11 +146,15 @@ public class GetAuto extends LinearOpMode {
     MovementTracker movementTracker;
 
     public List<Long> cycles = new ArrayList<>();
+    public boolean saved = false;
 
     @Override
     public void runOpMode() {
         // Initialize the robot hardware
         robot.init();
+        // FtcDashboard setup
+        //dashboard = FtcDashboard.getInstance();
+        //telemetry = dashboard.getTelemetry();
         // Initialize the autonomous configuration to get camera settings.
         autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
@@ -158,9 +162,6 @@ public class GetAuto extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
-        // FtcDashboard setup
-        dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
 
         movementTracker = new MovementTracker();
         movementTracker.init(robot.frontLeftDrive,robot.backLeftDrive,robot.frontRightDrive,robot.backRightDrive,hardwareMap.appContext);
@@ -259,15 +260,19 @@ public class GetAuto extends LinearOpMode {
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_RIGHT)) {
                 if (gamePadEx.wasJustPressed(GamepadKeys.Button.A)) {
                     movementTracker.recordMovement(cycles, "saveOne.txt");
+                    saved = true;
                 }
                 if (gamePadEx.wasJustPressed(GamepadKeys.Button.B)) {
                     movementTracker.recordMovement(cycles,"saveTwo");
+                    saved = true;
                 }
                 if (gamePadEx.wasJustPressed(GamepadKeys.Button.X)) {
                     movementTracker.recordMovement(cycles,"saveThree");
+                    saved = true;
                 }
                 if (gamePadEx.wasJustPressed(GamepadKeys.Button.Y)) {
                     movementTracker.recordMovement(cycles,"saveFour");
+                    saved = true;
                 }
             }
 
@@ -285,6 +290,7 @@ public class GetAuto extends LinearOpMode {
             cycles.add(cycletime);
 
             // Show the elapsed game time and wheel power.
+            telemetry.addData("Saved", saved);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);

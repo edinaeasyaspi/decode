@@ -37,6 +37,8 @@ public class teleopToAuto extends OpMode {
     public final double shortShot = 0.25;
     public boolean shootShort = true;
 
+    public int load = 0;
+
     @Override
     public void init() {
         movementPatternRetrieve = new MovementPatternRetrieve(hardwareMap.appContext);
@@ -45,8 +47,6 @@ public class teleopToAuto extends OpMode {
         backLeftDrive = new MotorEx(hardwareMap, "backleftdrive");
         frontRightDrive = new MotorEx(hardwareMap, "frontrightdrive");
         backRightDrive = new MotorEx(hardwareMap, "backrightdrive");
-
-        cycleTimes = movementPattern.cycleTime;
 
         gamepadEx = new GamepadEx(gamepad1);
 
@@ -58,7 +58,7 @@ public class teleopToAuto extends OpMode {
 
     @Override
     public void init_loop() {
-        if (gamepadEx.wasJustReleased(GamepadKeys.Button.A)) {
+        if (gamepad1.a && !loaded) {
             movementPattern = movementPatternRetrieve.getObject("saveOne.txt");
 
             frontLeftSpeeds = movementPattern.getFrontLeftSpeeds();
@@ -69,8 +69,9 @@ public class teleopToAuto extends OpMode {
             cycleTimes = movementPattern.cycleTime;
 
             loaded = true;
+            load = 1;
         }
-        if (gamepadEx.wasJustReleased(GamepadKeys.Button.B)) {
+        if (gamepad1.b && !loaded) {
             movementPattern = movementPatternRetrieve.getObject("saveTwo.txt");
 
             frontLeftSpeeds = movementPattern.getFrontLeftSpeeds();
@@ -81,8 +82,9 @@ public class teleopToAuto extends OpMode {
             cycleTimes = movementPattern.cycleTime;
 
             loaded = true;
+            load = 2;
         }
-        if (gamepadEx.wasJustReleased(GamepadKeys.Button.X)) {
+        if (gamepad1.x && !loaded) {
             movementPattern = movementPatternRetrieve.getObject("saveThree.txt");
 
             frontLeftSpeeds = movementPattern.getFrontLeftSpeeds();
@@ -93,8 +95,9 @@ public class teleopToAuto extends OpMode {
             cycleTimes = movementPattern.cycleTime;
 
             loaded = true;
+            load = 3;
         }
-        if (gamepadEx.wasJustReleased(GamepadKeys.Button.X)) {
+        if (gamepad1.y && !loaded) {
             movementPattern = movementPatternRetrieve.getObject("saveFour.txt");
 
             frontLeftSpeeds = movementPattern.getFrontLeftSpeeds();
@@ -105,6 +108,7 @@ public class teleopToAuto extends OpMode {
             cycleTimes = movementPattern.cycleTime;
 
             loaded = true;
+            load = 4;
         }
         if (gamepadEx.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
             shootShort = false;
@@ -117,6 +121,7 @@ public class teleopToAuto extends OpMode {
         telemetry.addLine("\nToggle short and long the same way you would the shooter");
         telemetry.addData("Shooting Far", !shootShort);
         telemetry.addData("Shooting Short", shootShort);
+        telemetry.addData("Save number", load);
     }
     @Override
     public void start() {
