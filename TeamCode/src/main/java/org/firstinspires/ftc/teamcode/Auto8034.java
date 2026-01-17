@@ -143,7 +143,7 @@ public class Auto8034 extends OpMode {
         }
 
         robot.launchManager.launchOn(0.25);
-        
+
         // Set the starting pose based on the selected starting position
         setPathState(0);
         runtime.reset();
@@ -158,11 +158,7 @@ public class Auto8034 extends OpMode {
 //        follower.update();
         cellManager.execute();
         robot.launchManager.execute();
-        try {
-            autonomousPathUpdate();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        autonomousPathUpdate();
 
         telemetry.addData("Status", "Run Time: " + runtime);
         telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
@@ -184,7 +180,7 @@ public class Auto8034 extends OpMode {
     }
 
     // State machine for autonomous path following and actions
-    public void autonomousPathUpdate() throws InterruptedException {
+    public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
                 robot.mecanumDrive.driveRobotCentric(0, .5, 0, false);
@@ -202,12 +198,8 @@ public class Auto8034 extends OpMode {
                 // This case will execute the AprilTag detection and open the artifact cells
 //                    if (robot.aprilTagManager.execute(true)) {
                 robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
-                Thread.sleep(1500);
-                robot.cellManager.openCell(ArtifactCellManager.CELL.Center);
-                Thread.sleep(1500);
-                robot.cellManager.openCell(ArtifactCellManager.CELL.Right);
                 driveTimer.reset();
-                setPathState(3);
+                setPathState(5);
                 break;
             case 3:
                 // This case will move the robot off the launch line
@@ -225,6 +217,18 @@ public class Auto8034 extends OpMode {
                     setPathState(-1);
                 }
                 break;
+            case 5:
+                if (driveTimer.milliseconds() > 2000) {
+                    robot.cellManager.openCell(ArtifactCellManager.CELL.Center);
+                    driveTimer.reset();
+                    setPathState(6);
+                }
+            case 6:
+                if (driveTimer.milliseconds() > 2000) {
+                    robot.cellManager.openCell(ArtifactCellManager.CELL.Right);
+                    driveTimer.reset();
+                    setPathState(3);
+                }
         }
     }
 
