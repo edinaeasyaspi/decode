@@ -71,12 +71,12 @@ public class Auto8034 extends OpMode {
 
     private double allianceGoalOffset;
     private double allianceAudienceOffset;
-    private final Pose startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
-    private final Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
-    private final Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
-    private final Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
-    private final Pose scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
-    private final Pose moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
+    private Pose startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
+    private Pose startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
+    private Pose startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
+    private Pose startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
+    private Pose scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+    private Pose moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
     private Path scorePreloadPath;
     private Path moveOffLaunchLinePath;
@@ -128,6 +128,12 @@ public class Auto8034 extends OpMode {
             }
             requestOpModeStop();
         }
+        startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
+        startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
+        startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
+        startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
+        scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+        moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
         // Apply any requested delay before starting
         delayTimer.reset();
