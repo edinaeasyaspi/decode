@@ -12,7 +12,7 @@ This class reads or writes AutonomousOptions objects to a file.
  It is intended for use with the AutonomousConfiguration class.
  */
 public class MovementPatternRetrieve {
-    private final String fileName = "movementPaths.txt";
+    private String fileName = "movementPaths.txt";
     private Context context;
 
     public MovementPatternRetrieve(Context context) {
@@ -30,7 +30,8 @@ public class MovementPatternRetrieve {
         return result;
     }
 
-    public void storeObject(MovementPattern autonomousSpeeds) {
+    public void storeObject(MovementPattern autonomousSpeeds, String fileNameTarget) {
+        fileName = fileNameTarget;
         try {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(context.openFileOutput(fileName, Context.MODE_PRIVATE));
             objectOutputStream.writeObject(autonomousSpeeds);
@@ -41,7 +42,8 @@ public class MovementPatternRetrieve {
         }
     }
 
-    public MovementPattern getObject() {
+    public MovementPattern getObject(String fileNameTarget) {
+        fileName = fileNameTarget;
         ObjectInputStream objectInputStream;
         MovementPattern autonomousSpeeds = null;
         try {

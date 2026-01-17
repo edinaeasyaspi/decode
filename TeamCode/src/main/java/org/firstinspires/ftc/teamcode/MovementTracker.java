@@ -35,10 +35,10 @@ public class MovementTracker {
         backRightSpeeds.add(backRightDrive.get());
     }
 
-    public void recordMovement(List<Long> cycle) {
+    public void recordMovement(List<Long> cycle, String filename) {
         MovementPatternRetrieve movementPatternRetrieve = new MovementPatternRetrieve(context);
         MovementPattern movementPattern = new MovementPattern();
         movementPattern.init(frontLeftSpeeds,backLeftSpeeds,frontRightSpeeds,backRightSpeeds,cycle);
-        movementPatternRetrieve.storeObject(movementPattern);
+        movementPatternRetrieve.storeObject(movementPattern, filename);
     }
 }

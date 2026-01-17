@@ -256,8 +256,10 @@ public class GetAuto extends LinearOpMode {
             }
 
             // Turn off the launch motors to save the battery.
-            if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                launchManager.launchOff();
+            if (gamePadEx.isDown(GamepadKeys.Button.DPAD_RIGHT)) {
+                if (gamePadEx.wasJustPressed(GamepadKeys.Button.A)) {
+                    movementTracker.recordMovement(cycles, "saveOne.txt");
+                }
             }
 
             // Send drive power to the wheels when not Auto-aligning.

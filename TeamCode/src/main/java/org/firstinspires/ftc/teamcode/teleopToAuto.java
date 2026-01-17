@@ -27,7 +27,7 @@ public class teleopToAuto extends OpMode {
     @Override
     public void init() {
         movementPatternRetrieve = new MovementPatternRetrieve(hardwareMap.appContext);
-        movementPattern = movementPatternRetrieve.getObject();
+        movementPattern = movementPatternRetrieve.getObject("saveOne.txt");
 
         frontLeftSpeeds = movementPattern.getFrontLeftSpeeds();
         backLeftSpeeds = movementPattern.getBackLeftSpeeds();
