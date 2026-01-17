@@ -156,7 +156,12 @@ public class Auto8034 extends OpMode {
     public void loop() {
 //        follower.update();
         cellManager.execute();
-        autonomousPathUpdate();
+        robot.launchManager.execute();
+        try {
+            autonomousPathUpdate();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         telemetry.addData("Status", "Run Time: " + runtime);
         telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
@@ -178,7 +183,7 @@ public class Auto8034 extends OpMode {
     }
 
     // State machine for autonomous path following and actions
-    public void autonomousPathUpdate() {
+    public void autonomousPathUpdate() throws InterruptedException {
         switch (pathState) {
             case 0:
                 robot.mecanumDrive.driveRobotCentric(0, .5, 0, false);
@@ -196,8 +201,10 @@ public class Auto8034 extends OpMode {
                 // This case will execute the AprilTag detection and open the artifact cells
 //                    if (robot.aprilTagManager.execute(true)) {
                 robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
-//                        cellManager.openCell(ArtifactCellManager.CELL.Center);
-//                        cellManager.openCell(ArtifactCellManager.CELL.Right);
+                Thread.sleep(1500);
+                robot.cellManager.openCell(ArtifactCellManager.CELL.Center);
+                Thread.sleep(1500);
+                robot.cellManager.openCell(ArtifactCellManager.CELL.Right);
                 driveTimer.reset();
                 setPathState(3);
                 break;
