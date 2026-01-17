@@ -179,36 +179,43 @@ public class Auto8034 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                robot.mecanumDrive.driveRobotCentric(0, -.5, 0, false);
-                follower.followPath(scorePreloadPath);
+                robot.mecanumDrive.driveRobotCentric(0, .5, 0, false);
                 driveTimer.reset();
                 setPathState(1);
                 break;
             case 1:
-                if (driveTimer.milliseconds() < 750) {
-                    // This case will execute the AprilTag detection and open the artifact cells
-                    if (robot.aprilTagManager.execute(true)) {
-                        cellManager.openCell(ArtifactCellManager.CELL.Left);
-                        cellManager.openCell(ArtifactCellManager.CELL.Center);
-                        cellManager.openCell(ArtifactCellManager.CELL.Right);
-                    } else {
-                        break;
-                    }
-
+                if (driveTimer.milliseconds() > 2000) {
+                    robot.mecanumDrive.stop();
                     setPathState(2);
                     driveTimer.reset();
                 }
                 break;
             case 2:
-                // This case will move the robot off the launch line
-                if (!follower.isBusy()) {
-                    follower.followPath(moveOffLaunchLinePath);
-                    setPathState(3);
+                if (driveTimer.milliseconds() > 2000) {
+                    // This case will execute the AprilTag detection and open the artifact cells
+                    if (robot.aprilTagManager.execute(true)) {
+                        cellManager.openCell(ArtifactCellManager.CELL.Left);
+                        cellManager.openCell(ArtifactCellManager.CELL.Center);
+                        cellManager.openCell(ArtifactCellManager.CELL.Right);
+                        driveTimer.reset();
+                        setPathState(3);
+                    } else {
+                        break;
+                    }
                 }
                 break;
             case 3:
+                // This case will move the robot off the launch line
+                if (driveTimer.milliseconds() > 2000) {
+                    robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                    driveTimer.reset();
+                    setPathState(4);
+                }
+                break;
+            case 4:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (driveTimer.milliseconds() < 750) {
+                if (driveTimer.milliseconds() > 750) {
+                    robot.mecanumDrive.stop();
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
