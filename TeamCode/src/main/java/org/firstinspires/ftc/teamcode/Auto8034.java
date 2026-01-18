@@ -143,6 +143,8 @@ public class Auto8034 extends OpMode {
         while (delayTimer.seconds() < startDelaySeconds) {
         }
 
+        allianceColor = autonomousConfiguration.getAlliance();
+        startPosition = autonomousConfiguration.getStartPosition();
 
         // Set the starting pose based on the selected starting position
         if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
