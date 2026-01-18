@@ -145,7 +145,7 @@ public class Auto8034 extends OpMode {
 
 
         // Set the starting pose based on the selected starting position
-        if (startPosition == AutonomousOptions.StartPosition.GoalWall) {
+        if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
             robot.launchManager.launchOn(0.25);
             setPathState(0);
         } else {
@@ -194,7 +194,7 @@ public class Auto8034 extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if (driveTimer.milliseconds() > 2000) {
+                if (driveTimer.milliseconds() > 1750) {
                     robot.mecanumDrive.stop();
                     setPathState(2);
                     driveTimer.reset();
@@ -214,7 +214,7 @@ public class Auto8034 extends OpMode {
                         if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                             robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
                         } else {
-                            robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                            robot.mecanumDrive.driveRobotCentric(-0.5, 0, 0, false);
 
                         }
                     } else {
@@ -268,8 +268,6 @@ public class Auto8034 extends OpMode {
         switch (autonomousConfiguration.getStartPosition()) {
             case GoalGate:
                 return startPoseGoalGate;
-            case GoalWall:
-                return startPoseGoalWall;
             case AudienceTeam:
                 return startPoseAudienceTeam;
             case AudienceCenter:
