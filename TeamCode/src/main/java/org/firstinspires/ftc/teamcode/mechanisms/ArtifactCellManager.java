@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ArtifactCellManager {
     public enum CELL_STATE {
         Idle,
@@ -35,9 +38,11 @@ public class ArtifactCellManager {
     public ColorSensor centerColorSensor;
     public ColorSensor rightColorSensor;
 
+    public static motif currentMotif;
+
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
                                ColorSensor csOne, ColorSensor csTwo, ColorSensor csThree,
-                               ServoEx leftServo, ServoEx centerServo, ServoEx rightServo) {
+                               ServoEx leftServo, ServoEx centerServo, ServoEx rightServo, motif motif1) {
         this.cellPositions = cellPositions;
         this.cellDownPositions = cellDownPositions;
         //Put in sensors
@@ -48,6 +53,12 @@ public class ArtifactCellManager {
         this.leftCellServo = leftServo;
         this.centerCellServo = centerServo;
         this.rightCellServo = rightServo;
+
+        this.currentMotif = motif.GPP;
+    }
+
+    public void setCurrentMotif(motif motif1) {
+        this.currentMotif = motif1;
     }
 
     public enum CELL {
@@ -62,6 +73,12 @@ public class ArtifactCellManager {
     private final double UP_WAIT_TIME = 0.4;
     private final double DOWN_WAIT_TIME = 0.1;
     public static final ElapsedTime timer = new ElapsedTime();
+
+    public enum motif {
+        GPP,
+        PGP,
+        PPG
+    }
 
     public void execute() {
         leftCellState = processCell(CELL.Left, leftCellState, leftCellServo);
@@ -120,6 +137,50 @@ public class ArtifactCellManager {
         return end;
     }
 
+    private static CELL_COLOR specificMotifColor(int num) {
+        if (currentMotif == motif.GPP) {
+            if (num == 1) return CELL_COLOR.Green;
+            if (num == 2) return CELL_COLOR.Purple;
+            if (num == 3) return CELL_COLOR.Purple;
+        } else if (currentMotif == motif.PGP) {
+            if (num == 1) return CELL_COLOR.Purple;
+            if (num == 2) return CELL_COLOR.Green;
+            if (num == 3) return CELL_COLOR.Purple;
+        } else if (currentMotif == motif.PPG) {
+            if (num == 1) return CELL_COLOR.Purple;
+            if (num == 2) return CELL_COLOR.Purple;
+            if (num == 3) return CELL_COLOR.Green;
+        }
+        return CELL_COLOR.Purple;
+    }
+
+    public static List<CELL> launchOrder() {
+
+        List<CELL> launchOrder = Collections.emptyList();
+        launchOrder.add(CELL.Left);
+        launchOrder.add(CELL.Center);
+        launchOrder.add(CELL.Right);
+        List<CELL_COLOR> balls = Collections.emptyList();
+        balls.add(leftCellColor);
+        balls.add(centerCellColor);
+        balls.add(rightCellColor);
+        /// I know its ineffecient, but I know how to do this and this is simple
+        if ((balls.indexOf(CELL_COLOR.Green) == 0)) {
+            launchOrder.set(0, CELL.Left);
+            launchOrder.set(1, CELL.Center);
+            launchOrder.set(2, CELL.Right);
+        } else if (balls.indexOf(CELL_COLOR.Green) == 1) {
+            launchOrder.set(0, CELL.Center);
+            launchOrder.set(1, CELL.Left);
+            launchOrder.set(2, CELL.Right);
+        } else if (balls.indexOf(CELL_COLOR.Green) == 2) {
+            launchOrder.set(0, CELL.Right);
+            launchOrder.set(1, CELL.Left);
+            launchOrder.set(2, CELL.Center);
+        }
+        return launchOrder;
+    }
+
     // Processes the state of a cell and updates its servo position accordingly
     private CELL_STATE processCell(CELL cell, CELL_STATE state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
@@ -155,40 +216,5 @@ public class ArtifactCellManager {
         }
 
         return state;
-    }
-
-    private void passiveCell(CELL cell, CELL_STATE state, ServoEx servo) {
-        double servoUpPosition = cellPositions[cell.ordinal()];
-        double servoDownPosition = cellDownPositions[cell.ordinal()];
-
-        switch (state) {
-            case Up:
-                timer.reset();
-                state = CELL_STATE.Down;
-                break;
-            case Down:
-                servo.set(servoDownPosition);
-                state = CELL_STATE.Idle;
-                break;
-            default:
-        }
-        switch (cell) {
-            case Left:
-                leftCellState = state;
-                break;
-            case Center:
-                centerCellState = state;
-                break;
-            case Right:
-                rightCellState = state;
-                break;
-        }
-    }
-
-    //TODO: Is this needed?
-    public void passiveProccessAll(ServoEx servoOne, ServoEx servoTwo, ServoEx servoThree) {
-        passiveCell(CELL.Left, leftCellState, servoOne);
-        passiveCell(CELL.Center, rightCellState, servoTwo);
-        passiveCell(CELL.Right, rightCellState, servoThree);
     }
 }
