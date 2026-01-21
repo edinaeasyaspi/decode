@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -157,11 +158,11 @@ public class ArtifactCellManager {
 
     public static List<CELL> launchOrder() {
 
-        List<CELL> launchOrder = Collections.emptyList();
+        List<CELL> launchOrder = new ArrayList<>();
         launchOrder.add(CELL.None);
         launchOrder.add(CELL.None);
         launchOrder.add(CELL.None);
-        List<CELL_COLOR> balls = Collections.emptyList();
+        List<CELL_COLOR> balls = new ArrayList<>();
         balls.add(leftCellColor);
         balls.add(centerCellColor);
         balls.add(rightCellColor);
