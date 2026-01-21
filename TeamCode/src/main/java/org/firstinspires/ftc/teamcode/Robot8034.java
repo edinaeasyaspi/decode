@@ -181,23 +181,41 @@ public class Robot8034 extends LinearOpMode {
                 switch (launchStage) {
                     case 0:
                         launchOrder = cellManager.launchOrder();
+                        if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
+                            launchStage = 5;
+                            break;
+                        }
                         launchStage = 1;
                         break;
                     case 1:
-                        cellManager.openCell(launchOrder.get(0));
+                        if (launchOrder.get(0) != ArtifactCellManager.CELL.None) {
+                            cellManager.openCell(launchOrder.get(0));
+                        }
                         launchTimer.reset();
+                        if (launchOrder.get(1) == ArtifactCellManager.CELL.None) {
+                            launchStage = 5;
+                            break;
+                        }
                         launchStage = 2;
                         break;
                     case 2:
                         if (launchTimer.milliseconds() >= 1500) {
-                            cellManager.openCell(launchOrder.get(1));
+                            if (launchOrder.get(1) != ArtifactCellManager.CELL.None) {
+                                cellManager.openCell(launchOrder.get(1));
+                            }
                             launchTimer.reset();
+                            if (launchOrder.get(2) == ArtifactCellManager.CELL.None) {
+                                launchStage = 5;
+                                break;
+                            }
                             launchStage = 3;
                             break;
                         }
                     case 3:
                         if (launchTimer.milliseconds() >= 1500) {
-                            cellManager.openCell(launchOrder.get(2));
+                            if (launchOrder.get(2) != ArtifactCellManager.CELL.None) {
+                                cellManager.openCell(launchOrder.get(2));
+                            }
                             launchTimer.reset();
                             launchStage = 4;
                             break;
@@ -208,6 +226,10 @@ public class Robot8034 extends LinearOpMode {
                             launchStage = 0;
                             break;
                         }
+                    case 5:
+                        launching = false;
+                        launchStage = 0;
+                        break;
                 }
             }
 

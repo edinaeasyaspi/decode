@@ -64,7 +64,8 @@ public class ArtifactCellManager {
     public enum CELL {
         Left,
         Center,
-        Right
+        Right,
+        None
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
@@ -157,14 +158,14 @@ public class ArtifactCellManager {
     public static List<CELL> launchOrder() {
 
         List<CELL> launchOrder = Collections.emptyList();
-        launchOrder.add(CELL.Left);
-        launchOrder.add(CELL.Center);
-        launchOrder.add(CELL.Right);
+        launchOrder.add(CELL.None);
+        launchOrder.add(CELL.None);
+        launchOrder.add(CELL.None);
         List<CELL_COLOR> balls = Collections.emptyList();
         balls.add(leftCellColor);
         balls.add(centerCellColor);
         balls.add(rightCellColor);
-        /// I know its ineffecient, but I know how to do this and this is simple
+        /// I know its inefficient, but I know how to do this and this is simple
         if (Collections.frequency(balls, CELL_COLOR.Purple) == 2 && Collections.frequency(balls, CELL_COLOR.Green) == 1) {
             if ((balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PGP) || ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG))) {
                 launchOrder.set(0, CELL.Left);
@@ -178,9 +179,32 @@ public class ArtifactCellManager {
                 launchOrder.set(0, CELL.Right);
                 launchOrder.set(1, CELL.Left);
                 launchOrder.set(2, CELL.Center);
+            } else {
+                launchOrder.set(0, CELL.Left);
+                launchOrder.set(1, CELL.Right);
+                launchOrder.set(2, CELL.Center);
             }
         } else {
-            //For now just defualt to launching them all in order
+            if (Collections.frequency(balls, CELL_COLOR.None) == 0) {
+                launchOrder.set(0, CELL.Left);
+                launchOrder.set(1, CELL.Center);
+                launchOrder.set(2, CELL.Right);
+            } else if (Collections.frequency(balls, CELL_COLOR.None) == 1) {
+                if (balls.get(0) == CELL_COLOR.None) {
+                    launchOrder.set(0, CELL.Center);
+                    launchOrder.set(1, CELL.Right);
+                } else if (balls.get(1) == CELL_COLOR.None) {
+                    launchOrder.set(0, CELL.Left);
+                    launchOrder.set(1, CELL.Right);
+                } else if (balls.get(2) == CELL_COLOR.None) {
+                    launchOrder.set(0, CELL.Left);
+                    launchOrder.set(1, CELL.Center);
+                }
+            } else if (Collections.frequency(balls, CELL_COLOR.None) == 2) {
+                if (balls.get(0) != CELL_COLOR.None) launchOrder.set(0, CELL.Left);
+                if (balls.get(1) != CELL_COLOR.None) launchOrder.set(0, CELL.Center);
+                if (balls.get(2) != CELL_COLOR.None) launchOrder.set(0, CELL.Right);
+            }
         }
         return launchOrder;
     }
