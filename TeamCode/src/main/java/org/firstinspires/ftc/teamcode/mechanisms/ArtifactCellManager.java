@@ -165,15 +165,15 @@ public class ArtifactCellManager {
         balls.add(centerCellColor);
         balls.add(rightCellColor);
         /// I know its ineffecient, but I know how to do this and this is simple
-        if ((balls.indexOf(CELL_COLOR.Green) == 0)) {
+        if ((balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PGP) || ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG))) {
             launchOrder.set(0, CELL.Left);
             launchOrder.set(1, CELL.Center);
             launchOrder.set(2, CELL.Right);
-        } else if (balls.indexOf(CELL_COLOR.Green) == 1) {
+        } else if ((balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.PGP) || (balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG)) {
             launchOrder.set(0, CELL.Center);
             launchOrder.set(1, CELL.Left);
             launchOrder.set(2, CELL.Right);
-        } else if (balls.indexOf(CELL_COLOR.Green) == 2) {
+        } else if ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.PGP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PPG)) {
             launchOrder.set(0, CELL.Right);
             launchOrder.set(1, CELL.Left);
             launchOrder.set(2, CELL.Center);
