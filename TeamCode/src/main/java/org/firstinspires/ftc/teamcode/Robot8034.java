@@ -46,6 +46,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
+import java.util.List;
+
 /*
  * This OpMode is the main teleOp for Decode.
  */
@@ -63,6 +65,10 @@ public class Robot8034 extends LinearOpMode {
     //TODO: Adjust shot variables as needed
     public static double SHORT_SHOT = 0.25;
     public static double LONG_SHOT = 0.315;
+    public boolean launching = false;
+    public int launchStage = 0;
+    public List<ArtifactCellManager.CELL> launchOrder;
+    public ElapsedTime launchTimer = new ElapsedTime();
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
@@ -130,10 +136,6 @@ public class Robot8034 extends LinearOpMode {
             cellManager.checkColors();
             launchManager.execute();
 
-//          No real reason to check the color sensors, just that we can say we have the code
-//          cellManager.checkColors();
-//          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
-
             // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isSlowMode = !isSlowMode;
@@ -141,15 +143,15 @@ public class Robot8034 extends LinearOpMode {
 
             // Activate the appropriate cell servo to launch an artifact
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Left);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Center);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Right);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
             }
 
             // Intake controls
@@ -166,9 +168,36 @@ public class Robot8034 extends LinearOpMode {
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
+                launching = true;
+                launchStage = 0;
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
                 launchManager.launchOn(SHORT_SHOT);
+                launching = true;
+                launchStage = 0;
+            }
+
+            if (launching) {
+                switch (launchStage) {
+                    case 0:
+                        launchOrder = cellManager.launchOrder();
+                        launchStage = 1;
+                    case 1:
+                        cellManager.openCell(launchOrder.get(0));
+                        launchTimer.reset();
+                        launchStage = 2;
+                        break;
+                    case 2:
+                        if (launchTimer.milliseconds() >= 1500) {
+                            cellManager.openCell(launchOrder.get(1));
+                            launchTimer.reset();
+                            launchStage = 3;
+                        }
+                    case 3:
+                        if (launchTimer.milliseconds() >= 1500) {
+                            cellManager.openCell(launchOrder.get(2));
+                        }
+                }
             }
 
             // Auto-align to AprilTag when D-Pad left is pressed.
@@ -179,6 +208,7 @@ public class Robot8034 extends LinearOpMode {
             // Turn off the launch motors to save the battery.
             if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
                 launchManager.launchOff();
+                launching = false;
             }
 
             // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
@@ -188,6 +218,7 @@ public class Robot8034 extends LinearOpMode {
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
                         isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
             }
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime);
