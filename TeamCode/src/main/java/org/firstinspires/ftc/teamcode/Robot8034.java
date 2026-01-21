@@ -182,6 +182,7 @@ public class Robot8034 extends LinearOpMode {
                     case 0:
                         launchOrder = cellManager.launchOrder();
                         launchStage = 1;
+                        break;
                     case 1:
                         cellManager.openCell(launchOrder.get(0));
                         launchTimer.reset();
@@ -192,10 +193,20 @@ public class Robot8034 extends LinearOpMode {
                             cellManager.openCell(launchOrder.get(1));
                             launchTimer.reset();
                             launchStage = 3;
+                            break;
                         }
                     case 3:
                         if (launchTimer.milliseconds() >= 1500) {
                             cellManager.openCell(launchOrder.get(2));
+                            launchTimer.reset();
+                            launchStage = 4;
+                            break;
+                        }
+                    case 4:
+                        if (launchTimer.milliseconds() >= 1500) {
+                            launching = false;
+                            launchStage = 0;
+                            break;
                         }
                 }
             }
