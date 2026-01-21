@@ -37,12 +37,8 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
-import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 /*
  * Auto opMode for FTC Team 8034.
@@ -50,9 +46,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  //TODOs:
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
-@Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
+@Autonomous(name = "DevilDogsAuto", group = "Autonomous", preselectTeleOp = "TeleOp8034")
 //@Disabled
-public class Auto8034 extends OpMode {
+public class DevilDogsAuto extends OpMode {
     private final RobotHardware robot = new RobotHardware(this);
     AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
     private ArtifactCellManager cellManager;
@@ -220,7 +216,7 @@ public class Auto8034 extends OpMode {
 
                         }
                     } else {
-                        robot.mecanumDrive.driveRobotCentric(0, -0.5, 0, false);
+                        robot.mecanumDrive.driveRobotCentric(0, 0, 0, false);
                     }
                     driveTimer.reset();
                     setPathState(4);

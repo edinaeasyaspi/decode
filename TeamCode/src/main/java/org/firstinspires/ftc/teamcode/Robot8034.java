@@ -146,9 +146,6 @@ public class Robot8034 extends LinearOpMode {
     public void runOpMode() {
         // Initialize the robot hardware
         robot.init();
-        // FtcDashboard setup
-        dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
         // Initialize the autonomous configuration to get camera settings.
         autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
@@ -156,6 +153,9 @@ public class Robot8034 extends LinearOpMode {
         double drive = 0;
         double strafe = 0;
         double turn = 0;
+        // FtcDashboard setup
+        dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
 
         initAprilTag();
         // Set the exposure and gain for the camera.
