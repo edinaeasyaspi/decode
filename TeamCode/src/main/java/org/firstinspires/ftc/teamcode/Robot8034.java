@@ -169,66 +169,46 @@ public class Robot8034 extends LinearOpMode {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
                 launching = true;
-                launchStage = 0;
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
                 launchManager.launchOn(SHORT_SHOT);
                 launching = true;
-                launchStage = 0;
             }
 
             if (launching) {
                 switch (launchStage) {
                     case 0:
                         launchOrder = cellManager.launchOrder();
-                        if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
-                            launchStage = 5;
-                            break;
-                        }
-                        launchStage = 1;
+                        switchStage(1);
                         break;
                     case 1:
-                        if (launchOrder.get(0) != ArtifactCellManager.CELL.None) {
-                            cellManager.openCell(launchOrder.get(0));
-                        }
+                        cellManager.openCell(launchOrder.get(0));
                         launchTimer.reset();
-                        if (launchOrder.get(1) == ArtifactCellManager.CELL.None) {
-                            launchStage = 5;
-                            break;
-                        }
-                        launchStage = 2;
+                        switchStage(2);
                         break;
                     case 2:
                         if (launchTimer.milliseconds() >= 1500) {
-                            if (launchOrder.get(1) != ArtifactCellManager.CELL.None) {
-                                cellManager.openCell(launchOrder.get(1));
-                            }
+                            cellManager.openCell(launchOrder.get(1));
                             launchTimer.reset();
-                            if (launchOrder.get(2) == ArtifactCellManager.CELL.None) {
-                                launchStage = 5;
-                                break;
-                            }
-                            launchStage = 3;
+                            switchStage(3);
                             break;
                         }
                     case 3:
                         if (launchTimer.milliseconds() >= 1500) {
-                            if (launchOrder.get(2) != ArtifactCellManager.CELL.None) {
-                                cellManager.openCell(launchOrder.get(2));
-                            }
+                            cellManager.openCell(launchOrder.get(2));
                             launchTimer.reset();
-                            launchStage = 4;
+                            switchStage(4);
                             break;
                         }
                     case 4:
                         if (launchTimer.milliseconds() >= 1500) {
                             launching = false;
-                            launchStage = 0;
+                            switchStage(0);
                             break;
                         }
                     case 5:
                         launching = false;
-                        launchStage = 0;
+                        switchStage(0);
                         break;
                 }
             }
@@ -255,12 +235,18 @@ public class Robot8034 extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime);
+            telemetry.addLine("------");
             telemetry.addData("Colors", cellManager.colors());
+            telemetry.addData("Launch stage", launchStage);
+            telemetry.addData("Launch Order",String.valueOf(cellManager.launchOrder()));
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
         }
+    }
+    private void switchStage(int num) {
+        launchStage = num;
     }
 }
