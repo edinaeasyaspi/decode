@@ -46,6 +46,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -67,7 +68,7 @@ public class Robot8034 extends LinearOpMode {
     public static double LONG_SHOT = 0.315;
     public boolean launching = false;
     public int launchStage = 0;
-    public List<ArtifactCellManager.CELL> launchOrder;
+    public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
     public ElapsedTime launchTimer = new ElapsedTime();
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
@@ -77,7 +78,7 @@ public class Robot8034 extends LinearOpMode {
     boolean isSlowMode = false;
 
     FtcDashboard dashboard;
-    Telemetry telemetry;
+    Telemetry telemetry2;
 
     GamepadEx gamePadEx;
     ToggleButtonReader aReader;
@@ -90,10 +91,10 @@ public class Robot8034 extends LinearOpMode {
         robot.init();
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
+        telemetry2 = dashboard.getTelemetry();
         // Initialize the autonomous configuration to get camera settings.
         AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
-        autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
+        autonomousConfiguration.init(gamepad1, telemetry2, hardwareMap.appContext);
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
@@ -169,47 +170,28 @@ public class Robot8034 extends LinearOpMode {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
                 launching = true;
+                launchOrder = cellManager.launchOrder();
+                launchStage = 0;
+                cellManager.openCell(launchOrder.get(launchStage));
+                launchStage++;
+                launchTimer.reset();
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
                 launchManager.launchOn(SHORT_SHOT);
                 launching = true;
+                launchOrder = cellManager.launchOrder();
+                launchStage = 0;
+                cellManager.openCell(launchOrder.get(launchStage));
+                launchStage++;
+                launchTimer.reset();
             }
 
             if (launching) {
-                switch (launchStage) {
-                    case 0:
-                        launchOrder = cellManager.launchOrder();
-                        switchStage(1);
-                        break;
-                    case 1:
-                        cellManager.openCell(launchOrder.get(0));
-                        launchTimer.reset();
-                        switchStage(2);
-                        break;
-                    case 2:
-                        if (launchTimer.milliseconds() >= 1500) {
-                            cellManager.openCell(launchOrder.get(1));
-                            launchTimer.reset();
-                            switchStage(3);
-                            break;
-                        }
-                    case 3:
-                        if (launchTimer.milliseconds() >= 1500) {
-                            cellManager.openCell(launchOrder.get(2));
-                            launchTimer.reset();
-                            switchStage(4);
-                            break;
-                        }
-                    case 4:
-                        if (launchTimer.milliseconds() >= 1500) {
-                            launching = false;
-                            switchStage(0);
-                            break;
-                        }
-                    case 5:
-                        launching = false;
-                        switchStage(0);
-                        break;
+                if (launchTimer.milliseconds() >= 1500) {
+                    cellManager.openCell(launchOrder.get(launchStage));
+                    launchStage++;
+                    launchTimer.reset();
+                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.CELL.None) launching = false;
                 }
             }
 
