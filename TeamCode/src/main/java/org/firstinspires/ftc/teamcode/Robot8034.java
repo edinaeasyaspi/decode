@@ -127,6 +127,7 @@ public class Robot8034 extends LinearOpMode {
             gamePadEx.readButtons();
             // Update the cell manager and launch manager
             cellManager.execute();
+            cellManager.checkColors();
             launchManager.execute();
 
 //          No real reason to check the color sensors, just that we can say we have the code
@@ -190,6 +191,7 @@ public class Robot8034 extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime);
+            telemetry.addData("Colors", cellManager.colors());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
