@@ -37,12 +37,8 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
-import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 /*
  * Auto opMode for FTC Team 8034.
@@ -50,10 +46,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  //TODOs:
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
-
-@Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
+@Autonomous(name = "DevilDogsAuto", group = "Autonomous", preselectTeleOp = "TeleOp8034")
 //@Disabled
-public class Auto8034 extends OpMode {
+public class DevilDogsAuto extends OpMode {
     private final RobotHardware robot = new RobotHardware(this);
     AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
     private ArtifactCellManager cellManager;
@@ -94,7 +89,7 @@ public class Auto8034 extends OpMode {
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         // Get the alliance color from the autonomous configuration
-        allianceColor = autonomousConfiguration.getAlliance();
+        AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
         startPosition = autonomousConfiguration.getStartPosition();
         allianceGoalOffset =
@@ -213,7 +208,6 @@ public class Auto8034 extends OpMode {
             case 3:
                 // This case will move the robot off the launch line
                 if (driveTimer.milliseconds() > 2000) {
-                    // On the goal side color controls the strafe direction.
                     if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
                         if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                             robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
@@ -222,8 +216,7 @@ public class Auto8034 extends OpMode {
 
                         }
                     } else {
-                        // Audience side just drives forward
-                        robot.mecanumDrive.driveRobotCentric(0, 0.5, 0, false);
+                        robot.mecanumDrive.driveRobotCentric(0, 0, 0, false);
                     }
                     driveTimer.reset();
                     setPathState(4);

@@ -46,6 +46,9 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * This OpMode is the main teleOp for Decode.
  */
@@ -63,6 +66,10 @@ public class Robot8034 extends LinearOpMode {
     //TODO: Adjust shot variables as needed
     public static double SHORT_SHOT = 0.25;
     public static double LONG_SHOT = 0.315;
+    public boolean launching = false;
+    public int launchStage = 0;
+    public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
+    public ElapsedTime launchTimer = new ElapsedTime();
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
     private boolean SHOOT_FAR = false;
@@ -71,7 +78,7 @@ public class Robot8034 extends LinearOpMode {
     boolean isSlowMode = false;
 
     FtcDashboard dashboard;
-    Telemetry telemetry;
+    Telemetry telemetry2;
 
     GamepadEx gamePadEx;
     ToggleButtonReader aReader;
@@ -84,10 +91,10 @@ public class Robot8034 extends LinearOpMode {
         robot.init();
         // FtcDashboard setup
         dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
+        telemetry2 = dashboard.getTelemetry();
         // Initialize the autonomous configuration to get camera settings.
         AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
-        autonomousConfiguration.init(gamepad1, telemetry, hardwareMap.appContext);
+        autonomousConfiguration.init(gamepad1, telemetry2, hardwareMap.appContext);
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
@@ -127,11 +134,8 @@ public class Robot8034 extends LinearOpMode {
             gamePadEx.readButtons();
             // Update the cell manager and launch manager
             cellManager.execute();
+            cellManager.checkColors();
             launchManager.execute();
-
-//          No real reason to check the color sensors, just that we can say we have the code
-//          cellManager.checkColors();
-//          cellManager.passiveProccessAll(leftCell, centerCell, rightCell);
 
             // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -140,15 +144,15 @@ public class Robot8034 extends LinearOpMode {
 
             // Activate the appropriate cell servo to launch an artifact
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Left);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Center);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
-                cellManager.openCell(ArtifactCellManager.CELL.Right);
+                cellManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
             }
 
             // Intake controls
@@ -165,9 +169,30 @@ public class Robot8034 extends LinearOpMode {
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
+                launching = true;
+                launchOrder = cellManager.launchOrder();
+                launchStage = 0;
+                cellManager.openCell(launchOrder.get(launchStage));
+                launchStage++;
+                launchTimer.reset();
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
                 launchManager.launchOn(SHORT_SHOT);
+                launching = true;
+                launchOrder = cellManager.launchOrder();
+                launchStage = 0;
+                cellManager.openCell(launchOrder.get(launchStage));
+                launchStage++;
+                launchTimer.reset();
+            }
+
+            if (launching) {
+                if (launchTimer.milliseconds() >= 2000) {
+                    cellManager.openCell(launchOrder.get(launchStage));
+                    launchStage++;
+                    launchTimer.reset();
+                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.CELL.None) launching = false;
+                }
             }
 
             // Auto-align to AprilTag when D-Pad left is pressed.
@@ -178,6 +203,7 @@ public class Robot8034 extends LinearOpMode {
             // Turn off the launch motors to save the battery.
             if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
                 launchManager.launchOff();
+                launching = false;
             }
 
             // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
@@ -188,13 +214,21 @@ public class Robot8034 extends LinearOpMode {
                         isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
             }
 
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime);
+            telemetry.addLine("------");
+            telemetry.addData("Colors", cellManager.colors());
+            telemetry.addData("Launch stage", launchStage);
+            telemetry.addData("Launch Order",String.valueOf(cellManager.launchOrder()));
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
             telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
         }
+    }
+    private void switchStage(int num) {
+        launchStage = num;
     }
 }
