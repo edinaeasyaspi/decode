@@ -71,6 +71,8 @@ public class Auto8034 extends OpMode {
     private AutonomousOptions.AllianceColor allianceColor;
     private AutonomousOptions.StartPosition startPosition;
     private int startDelaySeconds;
+    // Default motif assumes we haven't detected it yet.
+    private ArtifactCellManager.motif currentMotif = ArtifactCellManager.motif.NONE;
 
     private double allianceGoalOffset;
     private double allianceAudienceOffset;
@@ -146,7 +148,9 @@ public class Auto8034 extends OpMode {
 
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
-
+        //TODO: This assumes the robot can see the obelisk at start. If that is not true, move
+        // this to the state machine so the robot can move into position..
+        currentMotif = robot.aprilTagManager.findMotif();
         // Set the starting pose based on the selected starting position
         if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
             robot.launchManager.launchOn(0.25);
@@ -189,6 +193,7 @@ public class Auto8034 extends OpMode {
     }
 
     // State machine for autonomous path following and actions
+    //TODO: Refine this and convert it to enums for better documentation.
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
@@ -204,8 +209,7 @@ public class Auto8034 extends OpMode {
                 }
                 break;
             case 2:
-                // This case will execute the AprilTag detection and open the artifact cells
-//                    if (robot.aprilTagManager.execute(true)) {
+                //TODO: Change this to use the obelisk motif to determine the sequence for launching.
                 robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
                 driveTimer.reset();
                 setPathState(5);
