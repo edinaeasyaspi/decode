@@ -157,6 +157,20 @@ public class ArtifactCellManager {
         return CELL_COLOR.Purple;
     }
 
+    public static boolean isCompatible(List<CELL_COLOR> balls) {
+        int purples = 0;
+        int greens = 0;
+        int repCount = 0;
+        CELL_COLOR ball;
+        while (repCount < 3) {
+            ball = balls.get(repCount);
+            if (ball == CELL_COLOR.Green) greens++;
+            if (ball == CELL_COLOR.Purple) purples++;
+        }
+        if (purples == 2 && greens == 1) return true;
+        return false;
+    }
+
     public static List<CELL> launchOrder() {
 
         List<CELL> launchOrder = new ArrayList<>();
@@ -168,7 +182,7 @@ public class ArtifactCellManager {
         balls.add(centerCellColor);
         balls.add(rightCellColor);
         /// I know its inefficient, but I know how to do this and this is simple
-        if (Collections.frequency(balls, CELL_COLOR.Purple) == 2 && Collections.frequency(balls, CELL_COLOR.Green) == 1) {
+        if (isCompatible(balls)) {
             if ((balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PGP) || ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG))) {
                 launchOrder.set(0, CELL.Left);
                 launchOrder.set(1, CELL.Center);
