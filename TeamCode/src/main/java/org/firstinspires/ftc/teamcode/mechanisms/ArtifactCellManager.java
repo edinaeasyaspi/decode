@@ -79,7 +79,8 @@ public class ArtifactCellManager {
     public enum motif {
         GPP,
         PGP,
-        PPG
+        PPG,
+        NONE
     }
 
     public void execute() {

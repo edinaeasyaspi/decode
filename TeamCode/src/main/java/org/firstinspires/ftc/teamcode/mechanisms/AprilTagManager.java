@@ -33,6 +33,11 @@ public class AprilTagManager {
     private AutonomousOptions.AllianceColor allianceColor;
     private int exposure;
     private int gain;
+    private int BLUE_GOAL_ID = 20;
+    private int RED_GOAL_ID = 24;
+    private int OBELISK_GPP_ID = 21;
+    private int OBELISK_PGP_ID = 22;
+    private int OBELISK_PPG_ID = 23;
 
     public AprilTagManager(OpMode opMode, WebcamName webcamName, MecanumDrive mecanumDrive) {
         this.webcamName = webcamName;
@@ -88,9 +93,15 @@ public class AprilTagManager {
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
 
-    // Execute the AprilTag alignment process.
+    // Execute the AprilTag auto alignment process for launching.
     public boolean execute(boolean shootFar) {
         return isAprilTagAligned(shootFar);
+    }
+
+    // Find the obelisk motif AprilTag.
+    // Returns motif.NONE if no tag is found.
+    public ArtifactCellManager.motif findMotif() {
+        return getMotifApriltag();
     }
 
     /**
@@ -209,8 +220,27 @@ public class AprilTagManager {
         return aligned;
     }
 
+    private ArtifactCellManager.motif getMotifApriltag() {
+        ArtifactCellManager.motif motif = ArtifactCellManager.motif.NONE;
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                // Only correct for bearing for now
+                if (detection.id == 21) {
+                    motif = ArtifactCellManager.motif.GPP;
+                } else if (detection.id == 22) {
+                    motif = ArtifactCellManager.motif.PGP;
+                } else if (detection.id == 23) {
+                    motif = ArtifactCellManager.motif.PPG;
+                }
+            }
+        }
+        return motif;
+    }
+
     // Scale a value from one range to another.
-    private static double scale(double value, double inMin, double inMax, double outMin, double outMax) {
+    private static double scale(double value, double inMin, double inMax, double outMin,
+                                double outMax) {
         double result = (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 
         if (result < outMin) {
