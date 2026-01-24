@@ -58,6 +58,7 @@ public class ArtifactCellManager {
         this.currentMotif = motif.GPP;
     }
 
+    //  This can be set from auto if it finds the AprilTag or manually from teleop.
     public void setCurrentMotif(motif motif1) {
         this.currentMotif = motif1;
     }
@@ -116,6 +117,7 @@ public class ArtifactCellManager {
         }
     }
 
+    // Find out what colors are in each cell.
     public void checkColors() {
         leftCellColor = checkColor(leftColorSensor);
         centerCellColor = checkColor(centerColorSensor);
@@ -172,11 +174,12 @@ public class ArtifactCellManager {
     }
 
     public static List<CELL> launchOrder() {
-
+        // List to hold order. Order is controlled by the current motif.
         List<CELL> launchOrder = new ArrayList<>();
         launchOrder.add(CELL.None);
         launchOrder.add(CELL.None);
         launchOrder.add(CELL.None);
+        // Colors in each cell.
         List<CELL_COLOR> balls = new ArrayList<>();
         balls.add(leftCellColor);
         balls.add(centerCellColor);
