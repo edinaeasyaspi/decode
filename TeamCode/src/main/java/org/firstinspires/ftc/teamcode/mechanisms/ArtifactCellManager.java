@@ -165,6 +165,7 @@ public class ArtifactCellManager {
             ball = balls.get(repCount);
             if (ball == CELL_COLOR.Green) greens++;
             if (ball == CELL_COLOR.Purple) purples++;
+            repCount++;
         }
         if (purples == 2 && greens == 1) return true;
         return false;
