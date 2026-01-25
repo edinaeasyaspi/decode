@@ -64,8 +64,8 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.25;
-    public static double LONG_SHOT = 0.315;
+    public static double SHORT_SHOT = 0.24;
+    public static double LONG_SHOT = 0.24;
     public boolean launching = false;
     public int launchStage = 0;
     public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
@@ -187,7 +187,7 @@ public class Robot8034 extends LinearOpMode {
             }
 
             if (launching) {
-                if (launchTimer.milliseconds() >= 2000) {
+                if (launchTimer.milliseconds() >= 1500) {
                     cellManager.openCell(launchOrder.get(launchStage));
                     launchStage++;
                     launchTimer.reset();
@@ -222,8 +222,8 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addData("Launch stage", launchStage);
             telemetry.addData("Launch Order",String.valueOf(cellManager.launchOrder()));
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry.addData("Launch left speed:", launchManager.launchMotorLeftSpeed);
-            telemetry.addData("Launch right speed:", launchManager.launchMotorRightSpeed);
+            telemetry2.addData("Launch left speed:", launchManager.launchMotorLeftVelocity);
+            telemetry2.addData("Launch right speed:", launchManager.launchMotorRightVelocity);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
         }
