@@ -20,7 +20,10 @@ public class DriveTuning extends LinearOpMode {
 
     private ElapsedTime moveTimer = new ElapsedTime();
     private boolean autoDriveing = false;
-    public int driveTime = 2000;
+    private int driveTime = 2000;
+    public final int strafeDriveTime = 2000;
+    public final int forwardDriveTime = 2000;
+    public final int turnDriveTime = 2000;
 
     public Telemetry telemetry;
     public FtcDashboard ftcDashboard;
@@ -42,18 +45,21 @@ public class DriveTuning extends LinearOpMode {
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.A)) {
                 autoDriveing = true;
                 moveTimer.reset();
+                driveTime = strafeDriveTime;
                 mecanumDrive.driveRobotCentric(1,0,0);
             }
 
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.B)) {
                 autoDriveing = true;
                 moveTimer.reset();
+                driveTime = forwardDriveTime;
                 mecanumDrive.driveRobotCentric(0,1,0);
             }
 
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.Y)) {
                 autoDriveing = true;
                 moveTimer.reset();
+                driveTime = turnDriveTime;
                 mecanumDrive.driveRobotCentric(0,0,1);
             }
 
@@ -61,6 +67,10 @@ public class DriveTuning extends LinearOpMode {
                 autoDriveing = false;
                 mecanumDrive.driveRobotCentric(0,0,0);
             }
+
+            telemetry.addData("Forward(ms)", forwardDriveTime);
+            telemetry.addData("Strafe(ms)", strafeDriveTime);
+            telemetry.addData("Turn(ms)", turnDriveTime);
         }
     }
 }
