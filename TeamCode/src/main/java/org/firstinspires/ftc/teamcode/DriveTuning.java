@@ -21,9 +21,9 @@ public class DriveTuning extends LinearOpMode {
     private ElapsedTime moveTimer = new ElapsedTime();
     private boolean autoDriveing = false;
     private int driveTime = 2000;
-    public final int strafeDriveTime = 2000;
-    public final int forwardDriveTime = 2000;
-    public final int turnDriveTime = 2000;
+    public static int strafeDriveTime = 2000;
+    public static int forwardDriveTime = 2000;
+    public static int turnDriveTime = 2000;
 
     public Telemetry telemetry;
     public FtcDashboard ftcDashboard;
