@@ -51,7 +51,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
 
-@Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
+@Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "Robot8034")
 //@Disabled
 public class Auto8034 extends OpMode {
     private final RobotHardware robot = new RobotHardware(this);
@@ -95,14 +95,6 @@ public class Auto8034 extends OpMode {
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
-        // Get the alliance color from the autonomous configuration
-        allianceColor = autonomousConfiguration.getAlliance();
-        startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
-        startPosition = autonomousConfiguration.getStartPosition();
-        allianceGoalOffset =
-                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
-        allianceAudienceOffset =
-                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
         cellManager = robot.cellManager;
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);
@@ -134,12 +126,13 @@ public class Auto8034 extends OpMode {
             }
             requestOpModeStop();
         }
-        startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
-        startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
-        startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
-        startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
-        scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
-        moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
+        //TODO: These are for PedroPathing implementation.
+//        startPoseGoalGate = new Pose(28.5 + allianceGoalOffset, 128, Math.toRadians(180));
+//        startPoseGoalWall = new Pose(62 + allianceGoalOffset, 134, Math.toRadians(135));
+//        startPoseAudienceTeam = new Pose(48 + allianceAudienceOffset, 9, Math.toRadians(105));
+//        startPoseGoalAudienceCenter = new Pose(28.5 + allianceAudienceOffset, 128, Math.toRadians(180));
+//        scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
+//        moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
         // Apply any requested delay before starting
         delayTimer.reset();
@@ -148,6 +141,12 @@ public class Auto8034 extends OpMode {
 
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
+        startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
+        allianceGoalOffset =
+                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
+        allianceAudienceOffset =
+                autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
+
         //TODO: This assumes the robot can see the obelisk at start. If that is not true, move
         // this to the state machine so the robot can move into position..
         currentMotif = robot.aprilTagManager.findMotif();
@@ -174,11 +173,10 @@ public class Auto8034 extends OpMode {
         autonomousPathUpdate();
 
         telemetry.addData("Status", "Run Time: " + runtime);
-        telemetry.addData("Alliance", autonomousConfiguration.getAlliance());
-        telemetry.addData("Start Position", autonomousConfiguration.getStartPosition());
+        telemetry.addData("Alliance", allianceColor);
+        telemetry.addData("Start Position", startPosition);
         telemetry.addData("Retrieve from Spike", autonomousConfiguration.getRetrieveFromSpike());
-        telemetry.addData("Delay Start", autonomousConfiguration.getDelayStartSeconds());
-        telemetry.addData("Ready to Start", autonomousConfiguration.getReadyToStart());
+        telemetry.addData("Delay Start", startDelaySeconds);
         telemetry.update();
     }
 
