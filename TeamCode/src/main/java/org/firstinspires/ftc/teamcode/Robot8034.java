@@ -120,7 +120,7 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("x: sets GPP motif");
         telemetry.addLine("y: sets PGP motif");
         telemetry.addLine("b: sets PPG motif");
-        telemetry.addLine("Right Trigger: Intake On");
+        telemetry.addLine("Left Bumper: Intake On");
         telemetry.addLine("Right Bumper: Intake Off");
         telemetry.addLine("D-Pad Up: Long shot");
         telemetry.addLine("D-Pad Down: Short shot");
