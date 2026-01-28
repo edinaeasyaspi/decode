@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import static com.qualcomm.robotcore.eventloop.opmode.OpMode.blackboard;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
@@ -38,6 +40,8 @@ public class AprilTagManager {
     private int OBELISK_GPP_ID = 21;
     private int OBELISK_PGP_ID = 22;
     private int OBELISK_PPG_ID = 23;
+    public ArtifactCellManager.motif currentMotif;
+
 
     public AprilTagManager(OpMode opMode, WebcamName webcamName, MecanumDrive mecanumDrive) {
         this.webcamName = webcamName;
@@ -52,6 +56,9 @@ public class AprilTagManager {
 
         initAprilTag();
         setManualExposure(exposure, gain);
+        // Get the motif from the dashboard, default to NONE
+        Object dashboardCurrentMotif = blackboard.getOrDefault(CURRENT_MOTIF_KEY, ArtifactCellManager.motif.NONE);
+        currentMotif = (ArtifactCellManager.motif)dashboardCurrentMotif;
     }
 
     /**
@@ -92,7 +99,8 @@ public class AprilTagManager {
     // This is only used for auto-alignment if range is implemented.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
-    public ArtifactCellManager.motif currentMotif = ArtifactCellManager.motif.NONE;
+    // Store the current motif in the opmode dashboard for retrieval by tele OpModes.
+    private String CURRENT_MOTIF_KEY = "currentmotif";
 
     // Execute the AprilTag auto alignment process for launching.
     public boolean execute(boolean shootFar) {
@@ -103,7 +111,19 @@ public class AprilTagManager {
     // Returns motif.NONE if no tag is found.
     public ArtifactCellManager.motif findMotif() {
         this.currentMotif = getMotifApriltag();
+        // Store the current motif in the blackboard for retrieval by tele OpModes.
+        blackboard.put(CURRENT_MOTIF_KEY, currentMotif);
         return this.currentMotif;
+    }
+
+    // For use by teleop when auto does not find the motif.
+    public void setCurrentMotif(ArtifactCellManager.motif motif) {
+        this.currentMotif = motif;
+        blackboard.put(CURRENT_MOTIF_KEY, currentMotif);
+    }
+
+    public ArtifactCellManager.motif getCurrentMotif() {
+        return currentMotif;
     }
 
     /**

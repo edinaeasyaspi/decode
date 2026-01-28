@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
@@ -69,6 +70,7 @@ public class Robot8034 extends LinearOpMode {
     public boolean launching = false;
     public int launchStage = 0;
     public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
+
     public ElapsedTime launchTimer = new ElapsedTime();
     // Track whether we are shooting far or short.
     // If there is time, implement the AprilTag to calculate a variable distance.
@@ -110,13 +112,14 @@ public class Robot8034 extends LinearOpMode {
         IntakeManager intakeManager = robot.intakeManager;
         LaunchManager launchManager = robot.launchManager;
         cellManager = robot.cellManager;
-        cellManager.setCurrentMotif(robot.aprilTagManager.currentMotif);
+        // Get the current motif saved in AprilTagManager and the dashboard.
+        cellManager.setCurrentMotif(robot.aprilTagManager.getCurrentMotif());
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
-        telemetry.addLine("x: Open left cell");
-        telemetry.addLine("y: Open center cell");
-        telemetry.addLine("b: Open right cell");
+        telemetry.addLine("x: sets GPP motif");
+        telemetry.addLine("y: sets PGP motif");
+        telemetry.addLine("b: sets PPG motif");
         telemetry.addLine("Right Trigger: Intake On");
         telemetry.addLine("Right Bumper: Intake Off");
         telemetry.addLine("D-Pad Up: Long shot");
@@ -144,15 +147,19 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Activate the appropriate cell servo to launch an artifact
+            // This overrides the current motif set in Auto.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
                 cellManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
                 cellManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
                 cellManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
             }
 
@@ -192,7 +199,8 @@ public class Robot8034 extends LinearOpMode {
                     cellManager.openCell(launchOrder.get(launchStage));
                     launchStage++;
                     launchTimer.reset();
-                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.CELL.None) launching = false;
+                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.CELL.None)
+                        launching = false;
                 }
             }
 
@@ -221,7 +229,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addLine("------");
             telemetry.addData("Colors", cellManager.colors());
             telemetry.addData("Launch stage", launchStage);
-            telemetry.addData("Launch Order",String.valueOf(cellManager.launchOrder()));
+            telemetry.addData("Launch Order", String.valueOf(cellManager.launchOrder()));
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry2.addData("Launch left speed:", launchManager.launchMotorLeftVelocity);
             telemetry2.addData("Launch right speed:", launchManager.launchMotorRightVelocity);
@@ -229,6 +237,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.update();
         }
     }
+
     private void switchStage(int num) {
         launchStage = num;
     }
