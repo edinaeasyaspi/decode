@@ -50,6 +50,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  //TODOs:
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
+
 @Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "TeleOp8034")
 //@Disabled
 public class Auto8034 extends OpMode {
@@ -70,6 +71,8 @@ public class Auto8034 extends OpMode {
     private AutonomousOptions.AllianceColor allianceColor;
     private AutonomousOptions.StartPosition startPosition;
     private int startDelaySeconds;
+    // Default motif assumes we haven't detected it yet.
+    private ArtifactCellManager.motif currentMotif = ArtifactCellManager.motif.NONE;
 
     private double allianceGoalOffset;
     private double allianceAudienceOffset;
@@ -93,7 +96,7 @@ public class Auto8034 extends OpMode {
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         // Get the alliance color from the autonomous configuration
-        AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
+        allianceColor = autonomousConfiguration.getAlliance();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
         startPosition = autonomousConfiguration.getStartPosition();
         allianceGoalOffset =
@@ -145,7 +148,9 @@ public class Auto8034 extends OpMode {
 
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
-
+        //TODO: This assumes the robot can see the obelisk at start. If that is not true, move
+        // this to the state machine so the robot can move into position..
+        currentMotif = robot.aprilTagManager.findMotif();
         // Set the starting pose based on the selected starting position
         if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
             robot.launchManager.launchOn(0.25);
@@ -188,6 +193,7 @@ public class Auto8034 extends OpMode {
     }
 
     // State machine for autonomous path following and actions
+    //TODO: Refine this and convert it to enums for better documentation.
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
@@ -203,8 +209,7 @@ public class Auto8034 extends OpMode {
                 }
                 break;
             case 2:
-                // This case will execute the AprilTag detection and open the artifact cells
-//                    if (robot.aprilTagManager.execute(true)) {
+                //TODO: Change this to use the obelisk motif to determine the sequence for launching.
                 robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
                 driveTimer.reset();
                 setPathState(5);
@@ -212,6 +217,7 @@ public class Auto8034 extends OpMode {
             case 3:
                 // This case will move the robot off the launch line
                 if (driveTimer.milliseconds() > 2000) {
+                    // On the goal side color controls the strafe direction.
                     if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
                         if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                             robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
@@ -220,7 +226,8 @@ public class Auto8034 extends OpMode {
 
                         }
                     } else {
-                        robot.mecanumDrive.driveRobotCentric(0, -0.5, 0, false);
+                        // Audience side just drives forward
+                        robot.mecanumDrive.driveRobotCentric(0, 0.5, 0, false);
                     }
                     driveTimer.reset();
                     setPathState(4);

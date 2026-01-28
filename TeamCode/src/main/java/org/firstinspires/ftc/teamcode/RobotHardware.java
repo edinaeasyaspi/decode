@@ -84,8 +84,7 @@ public class RobotHardware {
                 rightColorSensor,
                 leftCell,
                 centerCell,
-                rightCell,
-                ArtifactCellManager.motif.PPG
+                rightCell
         );
     }
 }

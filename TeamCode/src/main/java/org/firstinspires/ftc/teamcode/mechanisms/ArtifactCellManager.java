@@ -27,9 +27,9 @@ public class ArtifactCellManager {
     public CELL_STATE centerCellState = CELL_STATE.Idle;
     public CELL_STATE rightCellState = CELL_STATE.Idle;
     // Servos for cells
-    private ServoEx leftCellServo;
-    private ServoEx centerCellServo;
-    private ServoEx rightCellServo;
+    private final ServoEx leftCellServo;
+    private final ServoEx centerCellServo;
+    private final ServoEx rightCellServo;
 
     //Color sensor
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
@@ -39,11 +39,12 @@ public class ArtifactCellManager {
     public ColorSensor centerColorSensor;
     public ColorSensor rightColorSensor;
 
-    public static motif currentMotif;
+    // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
+    public static motif currentMotif = motif.NONE;
 
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
                                ColorSensor csOne, ColorSensor csTwo, ColorSensor csThree,
-                               ServoEx leftServo, ServoEx centerServo, ServoEx rightServo, motif motif1) {
+                               ServoEx leftServo, ServoEx centerServo, ServoEx rightServo) {
         this.cellPositions = cellPositions;
         this.cellDownPositions = cellDownPositions;
         //Put in sensors
@@ -54,12 +55,11 @@ public class ArtifactCellManager {
         this.leftCellServo = leftServo;
         this.centerCellServo = centerServo;
         this.rightCellServo = rightServo;
-
-        this.currentMotif = motif.GPP;
     }
 
+    //  This can be set from auto if it finds the AprilTag or manually from teleop.
     public void setCurrentMotif(motif motif1) {
-        this.currentMotif = motif1;
+        currentMotif = motif1;
     }
 
     public enum CELL {
@@ -79,7 +79,8 @@ public class ArtifactCellManager {
     public enum motif {
         GPP,
         PGP,
-        PPG
+        PPG,
+        NONE
     }
 
     public void execute() {
@@ -115,6 +116,7 @@ public class ArtifactCellManager {
         }
     }
 
+    // Find out what colors are in each cell.
     public void checkColors() {
         leftCellColor = checkColor(leftColorSensor);
         centerCellColor = checkColor(centerColorSensor);
@@ -139,89 +141,78 @@ public class ArtifactCellManager {
         return end;
     }
 
-    private static CELL_COLOR specificMotifColor(int num) {
-        if (currentMotif == motif.GPP) {
-            if (num == 1) return CELL_COLOR.Green;
-            if (num == 2) return CELL_COLOR.Purple;
-            if (num == 3) return CELL_COLOR.Purple;
-        } else if (currentMotif == motif.PGP) {
-            if (num == 1) return CELL_COLOR.Purple;
-            if (num == 2) return CELL_COLOR.Green;
-            if (num == 3) return CELL_COLOR.Purple;
-        } else if (currentMotif == motif.PPG) {
-            if (num == 1) return CELL_COLOR.Purple;
-            if (num == 2) return CELL_COLOR.Purple;
-            if (num == 3) return CELL_COLOR.Green;
-        }
-        return CELL_COLOR.Purple;
-    }
-
-    public static boolean isCompatible(List<CELL_COLOR> balls) {
-        int purples = 0;
-        int greens = 0;
-        int repCount = 0;
-        CELL_COLOR ball;
-        while (repCount < 3) {
-            ball = balls.get(repCount);
-            if (ball == CELL_COLOR.Green) greens++;
-            if (ball == CELL_COLOR.Purple) purples++;
-            repCount++;
-        }
-        if (purples == 2 && greens == 1) return true;
-        return false;
-    }
-
+    /**
+     * Determines the launch order of cells based on their colors and the current motif.
+     * <p>
+     * The method initializes a list of cells (`launchOrder`) with default values (`CELL.None`)
+     * and a list of cell colors (`cellColors`) representing the colors of the left, center,
+     * and right cells. Based on the current motif, it assigns the cells to specific positions
+     * in the `launchOrder` list according to the color and motif logic.
+     *
+     * @return A list of `CELL` objects representing the launch order of the cells.
+     */
     public static List<CELL> launchOrder() {
+        // Initialize launch order and cell colors
+        List<CELL> launchOrder = new ArrayList<>(Collections.nCopies(3, CELL.None));
+        List<CELL_COLOR> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
 
-        List<CELL> launchOrder = new ArrayList<>();
-        launchOrder.add(CELL.None);
-        launchOrder.add(CELL.None);
-        launchOrder.add(CELL.None);
-        List<CELL_COLOR> balls = new ArrayList<>();
-        balls.add(leftCellColor);
-        balls.add(centerCellColor);
-        balls.add(rightCellColor);
-        /// I know its inefficient, but I know how to do this and this is simple
-        if (isCompatible(balls)) {
-            if ((balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PGP) || ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG))) {
-                launchOrder.set(0, CELL.Left);
-                launchOrder.set(1, CELL.Center);
-                launchOrder.set(2, CELL.Right);
-            } else if ((balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.PGP) || (balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.PPG)) {
-                launchOrder.set(0, CELL.Center);
-                launchOrder.set(1, CELL.Left);
-                launchOrder.set(2, CELL.Right);
-            } else if ((balls.indexOf(CELL_COLOR.Green) == 2 && currentMotif == motif.GPP) || (balls.indexOf(CELL_COLOR.Green) == 0 && currentMotif == motif.PGP) || (balls.indexOf(CELL_COLOR.Green) == 1 && currentMotif == motif.PPG)) {
-                launchOrder.set(0, CELL.Right);
-                launchOrder.set(1, CELL.Left);
-                launchOrder.set(2, CELL.Center);
-            } else {
-                launchOrder.set(0, CELL.Left);
-                launchOrder.set(1, CELL.Right);
-                launchOrder.set(2, CELL.Center);
-            }
-        } else {
-            if (Collections.frequency(balls, CELL_COLOR.None) == 0) {
-                launchOrder.set(0, CELL.Left);
-                launchOrder.set(1, CELL.Center);
-                launchOrder.set(2, CELL.Right);
-            } else if (Collections.frequency(balls, CELL_COLOR.None) == 1) {
-                if (balls.get(0) == CELL_COLOR.None) {
-                    launchOrder.set(0, CELL.Center);
-                    launchOrder.set(1, CELL.Right);
-                } else if (balls.get(1) == CELL_COLOR.None) {
-                    launchOrder.set(0, CELL.Left);
-                    launchOrder.set(1, CELL.Right);
-                } else if (balls.get(2) == CELL_COLOR.None) {
-                    launchOrder.set(0, CELL.Left);
-                    launchOrder.set(1, CELL.Center);
+        int index = 0;
+        switch (currentMotif) {
+            case GPP:
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Green) {
+                        launchOrder.set(0, CELL.values()[i]);
+                        break;
+                    }
                 }
-            } else if (Collections.frequency(balls, CELL_COLOR.None) == 2) {
-                if (balls.get(0) != CELL_COLOR.None) launchOrder.set(0, CELL.Left);
-                if (balls.get(1) != CELL_COLOR.None) launchOrder.set(0, CELL.Center);
-                if (balls.get(2) != CELL_COLOR.None) launchOrder.set(0, CELL.Right);
-            }
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Purple) {
+                        launchOrder.set(++index, CELL.values()[i]);
+                    }
+                }
+                break;
+
+            case PGP:
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Purple) {
+                        launchOrder.set(0, CELL.values()[i]);
+                        break;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Green) {
+                        launchOrder.set(++index, CELL.values()[i]);
+                        break;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Purple) {
+                        launchOrder.set(2, CELL.values()[i]);
+                    }
+                }
+                break;
+
+            case PPG:
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Purple) {
+                        launchOrder.set(0, CELL.values()[i]);
+                        break;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Purple) {
+                        launchOrder.set(++index, CELL.values()[i]);
+                        break;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (cellColors.get(i) == CELL_COLOR.Green) {
+                        launchOrder.set(++index, CELL.values()[i]);
+                    }
+                }
+                break;
         }
+
         return launchOrder;
     }
 
