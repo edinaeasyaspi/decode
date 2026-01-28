@@ -92,6 +92,7 @@ public class AprilTagManager {
     // This is only used for auto-alignment if range is implemented.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
+    public ArtifactCellManager.motif currentMotif = ArtifactCellManager.motif.NONE;
 
     // Execute the AprilTag auto alignment process for launching.
     public boolean execute(boolean shootFar) {
@@ -101,7 +102,8 @@ public class AprilTagManager {
     // Find the obelisk motif AprilTag.
     // Returns motif.NONE if no tag is found.
     public ArtifactCellManager.motif findMotif() {
-        return getMotifApriltag();
+        this.currentMotif = getMotifApriltag();
+        return this.currentMotif;
     }
 
     /**

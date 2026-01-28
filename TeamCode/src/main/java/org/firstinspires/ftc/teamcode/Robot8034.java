@@ -110,6 +110,7 @@ public class Robot8034 extends LinearOpMode {
         IntakeManager intakeManager = robot.intakeManager;
         LaunchManager launchManager = robot.launchManager;
         cellManager = robot.cellManager;
+        cellManager.setCurrentMotif(robot.aprilTagManager.currentMotif);
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
