@@ -47,8 +47,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 /*
  * Auto opMode for FTC Team 8034.
  * It has some parts of PedroPathing, but due to time constraints it is not fully implemented.
- //TODOs:
- * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
+ //TODO: Refactor to fully use PedroPathing.
  */
 
 @Autonomous(name = "Auto8034", group = "Autonomous", preselectTeleOp = "Robot8034")

@@ -35,6 +35,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -47,7 +48,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
  * * A state machine that uses mecanum drive to follow paths and perform actions is the current goal.
  */
 @Autonomous(name = "DevilDogsAuto", group = "Autonomous", preselectTeleOp = "TeleOp8034")
-//@Disabled
+@Disabled
 public class DevilDogsAuto extends OpMode {
     private final RobotHardware robot = new RobotHardware(this);
     AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
