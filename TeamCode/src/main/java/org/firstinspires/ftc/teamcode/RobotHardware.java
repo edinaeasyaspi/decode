@@ -4,9 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImplOnSimple;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -15,7 +12,6 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.mechanisms.AprilTagManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.ColorSensor;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
 import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 
