@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImplOnSimple;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -35,9 +38,9 @@ public class RobotHardware {
     public LaunchManager launchManager;
     public ArtifactCellManager cellManager;
     public AprilTagManager aprilTagManager;
-    public ColorSensor leftColorSensor;
-    public ColorSensor centerCOlorSensor;
-    public ColorSensor rightColorSensor;
+    public RevColorSensorV3 leftColorSensor;
+    public RevColorSensorV3 centerColorSensor;
+    public RevColorSensorV3 rightColorSensor;
 
     public RobotHardware(OpMode opmode) {
         myOpMode = opmode;
@@ -68,9 +71,9 @@ public class RobotHardware {
         final WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
         aprilTagManager = new AprilTagManager(myOpMode, webcamName, mecanumDrive);
 
-        leftColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorone"));
-        centerCOlorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensortwo"));
-        rightColorSensor = new ColorSensor(myOpMode.hardwareMap.get(NormalizedColorSensor.class, "colorsensorthree"));
+        leftColorSensor = (RevColorSensorV3) myOpMode.hardwareMap.get("colorsensorone");
+        centerColorSensor = (RevColorSensorV3) myOpMode.hardwareMap.get("colorsensortwo");
+        rightColorSensor = (RevColorSensorV3) myOpMode.hardwareMap.get("colorsensorthree");
 
         // Initialize the artifact cell servos and manager
         ServoEx leftCell = new ServoEx(myOpMode.hardwareMap, "cellLeft");
@@ -80,7 +83,7 @@ public class RobotHardware {
                 cellPositions, //ups
                 cellDownPositions, //downs
                 leftColorSensor,
-                centerCOlorSensor,
+                centerColorSensor,
                 rightColorSensor,
                 leftCell,
                 centerCell,

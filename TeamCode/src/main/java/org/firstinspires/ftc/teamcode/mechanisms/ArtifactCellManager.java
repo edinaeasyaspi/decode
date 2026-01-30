@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -35,15 +36,15 @@ public class ArtifactCellManager {
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
     public static CELL_COLOR centerCellColor = CELL_COLOR.None;
     public static CELL_COLOR leftCellColor = CELL_COLOR.None;
-    public ColorSensor leftColorSensor;
-    public ColorSensor centerColorSensor;
-    public ColorSensor rightColorSensor;
+    public RevColorSensorV3 leftColorSensor;
+    public RevColorSensorV3 centerColorSensor;
+    public RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
     public static motif currentMotif = motif.NONE;
 
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
-                               ColorSensor csOne, ColorSensor csTwo, ColorSensor csThree,
+                               RevColorSensorV3 csOne, RevColorSensorV3 csTwo, RevColorSensorV3 csThree,
                                ServoEx leftServo, ServoEx centerServo, ServoEx rightServo) {
         this.cellPositions = cellPositions;
         this.cellDownPositions = cellDownPositions;
@@ -104,16 +105,18 @@ public class ArtifactCellManager {
         }
     }
 
-    public CELL_COLOR checkColor(ColorSensor colorSensor) {
-        boolean green = colorSensor.isGreen();
-        boolean purple = colorSensor.isPurple();
-        if (green) {
-            return CELL_COLOR.Green;
-        } else if (purple) {
-            return CELL_COLOR.Purple;
-        } else {
-            return CELL_COLOR.None;
-        }
+    public CELL_COLOR checkColor(RevColorSensorV3 colorSensor) {
+        //TODO: Implement color checking logic
+//        boolean green = colorSensor.isGreen();
+//        boolean purple = colorSensor.isPurple();
+//        if (green) {
+//            return CELL_COLOR.Green;
+//        } else if (purple) {
+//            return CELL_COLOR.Purple;
+//        } else {
+//            return CELL_COLOR.None;
+//        }
+        return CELL_COLOR.None;
     }
 
     // Find out what colors are in each cell.
