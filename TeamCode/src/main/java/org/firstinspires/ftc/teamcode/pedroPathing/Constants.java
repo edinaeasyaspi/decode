@@ -17,7 +17,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(12);
+            .mass(12)
+            .forwardZeroPowerAcceleration(.01)
+            .lateralZeroPowerAcceleration(.1);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -32,9 +34,12 @@ public class Constants {
             .hardwareMapName("otos")
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(BNO055IMU.AngleUnit.RADIANS.toAngleUnit())
+            .linearScalar(.5)
             .angularScalar(0.99);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
+            .xVelocity(.5)
+            .yVelocity(.5)
             .rightFrontMotorName("frontrightdrive")
             .rightRearMotorName("backrightdrive")
             .leftRearMotorName("backleftdrive")
