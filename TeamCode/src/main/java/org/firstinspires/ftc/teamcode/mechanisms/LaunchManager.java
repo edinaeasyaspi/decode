@@ -47,7 +47,7 @@ public class LaunchManager {
     public void launchOn(double launchPower) {
         this.launchPower = launchPower;
         launchMotors.set(launchPower);
-        launchServo.setPower(-1);
+        launchServo.setPower(1);
     }
 
     public void launchOff() {

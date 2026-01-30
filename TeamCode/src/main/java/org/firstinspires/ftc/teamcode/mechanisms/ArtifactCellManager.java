@@ -205,7 +205,7 @@ public class ArtifactCellManager {
                         break;
                     }
                 }
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 2; i++) {
                     if (cellColors.get(i) == CELL_COLOR.Green) {
                         launchOrder.set(++index, CELL.values()[i]);
                     }

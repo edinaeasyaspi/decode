@@ -65,7 +65,7 @@ public class Robot8034 extends LinearOpMode {
     ArtifactCellManager cellManager;
 
     //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.24; //Haven't actually gotten this variable
+    public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
     public static double LONG_SHOT = 0.24;
     public boolean launching = false;
     public int launchStage = 0;
