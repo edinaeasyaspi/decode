@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -33,6 +36,7 @@ public class ArtifactCellManager {
     private final ServoEx rightCellServo;
 
     //Color sensor
+    private RevColorV3Manager revColorV3Manager;
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
     public static CELL_COLOR centerCellColor = CELL_COLOR.None;
     public static CELL_COLOR leftCellColor = CELL_COLOR.None;
@@ -52,6 +56,7 @@ public class ArtifactCellManager {
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
         this.rightColorSensor = csThree;
+        revColorV3Manager = new RevColorV3Manager();
         //Define servos
         this.leftCellServo = leftServo;
         this.centerCellServo = centerServo;
@@ -106,17 +111,11 @@ public class ArtifactCellManager {
     }
 
     public CELL_COLOR checkColor(RevColorSensorV3 colorSensor) {
-        //TODO: Implement color checking logic
-//        boolean green = colorSensor.isGreen();
-//        boolean purple = colorSensor.isPurple();
-//        if (green) {
-//            return CELL_COLOR.Green;
-//        } else if (purple) {
-//            return CELL_COLOR.Purple;
-//        } else {
-//            return CELL_COLOR.None;
-//        }
-        return CELL_COLOR.None;
+        //TODO: Imnplement the preferred color detection method based on the
+        // results from testing with the SensorColor opmode.
+//        NormalizedRGBA rgbColors = revColorV3Manager.getRGBA(colorSensor);
+//        float[] hsvValues = revColorV3Manager.getHSVArray(colorSensor);
+        return revColorV3Manager.GetCellColor(colorSensor);
     }
 
     // Find out what colors are in each cell.
