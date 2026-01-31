@@ -115,22 +115,22 @@ public class SensorColor extends LinearOpMode {
         // color of the Robot Controller app to match the hue detected by the RGB sensor.
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-        //Default
-        colorSensor = robot.rightColorSensor;
-        while (opModeInInit()) {
-            if (gamepad1.a) {
-                colorSensor = robot.leftColorSensor;
-            }
-            if (gamepad1.b) {
-                colorSensor = robot.centerColorSensor;
-            }
-            if (gamepad1.y) {
-                colorSensor = robot.rightColorSensor;
-            }
-            //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
-            //telemetry.update();
-        }
         try {
+            //Default
+            colorSensor = robot.rightColorSensor;
+            while (opModeInInit()) {
+                if (gamepad1.a) {
+                    colorSensor = robot.leftColorSensor;
+                }
+                if (gamepad1.b) {
+                    colorSensor = robot.centerColorSensor;
+                }
+                if (gamepad1.y) {
+                    colorSensor = robot.rightColorSensor;
+                }
+                //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
+                //telemetry.update();
+            }
             waitForStart();
             while (opModeIsActive()) {
                 sleep(250);
@@ -182,7 +182,8 @@ public class SensorColor extends LinearOpMode {
          * for an explanation of HSV color. */
 
         telemetry.addLine()
-                .addData("Red", "%.3f", rgbColors.red)
+                .addData("Color sensor", colorSensor.getDeviceName())
+                .addData("\nRed", "%.3f", rgbColors.red)
                 .addData("\nGreen", "%.3f", rgbColors.green)
                 .addData("\nBlue", "%.3f", rgbColors.blue)
                 .addData("\nAlpha", "%.3f", rgbColors.alpha);
@@ -191,7 +192,7 @@ public class SensorColor extends LinearOpMode {
                 .addData("\nSaturation", "%.3f", hsvColors.getSaturation())
                 .addData("\nValue", "%.3f", hsvColors.getValue())
                 .addData("\nargb Color", "%d", Color.HSVToColor(hsvValues))
-                .addData("Gain", "%.3f", gain);
+                .addData("\nGain", "%.3f", gain);
 
 
         /* If this color sensor also has a distance sensor, display the measured distance.
