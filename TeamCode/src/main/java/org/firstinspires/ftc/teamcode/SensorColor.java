@@ -182,7 +182,8 @@ public class SensorColor extends LinearOpMode {
          * for an explanation of HSV color. */
 
         telemetry.addLine()
-                .addData("Red", "%.3f", rgbColors.red)
+                .addData("Color sensor", colorSensor.getDeviceName())
+                .addData("\nRed", "%.3f", rgbColors.red)
                 .addData("\nGreen", "%.3f", rgbColors.green)
                 .addData("\nBlue", "%.3f", rgbColors.blue)
                 .addData("\nAlpha", "%.3f", rgbColors.alpha);
@@ -191,7 +192,7 @@ public class SensorColor extends LinearOpMode {
                 .addData("\nSaturation", "%.3f", hsvColors.getSaturation())
                 .addData("\nValue", "%.3f", hsvColors.getValue())
                 .addData("\nargb Color", "%d", Color.HSVToColor(hsvValues))
-                .addData("Gain", "%.3f", gain);
+                .addData("\nGain", "%.3f", gain);
 
 
         /* If this color sensor also has a distance sensor, display the measured distance.
