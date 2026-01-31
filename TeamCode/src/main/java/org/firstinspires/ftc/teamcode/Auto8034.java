@@ -94,6 +94,7 @@ public class Auto8034 extends OpMode {
         // Initialize the robot hardware
         robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
+        autonomousConfiguration.ShowHelp();
         cellManager = robot.cellManager;
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);

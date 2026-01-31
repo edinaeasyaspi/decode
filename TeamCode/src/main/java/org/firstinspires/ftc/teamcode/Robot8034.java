@@ -98,6 +98,7 @@ public class Robot8034 extends LinearOpMode {
         // Initialize the autonomous configuration to get camera settings.
         AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
         autonomousConfiguration.init(gamepad1, telemetry2, hardwareMap.appContext);
+        autonomousConfiguration.ShowHelp();
         boolean targetFound = false;
         double drive = 0;
         double strafe = 0;
