@@ -141,6 +141,8 @@ public class Robot8034 extends LinearOpMode {
             cellManager.checkColors();
             launchManager.execute();
 
+            leftTriggerReader.readValue();
+
             // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
                 isSlowMode = !isSlowMode;
@@ -188,6 +190,15 @@ public class Robot8034 extends LinearOpMode {
                 launchManager.launchOn(SHORT_SHOT);
                 launching = true;
                 launchOrder = cellManager.launchOrder();
+                launchStage = 0;
+                cellManager.openCell(launchOrder.get(launchStage));
+                launchStage++;
+                launchTimer.reset();
+            }
+
+            if (leftTriggerReader.wasJustReleased()) {
+                launching = true;
+                launchOrder = cellManager.noColorLaunch();
                 launchStage = 0;
                 cellManager.openCell(launchOrder.get(launchStage));
                 launchStage++;

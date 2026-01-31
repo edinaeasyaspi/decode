@@ -153,6 +153,13 @@ public class ArtifactCellManager {
      *
      * @return A list of `CELL` objects representing the launch order of the cells.
      */
+    public static List<CELL> noColorLaunch() {
+        List<CELL> launchOrder = new ArrayList<>();
+        launchOrder.add(CELL.Left);
+        launchOrder.add(CELL.Center);
+        launchOrder.add(CELL.Right);
+        return launchOrder;
+    }
     public static List<CELL> launchOrder() {
         // Initialize launch order and cell colors
         List<CELL> launchOrder = new ArrayList<>(Collections.nCopies(3, CELL.None));
