@@ -31,8 +31,8 @@ public class LaunchManager {
     public static double launchPower = 0.0;
     // Feedforward constants
     // The feedfoward controller is used by the launch manager to maintain consistent launch speed.
-    public static double FF_S = 0.1;
-    public static double FF_V = 1.0;
+    public static double FF_S = 0.135;
+    public static double FF_V = 0.85;
     public static double FF_A = 0.0;
     public static double launchMotorLeftVelocity;
     public static double launchMotorRightVelocity;
@@ -58,6 +58,7 @@ public class LaunchManager {
     // Call this method periodically to maintain the desired launch power using feedforward control.
     public void execute() {
         //TODO: This is for debugging, remove later.
+        feedforward = new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
         List<Double> velocities = launchMotors.getVelocities();
         launchMotorLeftVelocity = velocities.get(0);
         launchMotorRightVelocity = velocities.get(1);
