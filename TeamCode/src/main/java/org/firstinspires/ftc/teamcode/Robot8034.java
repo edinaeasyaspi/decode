@@ -66,7 +66,7 @@ public class Robot8034 extends LinearOpMode {
 
     //TODO: Adjust shot variables as needed
     public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
-    public static double LONG_SHOT = 0.24;
+    public static double LONG_SHOT = 0.255;
     public boolean launching = false;
     public int launchStage = 0;
     public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
@@ -206,7 +206,7 @@ public class Robot8034 extends LinearOpMode {
             }
 
             if (launching) {
-                if (launchTimer.milliseconds() >= 1250) {
+                if (launchTimer.milliseconds() >= 1200) {
                     cellManager.openCell(launchOrder.get(launchStage));
                     launchStage++;
                     launchTimer.reset();
