@@ -45,21 +45,16 @@ import org.firstinspires.ftc.teamcode.mechanisms.HSV;
 import org.firstinspires.ftc.teamcode.mechanisms.RevColorV3Manager;
 
 /*
- * This OpMode shows how to use a color sensor in a generic
- * way, regardless of which particular make or model of color sensor is used. The OpMode
- * assumes that the color sensor is configured with a name of "sensor_color".
+ * This OpMode is used to test the REV Color Sensor V3.
+ * It uses the RevColorV3Manager class to manage the sensor.
+ * It displays the color values and distance on the driver station.
  *
- * There will be some variation in the values measured depending on the specific sensor you are using.
- *
- * If the color sensor supports adjusting the gain, you can increase the gain (a multiplier to make
- * the sensor report higher values) by holding down the A button on the gamepad, and decrease the
- * gain by holding down the B button on the gamepad. The AndyMark Proximity & Color Sensor does not
- * support this.
+ * You can increase the gain (a multiplier to make the sensor report higher values) by holding down
+ * the A button on the gamepad, and decrease the gain by holding down the B button on the gamepad.
  *
  * If the color sensor has a light which is controllable from software, you can use the X button on
  * the gamepad to toggle the light on and off. The REV sensors don't support this, but instead have
- * a physical switch on them to turn the light on and off, beginning with REV Color Sensor V2. The
- * AndyMark Proximity & Color Sensor does not support this.
+ * a physical switch on them to turn the light on and off, beginning with REV Color Sensor V2.
  *
  * If the color sensor also supports short-range distance measurements (usually via an infrared
  * proximity sensor), the reported distance will be written to telemetry. As of September 2025,
@@ -68,10 +63,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.RevColorV3Manager;
  * small distances, and are sensitive to ambient light and surface reflectivity. You should use a
  * different sensor if you need precise distance measurements.
  *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Sensor: Color", group = "test")
+@TeleOp(name = "Sensor Color", group = "test")
 //@Disabled
 public class SensorColor extends LinearOpMode {
 
@@ -84,15 +77,12 @@ public class SensorColor extends LinearOpMode {
     float gain = 4.0f;
     RevColorV3Manager revColorV3Manager = new RevColorV3Manager();
     float[] hsvValues = new float[3];
-
-
     /**
      * The relativeLayout field is used to aid in providing interesting visual feedback
      * in this sample application; you probably *don't* need this when you use a color sensor on your
      * robot. Note that you won't see anything change on the Driver Station, only on the Robot Controller.
      */
     View relativeLayout;
-    int numtoreturn = 0;
 
     /*
      * The runOpMode() method is the root of this OpMode, as it is in all LinearOpModes.
@@ -108,17 +98,21 @@ public class SensorColor extends LinearOpMode {
     public void runOpMode() {
         // All hardware lives here.
         robot.init();
-        telemetry.clearAll();
-        telemetry.update();
 
         // Get a reference to the RelativeLayout so we can later change the background
         // color of the Robot Controller app to match the hue detected by the RGB sensor.
+        // You need to use scrcpy to see this.
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+
+        telemetry.addLine("a: select left sensor");
+        telemetry.addLine("b: select center sensor");
+        telemetry.addLine("y: select right sensor");
+        telemetry.update();
+
         try {
-            //Default
-            colorSensor = robot.rightColorSensor;
-            while (opModeInInit()) {
+            // Loop until a sensor is selected.
+            while (colorSensor == null) {
                 if (gamepad1.a) {
                     colorSensor = robot.leftColorSensor;
                 }
@@ -128,8 +122,8 @@ public class SensorColor extends LinearOpMode {
                 if (gamepad1.y) {
                     colorSensor = robot.rightColorSensor;
                 }
-                //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
-                //telemetry.update();
+                telemetry.addData("Color Sensor:", "Using %s", colorSensor.getDeviceName());
+                telemetry.update();
             }
             waitForStart();
             while (opModeIsActive()) {
@@ -141,23 +135,14 @@ public class SensorColor extends LinearOpMode {
             // as pure white, but it's too much work to dig out what actually was used, and this is good
             // enough to at least make the screen reasonable again.
             // Set the panel back to the default color
-            relativeLayout.post(new Runnable() {
-                public void run() {
-                    relativeLayout.setBackgroundColor(Color.WHITE);
-                }
-            });
+            relativeLayout.post(() -> relativeLayout.setBackgroundColor(Color.WHITE));
         }
     }
 
-    protected int runSample() {
-
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight) colorSensor).enableLight(true);
-        }
+    protected void runSample() {
         // Explain basic gain information via telemetry
         telemetry.addLine("Hold the A button on gamepad 1 to increase gain, or B to decrease it.\n");
         telemetry.addLine("Higher gain values mean that the sensor will report larger numbers for Red, Green, and Blue, and Value\n");
-        telemetry.addLine("X toggles light.");
         // Update the gain value if either of the A or B gamepad buttons is being held
         if (gamepad1.a) {
             // Only increase the gain by a small amount, since this loop will occur multiple times per second.
@@ -199,7 +184,7 @@ public class SensorColor extends LinearOpMode {
          * Note that the reported distance is only useful at very close range, and is impacted by
          * ambient light and surface reflectivity. */
         if (colorSensor instanceof DistanceSensor) {
-//            telemetry.addData("Distance (cm)", "%.3f", colorSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("\nDistance (cm)", "%.3f", colorSensor.getDistance(DistanceUnit.CM));
         }
 
         telemetry.update();
@@ -210,6 +195,5 @@ public class SensorColor extends LinearOpMode {
                 relativeLayout.setBackgroundColor(Color.HSVToColor(hsvValues));
             }
         });
-        return numtoreturn;
     }
 }

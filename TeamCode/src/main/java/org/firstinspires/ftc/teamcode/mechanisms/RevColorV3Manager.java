@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
  * RevColorV3Manager - A class to manage Rev Color Sensor V3 functionality.
  */
 public class RevColorV3Manager {
-    //TODO: Tune the gain to optimize calibrated values.float
+    //TODO: Tune the gain to optimize calibrated values.
     private float GAIN = 4.0f; // Sensor gain
 
     public ArtifactCellManager.CELL_COLOR GetCellColor(RevColorSensorV3 sensor) {
