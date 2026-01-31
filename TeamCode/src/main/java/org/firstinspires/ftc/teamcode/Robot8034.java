@@ -128,6 +128,7 @@ public class Robot8034 extends LinearOpMode {
         telemetry.addLine("D-Pad Down: Short shot");
         telemetry.addLine("D-Pad Left: Auto Aim");
         telemetry.addLine("D-Pad Right: turn off launch motors");
+        telemetry.addLine("Left Trigger: Launch all cells");
         telemetry.update();
 
         // Ready for start of OpMode
@@ -198,6 +199,7 @@ public class Robot8034 extends LinearOpMode {
                 launchTimer.reset();
             }
 
+            // Launch without regard to color.
             if (leftTriggerReader.wasJustReleased()) {
                 launching = true;
                 launchOrder = cellManager.noColorLaunch();
