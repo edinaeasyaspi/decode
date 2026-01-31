@@ -115,22 +115,22 @@ public class SensorColor extends LinearOpMode {
         // color of the Robot Controller app to match the hue detected by the RGB sensor.
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-        //Default
-        colorSensor = robot.rightColorSensor;
-        while (opModeInInit()) {
-            if (gamepad1.a) {
-                colorSensor = robot.leftColorSensor;
-            }
-            if (gamepad1.b) {
-                colorSensor = robot.centerColorSensor;
-            }
-            if (gamepad1.y) {
-                colorSensor = robot.rightColorSensor;
-            }
-            //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
-            //telemetry.update();
-        }
         try {
+            //Default
+            colorSensor = robot.rightColorSensor;
+            while (opModeInInit()) {
+                if (gamepad1.a) {
+                    colorSensor = robot.leftColorSensor;
+                }
+                if (gamepad1.b) {
+                    colorSensor = robot.centerColorSensor;
+                }
+                if (gamepad1.y) {
+                    colorSensor = robot.rightColorSensor;
+                }
+                //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
+                //telemetry.update();
+            }
             waitForStart();
             while (opModeIsActive()) {
                 sleep(250);
