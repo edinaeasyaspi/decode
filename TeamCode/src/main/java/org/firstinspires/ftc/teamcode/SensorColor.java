@@ -108,11 +108,15 @@ public class SensorColor extends LinearOpMode {
     public void runOpMode() {
         // All hardware lives here.
         robot.init();
+        telemetry.clearAll();
+        telemetry.update();
 
         // Get a reference to the RelativeLayout so we can later change the background
         // color of the Robot Controller app to match the hue detected by the RGB sensor.
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+        //Default
+        colorSensor = robot.rightColorSensor;
         while (opModeInInit()) {
             if (gamepad1.a) {
                 colorSensor = robot.leftColorSensor;
@@ -123,12 +127,13 @@ public class SensorColor extends LinearOpMode {
             if (gamepad1.y) {
                 colorSensor = robot.rightColorSensor;
             }
-            telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
-            telemetry.update();
+            //telemetry.addData("Color Sensor", "Using %s", colorSensor.getDeviceName());
+            //telemetry.update();
         }
         try {
             waitForStart();
             while (opModeIsActive()) {
+                sleep(250);
                 runSample(); // actually execute the sample
             }
         } finally {
@@ -156,9 +161,9 @@ public class SensorColor extends LinearOpMode {
         // Update the gain value if either of the A or B gamepad buttons is being held
         if (gamepad1.a) {
             // Only increase the gain by a small amount, since this loop will occur multiple times per second.
-            gain += 0.005;
+            gain += 0.5;
         } else if (gamepad1.b && gain > 1) { // A gain of less than 1 will make the values smaller, which is not helpful.
-            gain -= 0.005;
+            gain -= 0.5;
         }
 
         // Tell the sensor our desired gain value (normally you would do this during initialization,
@@ -178,21 +183,22 @@ public class SensorColor extends LinearOpMode {
 
         telemetry.addLine()
                 .addData("Red", "%.3f", rgbColors.red)
-                .addData("Green", "%.3f", rgbColors.green)
-                .addData("Blue", "%.3f", rgbColors.blue)
-                .addData("Alpha", "%.3f", rgbColors.alpha);
+                .addData("\nGreen", "%.3f", rgbColors.green)
+                .addData("\nBlue", "%.3f", rgbColors.blue)
+                .addData("\nAlpha", "%.3f", rgbColors.alpha);
         telemetry.addLine()
-                .addData("Hue", "%.3f", hsvColors.getHue())
-                .addData("Saturation", "%.3f", hsvColors.getSaturation())
-                .addData("Value", "%.3f", hsvColors.getValue())
-                .addData("argb Color", "%3", Color.HSVToColor(hsvValues));
+                .addData("\nHue", "%.3f", hsvColors.getHue())
+                .addData("\nSaturation", "%.3f", hsvColors.getSaturation())
+                .addData("\nValue", "%.3f", hsvColors.getValue())
+                .addData("\nargb Color", "%d", Color.HSVToColor(hsvValues))
+                .addData("Gain", "%.3f", gain);
 
 
         /* If this color sensor also has a distance sensor, display the measured distance.
          * Note that the reported distance is only useful at very close range, and is impacted by
          * ambient light and surface reflectivity. */
         if (colorSensor instanceof DistanceSensor) {
-            telemetry.addData("Distance (cm)", "%.3f", colorSensor.getDistance(DistanceUnit.CM));
+//            telemetry.addData("Distance (cm)", "%.3f", colorSensor.getDistance(DistanceUnit.CM));
         }
 
         telemetry.update();
