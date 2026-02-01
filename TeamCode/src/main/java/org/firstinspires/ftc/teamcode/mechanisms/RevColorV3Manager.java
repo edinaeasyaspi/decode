@@ -60,25 +60,31 @@ public class RevColorV3Manager {
         Return the Normalized RGBA values from the color sensor.
      */
     public NormalizedRGBA getRGBA(RevColorSensorV3 colorSensor) {
+        float redAverage = 0;
+        float greenAverage = 0;
+        float blueAverage = 0;
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
-        // Compensate for gain
-        colors.red = colors.red / colors.alpha;
-        colors.green = colors.green / colors.alpha;
-        colors.blue = colors.blue / colors.alpha;
+        // Compensate for gain and use low pass filter to smooth values.
+        colors.red = lowPass(redAverage, colors.red / colors.alpha);
+        colors.green = lowPass(greenAverage, colors.green / colors.alpha);
+        colors.blue = lowPass(blueAverage, colors.blue / colors.alpha);
         return colors;
     }
 
     // Get HSV values from the color sensor.
     public HSV getHSV(RevColorSensorV3 colorSensor) {
+        int redAverage = 0;
+        int greenAverage = 0;
+        int blueAverage = 0;
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         float[] hsvValues = new float[3];
-        // Convert the RGB values to HSV values
+        // Convert the RGB values to HSV values with filter smoothing.
         android.graphics.Color.RGBToHSV(
-                (int) (colors.red * 255),
-                (int) (colors.green * 255),
-                (int) (colors.blue * 255),
+                (int) lowPassInt(redAverage, (int) (colors.red * 255)),
+                (int) lowPassInt(greenAverage, (int) colors.green * 255),
+                (int) lowPassInt(blueAverage, (int) colors.blue * 255),
                 hsvValues);
         return new HSV(hsvValues[0], hsvValues[1], hsvValues[2]);
     }
@@ -100,4 +106,35 @@ public class RevColorV3Manager {
     public void setSensorGain(RevColorSensorV3 colorSensor) {
         colorSensor.setGain(GAIN);
     }
+
+    protected float lowPass(float colorAverage, float colorSample) {
+        // (0 - .99) Lower value results in stronger smoothing.
+        final float FILTER_COEFFICIENT = .2F;
+        // Used to filter out values that are way out of range. Tune for expected range.
+        final float THRESHOLD = .1F;
+
+        // Optional code to remove outliers.
+        if (Math.abs(colorSample - colorAverage) > THRESHOLD) {
+            colorSample = colorAverage;
+        }
+
+        colorAverage = ((1.0F - FILTER_COEFFICIENT) * (FILTER_COEFFICIENT + colorSample));
+        return colorAverage;
+    }
+
+    protected float lowPassInt(int colorAverage, int colorSample) {
+        // (0 - .99) Lower value results in stronger smoothing.
+        final float FILTER_COEFFICIENT = .2F;
+        // Used to filter out values that are way out of range. Tune for expected range.
+        final int THRESHOLD = 100;
+
+        // Optional code to remove outliers.
+        if (Math.abs(colorSample - colorAverage) > THRESHOLD) {
+            colorSample = colorAverage;
+        }
+
+        colorAverage = (int) ((1.0F - FILTER_COEFFICIENT) * (FILTER_COEFFICIENT + colorSample));
+        return colorAverage;
+    }
+
 }
