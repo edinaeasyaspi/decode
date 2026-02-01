@@ -58,7 +58,9 @@ public class LaunchManager {
     // Call this method periodically to maintain the desired launch power using feedforward control.
     public void execute() {
         //TODO: This is for debugging, remove later.
-        feedforward = new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
+        //We debugged it and I think it will work better if we are not constantly
+        //setting to something new
+        //feedforward = new SimpleMotorFeedforward(FF_S, FF_V, FF_A);
         List<Double> velocities = launchMotors.getVelocities();
         launchMotorLeftVelocity = velocities.get(0);
         launchMotorRightVelocity = velocities.get(1);
