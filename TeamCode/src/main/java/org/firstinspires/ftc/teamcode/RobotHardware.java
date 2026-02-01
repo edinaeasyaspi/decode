@@ -37,6 +37,7 @@ public class RobotHardware {
     public RevColorSensorV3 leftColorSensor;
     public RevColorSensorV3 centerColorSensor;
     public RevColorSensorV3 rightColorSensor;
+    public WebcamName webcamName;
 
     public RobotHardware(OpMode opmode) {
         myOpMode = opmode;
@@ -64,7 +65,7 @@ public class RobotHardware {
         CRServo launchServo = myOpMode.hardwareMap.get(CRServo.class, "launchservo");
         launchManager = new LaunchManager(leftLaunchMotor, rightLaunchMotor, launchServo);
 
-        final WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
         aprilTagManager = new AprilTagManager(myOpMode, webcamName, mecanumDrive);
 
         leftColorSensor = (RevColorSensorV3) myOpMode.hardwareMap.get("colorsensorone");

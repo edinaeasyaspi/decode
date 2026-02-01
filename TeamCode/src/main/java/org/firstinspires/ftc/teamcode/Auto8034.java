@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -37,12 +40,22 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
-import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionProcessor;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 
 /*
  * Auto opMode for FTC Team 8034.
@@ -84,6 +97,8 @@ public class Auto8034 extends OpMode {
 
     private Path scorePreloadPath;
     private Path moveOffLaunchLinePath;
+    private FtcDashboard dashboard;
+    private Telemetry telemetry2;
 
 
     /**
@@ -91,11 +106,24 @@ public class Auto8034 extends OpMode {
      */
     @Override
     public void init() {
+        // Enable dashboard.
+        dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
+
         // Initialize the robot hardware
         robot.init();
+        // Let driver select autonomous configuration.
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         autonomousConfiguration.ShowHelp();
         cellManager = robot.cellManager;
+        // Enable camera stream to dashboard.
+        final CameraStreamProcessor processor = new CameraStreamProcessor();
+        new VisionPortal.Builder()
+                .addProcessor(processor)
+                .setCamera(robot.webcamName)
+                .build();
+        FtcDashboard.getInstance().startCameraStream(processor, 0);
+
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);
 //        buildPaths();
@@ -282,6 +310,38 @@ public class Auto8034 extends OpMode {
             default:
                 // If something went wrong, return a default pose
                 return new Pose(0, 0, 0);
+        }
+    }
+
+    public static class CameraStreamProcessor implements VisionProcessor, CameraStreamSource {
+        private final AtomicReference<Bitmap> lastFrame =
+                new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
+
+        @Override
+        public void init(int width, int height, CameraCalibration calibration) {
+            lastFrame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
+        }
+
+        @Override
+        public Object processFrame(Mat frame, long captureTimeNanos) {
+            Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
+            Utils.matToBitmap(frame, b);
+            lastFrame.set(b);
+            return null;
+        }
+
+        @Override
+        public void onDrawFrame(android.graphics.Canvas canvas,
+                                int onscreenWidth,
+                                int onscreenHeight,
+                                float scaleBmpPxToCanvasPx,
+                                float scaleCanvasDensity,
+                                Object userContext) {
+        }
+
+        @Override
+        public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+            continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrame.get()));
         }
     }
 }
