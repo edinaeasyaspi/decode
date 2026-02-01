@@ -56,7 +56,8 @@ public class ArtifactCellManager {
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
         this.rightColorSensor = csThree;
-        revColorV3Manager = new RevColorV3Manager();
+        //TODO Choose RGB (default) or HSV for color detection.
+        revColorV3Manager = new RevColorV3Manager(true);
         //Define servos
         this.leftCellServo = leftServo;
         this.centerCellServo = centerServo;
@@ -111,10 +112,6 @@ public class ArtifactCellManager {
     }
 
     public CELL_COLOR checkColor(RevColorSensorV3 colorSensor) {
-        //TODO: Imnplement the preferred color detection method based on the
-        // results from testing with the SensorColor opmode.
-//        NormalizedRGBA rgbColors = revColorV3Manager.getRGBA(colorSensor);
-//        float[] hsvValues = revColorV3Manager.getHSVArray(colorSensor);
         return revColorV3Manager.GetCellColor(colorSensor);
     }
 
