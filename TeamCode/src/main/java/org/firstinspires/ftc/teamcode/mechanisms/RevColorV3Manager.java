@@ -9,8 +9,38 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class RevColorV3Manager {
     //TODO: Tune the gain to optimize calibrated values.
     private float GAIN = 4.0f; // Sensor gain
+    public boolean useRGB = true; // Flag to use RGB or HSV
+
+    // default constructor.
+    public RevColorV3Manager() {
+    }
+
+    // Allow selection of RGB or HSV.
+    public RevColorV3Manager(boolean useRGB) {
+        this.useRGB = useRGB;
+    }
 
     public ArtifactCellManager.CELL_COLOR GetCellColor(RevColorSensorV3 sensor) {
+        return useRGB ? getCellColorRGB(sensor) : getCellColorHSV(sensor);
+    }
+
+    private ArtifactCellManager.CELL_COLOR getCellColorHSV(RevColorSensorV3 sensor) {
+        HSV hsv = getHSV(sensor);
+        float hue = hsv.getHue();
+        float saturation = hsv.getSaturation();
+        float value = hsv.getValue();
+
+        // Simple threshold-based color detection using HSV
+        if (hue >= 85 && hue <= 150 && saturation > 0.4 && value > 0.2) {
+            return ArtifactCellManager.CELL_COLOR.Green;
+        } else if (hue >= 250 && hue <= 290 && saturation > 0.4 && value > 0.2) {
+            return ArtifactCellManager.CELL_COLOR.Purple;
+        } else {
+            return ArtifactCellManager.CELL_COLOR.None;
+        }
+    }
+
+    private ArtifactCellManager.CELL_COLOR getCellColorRGB(RevColorSensorV3 sensor) {
         NormalizedRGBA colors = getRGBA(sensor);
         float red = colors.red;
         float green = colors.green;
@@ -19,7 +49,7 @@ public class RevColorV3Manager {
         // Simple threshold-based color detection
         if (green > red && green > blue && green > 0.075) {
             return ArtifactCellManager.CELL_COLOR.Green;
-        } else if (green > red && green< blue && blue > 0.07) {
+        } else if (green > red && green < blue && blue > 0.07) {
             return ArtifactCellManager.CELL_COLOR.Purple;
         } else {
             return ArtifactCellManager.CELL_COLOR.None;
