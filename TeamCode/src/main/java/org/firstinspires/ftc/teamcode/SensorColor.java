@@ -127,7 +127,7 @@ public class SensorColor extends LinearOpMode {
             }
             waitForStart();
             while (opModeIsActive()) {
-                sleep(250);
+                sleep(100);
                 runSample(); // actually execute the sample
             }
         } finally {
