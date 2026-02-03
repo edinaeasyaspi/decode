@@ -58,7 +58,7 @@ public class AprilTagManager {
         setManualExposure(exposure, gain);
         // Get the motif from the dashboard, default to NONE
         Object dashboardCurrentMotif = blackboard.getOrDefault(CURRENT_MOTIF_KEY, ArtifactCellManager.motif.NONE);
-        currentMotif = (ArtifactCellManager.motif)dashboardCurrentMotif;
+        currentMotif = (ArtifactCellManager.motif) dashboardCurrentMotif;
     }
 
     /**
@@ -202,6 +202,8 @@ public class AprilTagManager {
      */
     private boolean isAprilTagAligned(boolean shootFar) {
         boolean aligned = false;
+        //TODO Adjust this to account for launcher offset from robot center if needed.
+        double COMPENSATION_ANGLE_DEGREES = 2.0;
         // Assume there are 2 launch distances: short and long
         double desiredRange = shootFar ? DESIRED_LONG_DISTANCE : DESIRED_SHORT_DISTANCE;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -231,7 +233,9 @@ public class AprilTagManager {
                         mecanumDrive.driveRobotCentric(0, 0, 0);
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
-                        mecanumDrive.driveRobotCentric(0, 0, scale(-bearing, -45, 45, -1., 1));
+                        mecanumDrive.driveRobotCentric(0,
+                                0,
+                                scale(-bearing, -45, 45, -1., 1) + COMPENSATION_ANGLE_DEGREES);
                     }
 
                     break; // No need to check further tags
