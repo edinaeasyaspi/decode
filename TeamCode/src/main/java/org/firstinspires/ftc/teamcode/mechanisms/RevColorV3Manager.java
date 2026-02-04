@@ -66,9 +66,9 @@ public class RevColorV3Manager {
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         // Compensate for gain and use low pass filter to smooth values.
-        colors.red = lowPass(redAverage, colors.red / colors.alpha);
-        colors.green = lowPass(greenAverage, colors.green / colors.alpha);
-        colors.blue = lowPass(blueAverage, colors.blue / colors.alpha);
+        colors.red = colors.red / colors.alpha;
+        colors.green = colors.green / colors.alpha);
+        colors.blue =, colors.blue / colors.alpha);
         return colors;
     }
 
@@ -81,11 +81,10 @@ public class RevColorV3Manager {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         float[] hsvValues = new float[3];
         // Convert the RGB values to HSV values with filter smoothing.
-        android.graphics.Color.RGBToHSV(
-                (int) lowPassInt(redAverage, (int) (colors.red * 255)),
-                (int) lowPassInt(greenAverage, (int) colors.green * 255),
-                (int) lowPassInt(blueAverage, (int) colors.blue * 255),
-                hsvValues);
+        android.graphics.Color.RGBToHSV((int) colors.red * 255,
+                (int) colors.green * 255,
+                (int) colors.blue * 255, hsvValues);
+
         return new HSV(hsvValues[0], hsvValues[1], hsvValues[2]);
     }
 
