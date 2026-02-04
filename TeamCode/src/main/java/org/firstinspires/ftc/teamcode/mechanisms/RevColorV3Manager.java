@@ -10,6 +10,9 @@ public class RevColorV3Manager {
     //TODO: Tune the gain to optimize calibrated values.
     private float GAIN = 4.0f; // Sensor gain
     public boolean useRGB = true; // Flag to use RGB or HSV
+    private float redAverage = 0;
+    private float greenAverage = 0;
+    private float blueAverage = 0;
 
     // default constructor.
     public RevColorV3Manager() {
@@ -60,15 +63,15 @@ public class RevColorV3Manager {
         Return the Normalized RGBA values from the color sensor.
      */
     public NormalizedRGBA getRGBA(RevColorSensorV3 colorSensor) {
-        float redAverage = 0;
-        float greenAverage = 0;
-        float blueAverage = 0;
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         // Compensate for gain and use low pass filter to smooth values.
         colors.red = lowPass(redAverage, colors.red / colors.alpha);
+        redAverage = colors.red;
         colors.green = lowPass(greenAverage, colors.green / colors.alpha);
+        greenAverage = colors.green;
         colors.blue = lowPass(blueAverage, colors.blue / colors.alpha);
+        blueAverage = colors.blue;
         return colors;
     }
 
