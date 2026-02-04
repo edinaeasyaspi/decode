@@ -228,14 +228,14 @@ public class AprilTagManager {
 //                        aligned = true;
 //                    } else {
                     // Only correct for bearing for now
-                    if (Math.abs(bearing) <= bearingTolerance) {
+                    if (Math.abs(bearing + COMPENSATION_ANGLE_DEGREES) <= bearingTolerance) {
                         aligned = true;
                         mecanumDrive.driveRobotCentric(0, 0, 0);
                     } else {
                         // The parameters are set to only center. You may want to add range control as well.
                         mecanumDrive.driveRobotCentric(0,
                                 0,
-                                scale(-bearing, -45, 45, -1., 1) + COMPENSATION_ANGLE_DEGREES);
+                                scale(-bearing, -45, 45, -1., 1));
                     }
 
                     break; // No need to check further tags
