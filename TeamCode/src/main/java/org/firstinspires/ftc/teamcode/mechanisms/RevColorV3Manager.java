@@ -67,8 +67,8 @@ public class RevColorV3Manager {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         // Compensate for gain and use low pass filter to smooth values.
         colors.red = colors.red / colors.alpha;
-        colors.green = colors.green / colors.alpha);
-        colors.blue =, colors.blue / colors.alpha);
+        colors.green = colors.green / colors.alpha;
+        colors.blue = colors.blue / colors.alpha;
         return colors;
     }
 
