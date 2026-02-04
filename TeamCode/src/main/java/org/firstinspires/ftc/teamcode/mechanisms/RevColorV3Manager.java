@@ -151,6 +151,11 @@ public class RevColorV3Manager {
          * @return filtered value
          */
         public double estimate(double measurement) {
+            /// We might want to cut off extreme values because we know what normal ones look like
+            /// If we don't they could have a long effect on whether the color sensor thinks it sees
+            /// a certain color. This is all dependant on the gain as mentioned in the code,
+            /// but I think that we should have a relatively high gain because of how fidgety the
+            /// color sensors are.
             double estimate = gain * previousEstimate + (1 - gain) * measurement;
             previousEstimate = estimate;
             return estimate;
