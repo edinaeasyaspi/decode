@@ -122,8 +122,8 @@ public class SensorColor extends LinearOpMode {
                 if (gamepad1.y) {
                     colorSensor = robot.rightColorSensor;
                 }
-                telemetry.addData("Color Sensor:", "Using %s", colorSensor.getDeviceName());
-                telemetry.update();
+//                telemetry.addData("Color Sensor:", "Using %s", colorSensor.getDeviceName());
+//                telemetry.update();
             }
             waitForStart();
             while (opModeIsActive()) {
