@@ -9,10 +9,15 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class RevColorV3Manager {
     //TODO: Tune the gain to optimize calibrated values.
     private float GAIN = 4.0f; // Sensor gain
+    // Gain value for Low pass filter.
+    // Lower values = more smoothing, but more lag.
+    public static double lowPassGain = 0.3;
     public boolean useRGB = true; // Flag to use RGB or HSV
     private float redAverage = 0;
     private float greenAverage = 0;
     private float blueAverage = 0;
+    private LowPassFilter lowPassFilter = new LowPassFilter(lowPassGain);
+
 
     // default constructor.
     public RevColorV3Manager() {
@@ -59,29 +64,33 @@ public class RevColorV3Manager {
         }
     }
 
+    // Used to filter all color sensor readings.
+    private NormalizedRGBA applylowPassFilter(NormalizedRGBA colors) {
+        // Compensate for gain and use low pass filter to smooth values.
+        colors.red = (float) lowPassFilter.estimate((double) colors.red / colors.alpha);
+        colors.green = (float) lowPassFilter.estimate((double) colors.green / colors.alpha);
+        colors.blue = (float) lowPassFilter.estimate((double) colors.blue / colors.alpha);
+        return colors;
+    }
+
     /*
-        Return the Normalized RGBA values from the color sensor.
+        Return Normalized RGBA values, with low pass filter applied.
      */
     public NormalizedRGBA getRGBA(RevColorSensorV3 colorSensor) {
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
-        // Compensate for gain and use low pass filter to smooth values.
-        colors.red = lowPass(redAverage, colors.red / colors.alpha);
-        redAverage = colors.red;
-        colors.green = lowPass(greenAverage, colors.green / colors.alpha);
-        greenAverage = colors.green;
-        colors.blue = lowPass(blueAverage, colors.blue / colors.alpha);
-        blueAverage = colors.blue;
-        return colors;
+        colors.red = (float) lowPassFilter.estimate((double) colors.red / colors.alpha);
+        colors.green = (float) lowPassFilter.estimate((double) colors.green / colors.alpha);
+        colors.blue = (float) lowPassFilter.estimate((double) colors.blue / colors.alpha);
+        return applylowPassFilter(colors);
     }
 
-    // Get HSV values from the color sensor.
+    /*
+        Returns HSV values, with low pass filter applied.
+     */
     public HSV getHSV(RevColorSensorV3 colorSensor) {
-        int redAverage = 0;
-        int greenAverage = 0;
-        int blueAverage = 0;
         setSensorGain(colorSensor);
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        NormalizedRGBA colors = applylowPassFilter(getRGBA(colorSensor));
         float[] hsvValues = new float[3];
         // Convert the RGB values to HSV values with filter smoothing.
         android.graphics.Color.RGBToHSV((int) colors.red * 255,
@@ -91,7 +100,9 @@ public class RevColorV3Manager {
         return new HSV(hsvValues[0], hsvValues[1], hsvValues[2]);
     }
 
-    // Get HSV as an array.
+    /*
+        Return HSV values with the low pass filter applied.
+     */
     public float[] getHSVArray(RevColorSensorV3 colorSensor) {
         NormalizedRGBA colors = getRGBA(colorSensor);
         float[] hsvValues = new float[3];
@@ -109,34 +120,39 @@ public class RevColorV3Manager {
         colorSensor.setGain(GAIN);
     }
 
-    protected float lowPass(float colorAverage, float colorSample) {
-        // (0 - .99) Lower value results in stronger smoothing.
-        final float FILTER_COEFFICIENT = .2F;
-        // Used to filter out values that are way out of range. Tune for expected range.
-        final float THRESHOLD = .1F;
+    public class LowPassFilter {
+        protected double gain;
+        protected double previousEstimate = 0;
 
-        // Optional code to remove outliers.
-        if (Math.abs(colorSample - colorAverage) > THRESHOLD) {
-            colorSample = colorAverage;
+        /**
+         * gain of the low pass filter.
+         * <p>
+         * (0 < x < 1)
+         * <p>
+         * High values of A are smoother but have more phase lag, low values of A allow more noise but
+         * will respond faster to quick changes in the measured state.
+         *
+         * @param gain Aforementioned Gain. (0 < x < 1)
+         */
+        public LowPassFilter(double gain) {
+            this.gain = gain;
         }
 
-        colorAverage = ((1.0F - FILTER_COEFFICIENT) * (FILTER_COEFFICIENT + colorSample));
-        return colorAverage;
-    }
-
-    protected float lowPassInt(int colorAverage, int colorSample) {
-        // (0 - .99) Lower value results in stronger smoothing.
-        final float FILTER_COEFFICIENT = .2F;
-        // Used to filter out values that are way out of range. Tune for expected range.
-        final int THRESHOLD = 100;
-
-        // Optional code to remove outliers.
-        if (Math.abs(colorSample - colorAverage) > THRESHOLD) {
-            colorSample = colorAverage;
+        // Added to allow changes using dashboard.
+        public void setGain(double gain) {
+            this.gain = gain;
         }
 
-        colorAverage = (int) ((1.0F - FILTER_COEFFICIENT) * (FILTER_COEFFICIENT + colorSample));
-        return colorAverage;
+        /**
+         * Low Pass Filter estimate
+         *
+         * @param measurement current measurement
+         * @return filtered value
+         */
+        public double estimate(double measurement) {
+            double estimate = gain * previousEstimate + (1 - gain) * measurement;
+            previousEstimate = estimate;
+            return estimate;
+        }
     }
-
 }
