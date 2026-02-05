@@ -44,6 +44,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechanisms.HSV;
 import org.firstinspires.ftc.teamcode.mechanisms.RevColorV3Manager;
 
+import java.util.Set;
+
 /*
  * This OpMode is used to test the REV Color Sensor V3.
  * It uses the RevColorV3Manager class to manage the sensor.
@@ -73,7 +75,9 @@ public class SensorColor extends LinearOpMode {
      * The colorSensor field will contain a reference to our color sensor hardware object
      */
     RevColorSensorV3 colorSensor;
-    // Default gain value for Rev Color Sensor V3.
+    // The default gain value for Rev Color Sensor V3 is 3.
+    // Documentation suggests 1, 3, 6, 9 or 18, with lower values for bright light and
+    // higher values for low light.
     float gain = 4.0f;
     RevColorV3Manager revColorV3Manager = new RevColorV3Manager();
     float[] hsvValues = new float[3];
@@ -122,8 +126,10 @@ public class SensorColor extends LinearOpMode {
                 if (gamepad1.y) {
                     colorSensor = robot.rightColorSensor;
                 }
-//                telemetry.addData("Color Sensor:", "Using %s", colorSensor.getDeviceName());
-//                telemetry.update();
+                // Use the hardware map to get the name of the selected sensor.
+                Set name= hardwareMap.getNamesOf(colorSensor);
+                telemetry.addData("Color Sensor:", "Using %s", name);
+                telemetry.update();
             }
             waitForStart();
             while (opModeIsActive()) {
