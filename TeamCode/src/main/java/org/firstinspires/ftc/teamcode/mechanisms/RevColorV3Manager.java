@@ -156,6 +156,10 @@ public class RevColorV3Manager {
             /// a certain color. This is all dependant on the gain as mentioned in the code,
             /// but I think that we should have a relatively high gain because of how fidgety the
             /// color sensors are.
+            if (measurement >= 0.1) {
+                //This will only work for rgba NOT hsl
+                return previousEstimate;
+            }
             double estimate = gain * previousEstimate + (1 - gain) * measurement;
             previousEstimate = estimate;
             return estimate;
