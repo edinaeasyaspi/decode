@@ -11,7 +11,7 @@ public class RevColorV3Manager {
     private float GAIN = 4.0f; // Sensor gain
     // Gain value for Low pass filter.
     // Lower values = more smoothing, but more lag.
-    public static double lowPassGain = 0.3;
+    public static double lowPassGain = 0.05;
     public boolean useRGB = true; // Flag to use RGB or HSV
     private float redAverage = 0;
     private float greenAverage = 0;
@@ -58,9 +58,9 @@ public class RevColorV3Manager {
 
         // Simple threshold-based color detection
         //TODO: Tune these thresholds based on testing in opmode SensorColor.
-        if (green > 0.75 && red > 0.3 && blue < 0.3) {
+        if (green > 0.07 && red > 0.04 && blue > 0.055) {
             return ArtifactCellManager.CELL_COLOR.Green;
-        } else if (blue > 0.6 && red > 0.3 && green < 0.3) {
+        } else if (blue > 0.075 && red > 0.037 && green > 0.04) {
             return ArtifactCellManager.CELL_COLOR.Purple;
         } else {
             return ArtifactCellManager.CELL_COLOR.None;
