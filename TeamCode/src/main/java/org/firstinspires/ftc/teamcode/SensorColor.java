@@ -75,6 +75,8 @@ public class SensorColor extends LinearOpMode {
      * The colorSensor field will contain a reference to our color sensor hardware object
      */
     RevColorSensorV3 colorSensor;
+    // The name of the selected sensor in the config file.
+    Set sensorName;
     // The default gain value for Rev Color Sensor V3 is 3.
     // Documentation suggests 1, 3, 6, 9 or 18, with lower values for bright light and
     // higher values for low light.
@@ -126,11 +128,12 @@ public class SensorColor extends LinearOpMode {
                 if (gamepad1.y) {
                     colorSensor = robot.rightColorSensor;
                 }
-                // Use the hardware map to get the name of the selected sensor.
-                Set name= hardwareMap.getNamesOf(colorSensor);
-                telemetry.addData("Color Sensor:", "Using %s", name);
-                telemetry.update();
             }
+
+            // Use the hardware map to get the name of the selected sensor.
+            sensorName = hardwareMap.getNamesOf(colorSensor);
+            telemetry.addData("Color Sensor:", "Using %s", sensorName);
+            telemetry.update();
             waitForStart();
             while (opModeIsActive()) {
                 sleep(100);
@@ -173,7 +176,7 @@ public class SensorColor extends LinearOpMode {
          * for an explanation of HSV color. */
 
         telemetry.addLine()
-                .addData("Color sensor", colorSensor.getDeviceName())
+                .addData("Color Sensor:", "Using %s", sensorName)
                 .addData("\nRed", "%.3f", rgbColors.red)
                 .addData("\nGreen", "%.3f", rgbColors.green)
                 .addData("\nBlue", "%.3f", rgbColors.blue)
