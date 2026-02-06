@@ -161,64 +161,60 @@ public class ArtifactCellManager {
     }
     public static List<CELL> launchOrder() {
         // Initialize launch order and cell colors
-        List<CELL> launchOrder = new ArrayList<>(Collections.nCopies(3, CELL.None));
+        List<CELL> launchOrder = new ArrayList<>(Collections.nCopies(1, CELL.None));
+        List<CELL> plainOrder = List.of(CELL.Left, CELL.Center, CELL.Right);
         List<CELL_COLOR> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
 
         int index = 0;
-        switch (currentMotif) {
-            case GPP:
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Green) {
-                        launchOrder.set(0, CELL.values()[i]);
-                        break;
-                    }
-                }
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Purple) {
-                        launchOrder.set(++index, CELL.values()[i]);
-                    }
-                }
-                break;
+        if (Collections.frequency(cellColors, CELL_COLOR.Purple) == 2 && Collections.frequency(cellColors, CELL_COLOR.Green) == 1) {
+            switch (currentMotif) {
+                case GPP:
+                    launchOrder.set(0,plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)));
+                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Left)) launchOrder.add(CELL.Left);
+                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Center)) launchOrder.add(CELL.Center);
+                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Right)) launchOrder.add(CELL.Right);
+                    break;
 
-            case PGP:
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Purple) {
-                        launchOrder.set(0, CELL.values()[i]);
-                        break;
+                case PGP:
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Purple) {
+                            launchOrder.set(0, CELL.values()[i]);
+                            break;
+                        }
                     }
-                }
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Green) {
-                        launchOrder.set(++index, CELL.values()[i]);
-                        break;
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Green) {
+                            launchOrder.set(++index, CELL.values()[i]);
+                            break;
+                        }
                     }
-                }
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Purple) {
-                        launchOrder.set(2, CELL.values()[i]);
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Purple) {
+                            launchOrder.set(2, CELL.values()[i]);
+                        }
                     }
-                }
-                break;
+                    break;
 
-            case PPG:
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Purple) {
-                        launchOrder.set(0, CELL.values()[i]);
-                        break;
+                case PPG:
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Purple) {
+                            launchOrder.set(0, CELL.values()[i]);
+                            break;
+                        }
                     }
-                }
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Purple) {
-                        launchOrder.set(++index, CELL.values()[i]);
-                        break;
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Purple) {
+                            launchOrder.set(++index, CELL.values()[i]);
+                            break;
+                        }
                     }
-                }
-                for (int i = 0; i < 3; i++) {
-                    if (cellColors.get(i) == CELL_COLOR.Green) {
-                        launchOrder.set(++index, CELL.values()[i]);
+                    for (int i = 0; i < 3; i++) {
+                        if (cellColors.get(i) == CELL_COLOR.Green) {
+                            launchOrder.set(++index, CELL.values()[i]);
+                        }
                     }
-                }
-                break;
+                    break;
+            }
         }
 
         return launchOrder;
