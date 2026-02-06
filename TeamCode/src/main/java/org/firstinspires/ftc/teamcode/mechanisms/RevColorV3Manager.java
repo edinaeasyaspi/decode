@@ -16,7 +16,9 @@ public class RevColorV3Manager {
     private float redAverage = 0;
     private float greenAverage = 0;
     private float blueAverage = 0;
-    private LowPassFilter lowPassFilter = new LowPassFilter(lowPassGain);
+    private LowPassFilter lowPassFilterR = new LowPassFilter(lowPassGain);
+    private LowPassFilter lowPassFilterG = new LowPassFilter(lowPassGain);
+    private LowPassFilter lowPassFilterB = new LowPassFilter(lowPassGain);
 
 
     // default constructor.
@@ -68,9 +70,9 @@ public class RevColorV3Manager {
     // Used to filter all color sensor readings.
     private NormalizedRGBA applylowPassFilter(NormalizedRGBA colors) {
         // Compensate for gain and use low pass filter to smooth values.
-        colors.red = (float) lowPassFilter.estimate((double) colors.red / colors.alpha);
-        colors.green = (float) lowPassFilter.estimate((double) colors.green / colors.alpha);
-        colors.blue = (float) lowPassFilter.estimate((double) colors.blue / colors.alpha);
+        colors.red = (float) lowPassFilterR.estimate(colors.red);
+        colors.green = (float) lowPassFilterG.estimate(colors.green);
+        colors.blue = (float) lowPassFilterB.estimate(colors.blue);
         return colors;
     }
 
@@ -80,9 +82,9 @@ public class RevColorV3Manager {
     public NormalizedRGBA getRGBA(RevColorSensorV3 colorSensor) {
         setSensorGain(colorSensor);
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
-        colors.red = (float) lowPassFilter.estimate((double) colors.red / colors.alpha);
-        colors.green = (float) lowPassFilter.estimate((double) colors.green / colors.alpha);
-        colors.blue = (float) lowPassFilter.estimate((double) colors.blue / colors.alpha);
+        colors.red = colors.red / colors.alpha;
+        colors.green = colors.green / colors.alpha;
+        colors.blue = colors.blue / colors.alpha;
         return applylowPassFilter(colors);
     }
 
