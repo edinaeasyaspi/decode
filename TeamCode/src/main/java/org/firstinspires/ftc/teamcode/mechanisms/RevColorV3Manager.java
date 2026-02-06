@@ -11,7 +11,7 @@ public class RevColorV3Manager {
     private float GAIN = 4.0f; // Sensor gain
     // Gain value for Low pass filter.
     // Lower values = more smoothing, but more lag.
-    public static double lowPassGain = 0.05;
+    public static double lowPassGain = 0.9;
     public boolean useRGB = true; // Flag to use RGB or HSV
     private float redAverage = 0;
     private float greenAverage = 0;
@@ -58,9 +58,9 @@ public class RevColorV3Manager {
 
         // Simple threshold-based color detection
         //TODO: Tune these thresholds based on testing in opmode SensorColor.
-        if (green > 0.07 && red > 0.04 && blue > 0.055) {
+        if (green > 0.15 && red > 0.04 && blue > 0.12) {
             return ArtifactCellManager.CELL_COLOR.Green;
-        } else if (blue > 0.075 && red > 0.037 && green > 0.04) {
+        } else if (blue > 0.11 && red > 0.065 && green > 0.07) {
             return ArtifactCellManager.CELL_COLOR.Purple;
         } else {
             return ArtifactCellManager.CELL_COLOR.None;
@@ -153,15 +153,7 @@ public class RevColorV3Manager {
          * @return filtered value
          */
         public double estimate(double measurement) {
-            /// We might want to cut off extreme values because we know what normal ones look like
-            /// If we don't they could have a long effect on whether the color sensor thinks it sees
-            /// a certain color. This is all dependant on the gain as mentioned in the code,
-            /// but I think that we should have a relatively high gain because of how fidgety the
-            /// color sensors are.
-            if (measurement >= 0.1) {
-                //This will only work for rgba NOT hsl
-                return previousEstimate;
-            }
+            if (measurement > 1) return previousEstimate;
             double estimate = gain * previousEstimate + (1 - gain) * measurement;
             previousEstimate = estimate;
             return estimate;

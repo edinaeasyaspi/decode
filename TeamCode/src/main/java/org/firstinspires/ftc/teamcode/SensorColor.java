@@ -185,7 +185,7 @@ public class SensorColor extends LinearOpMode {
                 .addData("\nargb Color", "%d", Color.HSVToColor(hsvValues))
                 .addData("\nGain", "%.3f", gain);
 
-
+        telemetry.addData("Color", revColorV3Manager.GetCellColor(colorSensor));
         /* If this color sensor also has a distance sensor, display the measured distance.
          * Note that the reported distance is only useful at very close range, and is impacted by
          * ambient light and surface reflectivity. */
