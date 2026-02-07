@@ -114,7 +114,11 @@ public class ArtifactCellManager {
     public CELL_COLOR checkColor(RevColorSensorV3 colorSensor) {
         if (ColorSensor.isGreen(colorSensor)) return CELL_COLOR.Green;
         if (ColorSensor.isPurple(colorSensor)) return CELL_COLOR.Purple;
-        return CELL_COLOR.None;
+        if (Math.random() > 0.5){
+            return  CELL_COLOR.Green;
+        } else {
+            return CELL_COLOR.Purple;
+        }
     }
 
     // Find out what colors are in each cell.

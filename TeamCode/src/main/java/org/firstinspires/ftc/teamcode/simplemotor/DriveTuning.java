@@ -33,12 +33,15 @@ public class DriveTuning extends LinearOpMode {
     public void runOpMode() {
         robot.init();
         mecanumDrive = robot.mecanumDrive;
+
         gamepadEx = new GamepadEx(gamepad1);
 
         ftcDashboard = FtcDashboard.getInstance();
         telemetry = ftcDashboard.getTelemetry();
 
         while (opModeIsActive()) {
+            gamepadEx.readButtons();
+
             if (!autoDriveing) {
                 mecanumDrive.driveRobotCentric(gamepadEx.getLeftX(),gamepadEx.getLeftY(),gamepadEx.getRightX());
             }

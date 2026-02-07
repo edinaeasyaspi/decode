@@ -54,6 +54,10 @@ public class RobotHardware {
         backLeftDrive.setInverted(true);
         frontRightDrive.setInverted(true);
         backRightDrive.setInverted(true);
+        frontLeftDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        frontRightDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         mecanumDrive = new MecanumDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
 
         MotorEx leftIntakeMotor = new MotorEx(myOpMode.hardwareMap, "leftintakemotor", Motor.GoBILDA.RPM_435);
