@@ -68,7 +68,7 @@ public class Robot8034 extends LinearOpMode {
     public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
     public static double LONG_SHOT = 0.255;
     public boolean launching = false;
-    public static int gap = 900;
+    public static int gap = 1200;
     public int launchStage = 0;
     public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
 
@@ -182,21 +182,29 @@ public class Robot8034 extends LinearOpMode {
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
                 launchManager.launchOn(LONG_SHOT);
-                launching = true;
-                launchOrder = cellManager.launchOrder();
-                launchStage = 0;
-                cellManager.openCell(launchOrder.get(launchStage));
-                launchStage++;
-                launchTimer.reset();
+//                launching = true;
+//                launchOrder = cellManager.launchOrder();
+//                if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
+//                    launching = false;
+//                } else {
+//                    launchStage = 0;
+//                    cellManager.openCell(launchOrder.get(launchStage));
+//                    launchStage++;
+//                    launchTimer.reset();
+//                }
             } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
                 SHOOT_FAR = false;
                 launchManager.launchOn(SHORT_SHOT);
-                launching = true;
-                launchOrder = cellManager.launchOrder();
-                launchStage = 0;
-                cellManager.openCell(launchOrder.get(launchStage));
-                launchStage++;
-                launchTimer.reset();
+//                launching = true;
+//                launchOrder = cellManager.launchOrder();
+//                if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
+//                    launching = false;
+//                } else {
+//                    launchStage = 0;
+//                    cellManager.openCell(launchOrder.get(launchStage));
+//                    launchStage++;
+//                    launchTimer.reset();
+//                }
             }
 
             // Launch without regard to color.

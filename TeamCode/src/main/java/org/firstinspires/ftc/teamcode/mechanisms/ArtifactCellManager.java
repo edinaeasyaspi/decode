@@ -40,9 +40,9 @@ public class ArtifactCellManager {
     public static CELL_COLOR rightCellColor = CELL_COLOR.None;
     public static CELL_COLOR centerCellColor = CELL_COLOR.None;
     public static CELL_COLOR leftCellColor = CELL_COLOR.None;
-    public RevColorSensorV3 leftColorSensor;
-    public RevColorSensorV3 centerColorSensor;
-    public RevColorSensorV3 rightColorSensor;
+    public static RevColorSensorV3 leftColorSensor;
+    public static RevColorSensorV3 centerColorSensor;
+    public static RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
     public static motif currentMotif = motif.NONE;
@@ -139,6 +139,9 @@ public class ArtifactCellManager {
         end = colorToString(leftCellColor);
         end += colorToString(centerCellColor);
         end += colorToString(rightCellColor);
+        end += "-" + ColorSensor.hue(leftColorSensor);
+        end += "-" + ColorSensor.hue(centerColorSensor);
+        end += "-" + ColorSensor.hue(rightColorSensor);
         return end;
     }
 
@@ -161,10 +164,10 @@ public class ArtifactCellManager {
     }
     public static List<CELL> launchOrder() {
         // Initialize launch order and cell colors
-        List<CELL> launchOrder = new ArrayList<>(Collections.nCopies(0, CELL.None));
+        List<CELL> launchOrder = new ArrayList<>();
         List<CELL> plainOrder = List.of(CELL.Left, CELL.Center, CELL.Right);
         List<CELL_COLOR> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
-        
+
         if (Collections.frequency(cellColors, CELL_COLOR.Purple) == 2 && Collections.frequency(cellColors, CELL_COLOR.Green) == 1) {
             switch (currentMotif) {
                 case GPP:
@@ -187,6 +190,8 @@ public class ArtifactCellManager {
                     if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Right)) launchOrder.add(CELL.Right);
                     launchOrder.add(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)));
                     break;
+                case NONE:
+                    launchOrder.add(CELL.None);
             }
         }
 

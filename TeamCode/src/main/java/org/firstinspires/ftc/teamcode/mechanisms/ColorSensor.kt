@@ -24,6 +24,10 @@ class ColorSensor() {
             val color = getColor(colorSensor);
             return color.hue >= 200 && color.hue <= 350
         }
+        @JvmStatic fun hue(colorSensor: RevColorSensorV3): Float {
+            val hue: Float = getColor(colorSensor).hue
+            return hue;
+        }
     }
 }
 
