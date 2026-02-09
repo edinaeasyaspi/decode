@@ -129,12 +129,13 @@ public class Auto8034 extends OpMode {
         autonomousConfiguration.ShowHelp();
         cellManager = robot.cellManager;
         // Enable camera stream to dashboard.
+        //TODO If this is not useful, remove it to save resources.
         final CameraStreamProcessor processor = new CameraStreamProcessor();
         new VisionPortal.Builder()
                 .addProcessor(processor)
                 .setCamera(robot.webcamName)
                 .build();
-        FtcDashboard.getInstance().startCameraStream(processor, 0);
+        dashboard.startCameraStream(processor, 0);
 
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);
@@ -174,11 +175,6 @@ public class Auto8034 extends OpMode {
 //        scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
 //        moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
-        // Apply any requested delay before starting
-        delayTimer.reset();
-        while (delayTimer.seconds() < startDelaySeconds) {
-        }
-
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
@@ -186,6 +182,11 @@ public class Auto8034 extends OpMode {
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
         allianceAudienceOffset =
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
+
+        // Apply any requested delay before starting
+        delayTimer.reset();
+        while (delayTimer.seconds() < startDelaySeconds) {
+        }
 
         //TODO: This assumes the robot can see the obelisk at start. If that is not true, move
         // this to the state machine so the robot can move into position..
