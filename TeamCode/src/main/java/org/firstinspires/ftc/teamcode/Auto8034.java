@@ -213,7 +213,7 @@ public class Auto8034 extends OpMode {
         if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
             startGoalPathUpdate();
         } else {
-            autonomousPathUpdate();
+            startAudiencePathUpdate();
         }
 
         telemetry.addData("Status", "Run Time: " + runtime);
@@ -236,6 +236,64 @@ public class Auto8034 extends OpMode {
     /// This is a rough draft not the final disign there are many parts missing
     public int launches = 0;
     public List<ArtifactCellManager.CELL> launchOrer;
+    public int afterShoot;
+    public void startAudiencePathUpdate() {
+        switch (pathState) {
+            case 0:
+                launchOrer = cellManager.noColorLaunch();
+                cellManager.openCell(launchOrer.get(launches));
+                launches++;
+                driveTimer.reset();
+                afterShoot = 2;
+                setPathState(1);
+                break;
+            case 1:
+                if (driveTimer.milliseconds() >= 1200) {
+                    cellManager.openCell(launchOrer.get(launches));
+                    launches++;
+                    driveTimer.reset();
+                    if (launches == 3) {
+                        setPathState(afterShoot);
+                        break;
+                    }
+                }
+            case 2:
+                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+                    movementManager.turn(1.233, 1);
+                    movementManager.moveStrafe(1,-1);
+                } else {
+                    movementManager.turn(0.74, -1);
+                    movementManager.moveStrafe(1,1);
+                }
+                setPathState(3);
+                break;
+            case 3:
+                intakeManager.intakeOn();
+                movementManager.moveForward(1.25, 1);
+                movementManager.moveForward(1.25, -1);
+                setPathState(4);
+                break;
+            case 4:
+                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+                    movementManager.moveStrafe(1,1);
+                    movementManager.turn(1.233, -1);
+                } else {
+                    movementManager.moveStrafe(1,-1);
+                    movementManager.turn(0.74, 1);
+                }
+                setPathState(5);
+            case 5:
+                launchOrer = cellManager.noColorLaunch();
+                cellManager.openCell(launchOrer.get(launches));
+                launches++;
+                driveTimer.reset();
+                afterShoot = 6;
+                setPathState(1);
+                break;
+            case 6:
+                //Wait here
+        }
+    }
     public void startGoalPathUpdate() {
         switch (pathState) {
             case 0:
@@ -243,6 +301,7 @@ public class Auto8034 extends OpMode {
                 //I'm still going to do it
                 movementManager.moveForward(1.5, 1);
                 setPathState(1);
+                break;
             case 1:
                 //We don't have enough time to figure out how to look at the colors
                 //If you want to make it look at them you can
@@ -251,6 +310,7 @@ public class Auto8034 extends OpMode {
                 launches++;
                 driveTimer.reset();
                 setPathState(2);
+                break;
             case 2:
                 if (driveTimer.milliseconds() >= 1200) {
                     cellManager.openCell(launchOrer.get(launches));
@@ -258,6 +318,7 @@ public class Auto8034 extends OpMode {
                     driveTimer.reset();
                     if (launches == 3) {
                         setPathState(3);
+                        break;
                     }
                 }
             case 3:
@@ -270,12 +331,14 @@ public class Auto8034 extends OpMode {
                     movementManager.moveStrafe(0.5, 1);
                 }
                 setPathState(4); //I didn't feel like shoving all this in one case
+                break;
             case 4:
                 intakeManager.intakeOn();
                 movementManager.moveForward(1.5, 1);
                 movementManager.moveForward(1.5, -1);
                 //We don't turn the intake off because then a ball could get stuck
                 setPathState(5);
+                break;
             case 5:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                     movementManager.moveStrafe(0.5, 1);
@@ -285,6 +348,7 @@ public class Auto8034 extends OpMode {
                     movementManager.turn(0.555, -1);
                 }
                 setPathState(6);
+                break;
             case 6:
                 launches = 0;
                 launchOrer = cellManager.noColorLaunch();
@@ -292,6 +356,7 @@ public class Auto8034 extends OpMode {
                 launches++;
                 driveTimer.reset();
                 setPathState(7);
+                break;
             case 7:
                 if (driveTimer.milliseconds() >= 1200) {
                     cellManager.openCell(launchOrer.get(launches));
@@ -299,6 +364,7 @@ public class Auto8034 extends OpMode {
                     driveTimer.reset();
                     if (launches == 3) {
                         setPathState(8);
+                        break;
                     }
                 }
             case 8:
