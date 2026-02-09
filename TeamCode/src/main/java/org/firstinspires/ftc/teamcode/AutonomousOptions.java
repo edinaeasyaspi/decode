@@ -109,7 +109,6 @@ public class AutonomousOptions implements Serializable {
     public enum StartPosition {
         None,
         GoalGate,
-        AudienceCenter,
         AudienceTeam,
     }
 

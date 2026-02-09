@@ -49,9 +49,12 @@ import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
+import org.firstinspires.ftc.teamcode.simplemotor.MovementManager;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
@@ -100,6 +103,9 @@ public class Auto8034 extends OpMode {
     private FtcDashboard dashboard;
     private Telemetry telemetry2;
 
+    private MovementManager movementManager;
+    private IntakeManager intakeManager;
+
 
     /**
      * This method will be called once, when the INIT button is pressed.
@@ -112,6 +118,12 @@ public class Auto8034 extends OpMode {
 
         // Initialize the robot hardware
         robot.init();
+
+        movementManager = new MovementManager();
+        movementManager.load(robot.mecanumDrive);
+
+        intakeManager = robot.intakeManager;
+
         // Let driver select autonomous configuration.
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         autonomousConfiguration.ShowHelp();
@@ -198,7 +210,11 @@ public class Auto8034 extends OpMode {
 //        follower.update();
         cellManager.execute();
         robot.launchManager.execute();
-        autonomousPathUpdate();
+        if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
+            startGoalPathUpdate();
+        } else {
+            autonomousPathUpdate();
+        }
 
         telemetry.addData("Status", "Run Time: " + runtime);
         telemetry.addData("Alliance", allianceColor);
@@ -216,6 +232,79 @@ public class Auto8034 extends OpMode {
     @Override
     public void stop() {
 
+    }
+    /// This is a rough draft not the final disign there are many parts missing
+    public int launches = 0;
+    public List<ArtifactCellManager.CELL> launchOrer;
+    public void startGoalPathUpdate() {
+        switch (pathState) {
+            case 0:
+                //I know that holding the loop up to move is controversial
+                //I'm still going to do it
+                movementManager.moveForward(1.5, 1);
+                setPathState(1);
+            case 1:
+                //We don't have enough time to figure out how to look at the colors
+                //If you want to make it look at them you can
+                launchOrer = cellManager.noColorLaunch();
+                cellManager.openCell(launchOrer.get(launches));
+                launches++;
+                driveTimer.reset();
+                setPathState(2);
+            case 2:
+                if (driveTimer.milliseconds() >= 1200) {
+                    cellManager.openCell(launchOrer.get(launches));
+                    launches++;
+                    driveTimer.reset();
+                    if (launches == 3) {
+                        setPathState(3);
+                    }
+                }
+            case 3:
+                if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
+                    //The accuracy of the fifty degree turn is adjustable because it is 0.55...
+                    movementManager.turn(0.555,-1);
+                    movementManager.moveStrafe(0.5, -1);
+                } else {
+                    movementManager.turn(0.555, 1);
+                    movementManager.moveStrafe(0.5, 1);
+                }
+                setPathState(4); //I didn't feel like shoving all this in one case
+            case 4:
+                intakeManager.intakeOn();
+                movementManager.moveForward(1.5, 1);
+                movementManager.moveForward(1.5, -1);
+                //We don't turn the intake off because then a ball could get stuck
+                setPathState(5);
+            case 5:
+                if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
+                    movementManager.moveStrafe(0.5, 1);
+                    movementManager.turn(0.555,1);
+                } else {
+                    movementManager.moveStrafe(0.5, -1);
+                    movementManager.turn(0.555, -1);
+                }
+                setPathState(6);
+            case 6:
+                launches = 0;
+                launchOrer = cellManager.noColorLaunch();
+                cellManager.openCell(launchOrer.get(launches));
+                launches++;
+                driveTimer.reset();
+                setPathState(7);
+            case 7:
+                if (driveTimer.milliseconds() >= 1200) {
+                    cellManager.openCell(launchOrer.get(launches));
+                    launches++;
+                    driveTimer.reset();
+                    if (launches == 3) {
+                        setPathState(8);
+                    }
+                }
+            case 8:
+                //Once we test this we can expand this to go pick up different spots
+                //This can just wait here
+        }
     }
 
     // State machine for autonomous path following and actions
@@ -305,8 +394,6 @@ public class Auto8034 extends OpMode {
                 return startPoseGoalGate;
             case AudienceTeam:
                 return startPoseAudienceTeam;
-            case AudienceCenter:
-                return startPoseGoalAudienceCenter;
             default:
                 // If something went wrong, return a default pose
                 return new Pose(0, 0, 0);
