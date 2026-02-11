@@ -113,8 +113,8 @@ public class Auto8034 extends OpMode {
     @Override
     public void init() {
         // Enable dashboard.
-        dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
+        //dashboard = FtcDashboard.getInstance();
+        //telemetry = dashboard.getTelemetry();
 
         // Initialize the robot hardware
         robot.init();
@@ -130,12 +130,12 @@ public class Auto8034 extends OpMode {
         cellManager = robot.cellManager;
         // Enable camera stream to dashboard.
         //TODO If this is not useful, remove it to save resources.
-        final CameraStreamProcessor processor = new CameraStreamProcessor();
-        new VisionPortal.Builder()
-                .addProcessor(processor)
-                .setCamera(robot.webcamName)
-                .build();
-        dashboard.startCameraStream(processor, 0);
+        //final CameraStreamProcessor processor = new CameraStreamProcessor();
+//        new VisionPortal.Builder()
+//                .addProcessor(processor)
+//                .setCamera(robot.webcamName)
+//                .build();
+//        dashboard.startCameraStream(processor, 0);
 
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);
@@ -222,6 +222,7 @@ public class Auto8034 extends OpMode {
         telemetry.addData("Start Position", startPosition);
         telemetry.addData("Retrieve from Spike", autonomousConfiguration.getRetrieveFromSpike());
         telemetry.addData("Delay Start", startDelaySeconds);
+        telemetry.addData("State", pathState);
         telemetry.update();
     }
 
@@ -255,44 +256,44 @@ public class Auto8034 extends OpMode {
                     launches++;
                     driveTimer.reset();
                     if (launches == 3) {
-                        setPathState(afterShoot);
+                        setPathState(6);
                         break;
                     }
                 }
-            case 2:
-                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
-                    movementManager.turn(1.233, 1);
-                    movementManager.moveStrafe(1,-1);
-                } else {
-                    movementManager.turn(0.74, -1);
-                    movementManager.moveStrafe(1,1);
-                }
-                setPathState(3);
-                break;
-            case 3:
-                intakeManager.intakeOn();
-                movementManager.moveForward(1.25, 1);
-                movementManager.moveForward(1.25, -1);
-                setPathState(4);
-                break;
-            case 4:
-                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
-                    movementManager.moveStrafe(1,1);
-                    movementManager.turn(1.233, -1);
-                } else {
-                    movementManager.moveStrafe(1,-1);
-                    movementManager.turn(0.74, 1);
-                }
-                setPathState(5);
-            case 5:
-                launchOrer = cellManager.noColorLaunch();
-                cellManager.openCell(launchOrer.get(launches));
-                robot.launchManager.launchOn(0.255);
-                launches++;
-                driveTimer.reset();
-                afterShoot = 6;
-                setPathState(1);
-                break;
+//            case 2:
+//                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+//                    movementManager.turn(1.233, 1);
+//                    movementManager.moveStrafe(1,-1);
+//                } else {
+//                    movementManager.turn(0.74, -1);
+//                    movementManager.moveStrafe(1,1);
+//                }
+//                setPathState(3);
+//                break;
+//            case 3:
+//                intakeManager.intakeOn();
+//                movementManager.moveForward(1.25, 1);
+//                movementManager.moveForward(1.25, -1);
+//                setPathState(4);
+//                break;
+//            case 4:
+//                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+//                    movementManager.moveStrafe(1,1);
+//                    movementManager.turn(1.233, -1);
+//                } else {
+//                    movementManager.moveStrafe(1,-1);
+//                    movementManager.turn(0.74, 1);
+//                }
+//                setPathState(5);
+//            case 5:
+//                launchOrer = cellManager.noColorLaunch();
+//                cellManager.openCell(launchOrer.get(launches));
+//                robot.launchManager.launchOn(0.255);
+//                launches++;
+//                driveTimer.reset();
+//                afterShoot = 6;
+//                setPathState(1);
+//                break;
             case 6:
                 //Wait here
         }
@@ -309,6 +310,7 @@ public class Auto8034 extends OpMode {
                 //We don't have enough time to figure out how to look at the colors
                 //If you want to make it look at them you can
                 launchOrer = cellManager.noColorLaunch();
+                launches = 0;
                 robot.launchManager.launchOn(0.2);
                 cellManager.openCell(launchOrer.get(launches));
                 launches++;
