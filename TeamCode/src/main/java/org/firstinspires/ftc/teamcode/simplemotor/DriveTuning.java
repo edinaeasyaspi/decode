@@ -29,10 +29,14 @@ public class DriveTuning extends LinearOpMode {
     public Telemetry telemetry;
     public FtcDashboard ftcDashboard;
 
+    public MovementManager movementManager;
+
     @Override
     public void runOpMode() {
         robot.init();
         mecanumDrive = robot.mecanumDrive;
+        movementManager = new MovementManager();
+        movementManager.load(robot.mecanumDrive);
 
         gamepadEx = new GamepadEx(gamepad1);
 
@@ -42,35 +46,20 @@ public class DriveTuning extends LinearOpMode {
         while (opModeIsActive()) {
             gamepadEx.readButtons();
 
-            if (!autoDriveing) {
-                mecanumDrive.driveRobotCentric(gamepadEx.getLeftX(),gamepadEx.getLeftY(),gamepadEx.getRightX());
-            }
+            movementManager.load(robot.mecanumDrive);
 
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.A)) {
-                autoDriveing = true;
-                moveTimer.reset();
-                driveTime = strafeDriveTime;
-                mecanumDrive.driveRobotCentric(1,0,0);
+                movementManager.turn(1,1);
             }
 
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.B)) {
-                autoDriveing = true;
-                moveTimer.reset();
-                driveTime = forwardDriveTime;
-                mecanumDrive.driveRobotCentric(0,1,0);
+                movementManager.moveForward(1,1);
             }
 
             if (gamepadEx.wasJustReleased(GamepadKeys.Button.Y)) {
-                autoDriveing = true;
-                moveTimer.reset();
-                driveTime = turnDriveTime;
-                mecanumDrive.driveRobotCentric(0,0,1);
+                movementManager.moveStrafe(1,1);
             }
 
-            if (autoDriveing && moveTimer.milliseconds() >= driveTime) {
-                autoDriveing = false;
-                mecanumDrive.driveRobotCentric(0,0,0);
-            }
 
             telemetry.addData("Forward(ms)", forwardDriveTime);
             telemetry.addData("Strafe(ms)", strafeDriveTime);

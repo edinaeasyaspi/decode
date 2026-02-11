@@ -54,6 +54,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
+import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 import org.firstinspires.ftc.teamcode.simplemotor.MovementManager;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -105,6 +106,7 @@ public class Auto8034 extends OpMode {
 
     private MovementManager movementManager;
     private IntakeManager intakeManager;
+    private LaunchManager launchManager;
 
 
     /**
@@ -123,6 +125,8 @@ public class Auto8034 extends OpMode {
         movementManager.load(robot.mecanumDrive);
 
         intakeManager = robot.intakeManager;
+
+        launchManager = robot.launchManager;
 
         // Let driver select autonomous configuration.
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
@@ -191,14 +195,7 @@ public class Auto8034 extends OpMode {
         //TODO: This assumes the robot can see the obelisk at start. If that is not true, move
         // this to the state machine so the robot can move into position..
         currentMotif = robot.aprilTagManager.findMotif();
-        // Set the starting pose based on the selected starting position
-        if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
-            robot.launchManager.launchOn(0.25);
-            setPathState(0);
-        } else {
-            robot.launchManager.launchOn(0.315);
-            setPathState(2);
-        }
+
         runtime.reset();
     }
 
@@ -303,7 +300,7 @@ public class Auto8034 extends OpMode {
             case 0:
                 //I know that holding the loop up to move is controversial
                 //I'm still going to do it
-                movementManager.moveForward(1.5, 1);
+                movementManager.moveForward(1.5, 0.5);
                 setPathState(1);
                 break;
             case 1:
@@ -327,31 +324,34 @@ public class Auto8034 extends OpMode {
                         break;
                     }
                 }
+                break;
             case 3:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                     //The accuracy of the fifty degree turn is adjustable because it is 0.55...
-                    movementManager.turn(0.555,-1);
-                    movementManager.moveStrafe(0.5, -1);
+                    movementManager.turn(0.555,-0.5);
+                    movementManager.moveStrafe(0.5, 0.5);
                 } else {
-                    movementManager.turn(0.555, 1);
-                    movementManager.moveStrafe(0.5, 1);
+                    movementManager.turn(0.555, 0.5);
+                    movementManager.moveStrafe(0.5, -0.5);
                 }
                 setPathState(4); //I didn't feel like shoving all this in one case
                 break;
             case 4:
                 intakeManager.intakeOn();
-                movementManager.moveForward(1.5, 1);
-                movementManager.moveForward(1.5, -1);
+                movementManager.turn(2, 0.5);
+                movementManager.moveForward(.5, 0.5);
+                movementManager.moveForward(.5, -0.5);
+                movementManager.turn(2,0.5);
                 //We don't turn the intake off because then a ball could get stuck
                 setPathState(5);
                 break;
             case 5:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
-                    movementManager.moveStrafe(0.5, 1);
-                    movementManager.turn(0.555,1);
+                    movementManager.moveStrafe(0.5, 0.5);
+                    movementManager.turn(0.555,0.5);
                 } else {
-                    movementManager.moveStrafe(0.5, -1);
-                    movementManager.turn(0.555, -1);
+                    movementManager.moveStrafe(0.5, -0.5);
+                    movementManager.turn(0.555, -0.5);
                 }
                 setPathState(6);
                 break;
@@ -373,6 +373,7 @@ public class Auto8034 extends OpMode {
                         break;
                     }
                 }
+                break;
             case 8:
                 //Once we test this we can expand this to go pick up different spots
                 //This can just wait here

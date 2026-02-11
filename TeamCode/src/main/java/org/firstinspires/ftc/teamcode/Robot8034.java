@@ -210,6 +210,7 @@ public class Robot8034 extends LinearOpMode {
             // Launch without regard to color.
             if (leftTriggerReader.wasJustReleased()) {
                 launching = true;
+                if (SHOOT_FAR) gap = 1500; else gap = 1200;
                 launchOrder = cellManager.noColorLaunch();
                 launchStage = 0;
                 cellManager.openCell(launchOrder.get(launchStage));
