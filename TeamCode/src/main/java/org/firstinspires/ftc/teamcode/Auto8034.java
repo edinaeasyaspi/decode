@@ -243,6 +243,7 @@ public class Auto8034 extends OpMode {
             case 0:
                 launchOrer = cellManager.noColorLaunch();
                 cellManager.openCell(launchOrer.get(launches));
+                robot.launchManager.launchOn(0.255);
                 launches++;
                 driveTimer.reset();
                 afterShoot = 2;
@@ -286,6 +287,7 @@ public class Auto8034 extends OpMode {
             case 5:
                 launchOrer = cellManager.noColorLaunch();
                 cellManager.openCell(launchOrer.get(launches));
+                robot.launchManager.launchOn(0.255);
                 launches++;
                 driveTimer.reset();
                 afterShoot = 6;
@@ -307,6 +309,7 @@ public class Auto8034 extends OpMode {
                 //We don't have enough time to figure out how to look at the colors
                 //If you want to make it look at them you can
                 launchOrer = cellManager.noColorLaunch();
+                robot.launchManager.launchOn(0.2);
                 cellManager.openCell(launchOrer.get(launches));
                 launches++;
                 driveTimer.reset();

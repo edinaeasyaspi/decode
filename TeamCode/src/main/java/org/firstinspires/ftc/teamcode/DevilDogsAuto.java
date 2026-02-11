@@ -269,8 +269,6 @@ public class DevilDogsAuto extends OpMode {
                 return startPoseGoalGate;
             case AudienceTeam:
                 return startPoseAudienceTeam;
-            case AudienceCenter:
-                return startPoseGoalAudienceCenter;
             default:
                 // If something went wrong, return a default pose
                 return new Pose(0, 0, 0);
