@@ -249,48 +249,53 @@ public class Auto8034 extends OpMode {
                 break;
             case 1:
                 if (driveTimer.milliseconds() >= 1200) {
-                    cellManager.openCell(launchOrer.get(launches));
-                    launches++;
-                    driveTimer.reset();
                     if (launches == 3) {
-                        setPathState(6);
-                        break;
+                        if (driveTimer.milliseconds() >= 2500) {
+                            setPathState(afterShoot);
+                            break;
+                        }
+                    } else {
+                        cellManager.openCell(launchOrer.get(launches));
+                        launches++;
+                        driveTimer.reset();
                     }
                 }
-//            case 2:
-//                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
-//                    movementManager.turn(1.233, 1);
-//                    movementManager.moveStrafe(1,-1);
-//                } else {
-//                    movementManager.turn(0.74, -1);
-//                    movementManager.moveStrafe(1,1);
-//                }
-//                setPathState(3);
-//                break;
-//            case 3:
-//                intakeManager.intakeOn();
-//                movementManager.moveForward(1.25, 1);
-//                movementManager.moveForward(1.25, -1);
-//                setPathState(4);
-//                break;
-//            case 4:
-//                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
-//                    movementManager.moveStrafe(1,1);
-//                    movementManager.turn(1.233, -1);
-//                } else {
-//                    movementManager.moveStrafe(1,-1);
-//                    movementManager.turn(0.74, 1);
-//                }
-//                setPathState(5);
-//            case 5:
-//                launchOrer = cellManager.noColorLaunch();
-//                cellManager.openCell(launchOrer.get(launches));
-//                robot.launchManager.launchOn(0.255);
-//                launches++;
-//                driveTimer.reset();
-//                afterShoot = 6;
-//                setPathState(1);
-//                break;
+                break;
+            case 2:
+                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+                    movementManager.turn(1.233, 1);
+                    movementManager.moveStrafe(1,-1);
+                } else {
+                    movementManager.turn(0.74, -1);
+                    movementManager.moveStrafe(1,1);
+                }
+                setPathState(3);
+                break;
+            case 3:
+                intakeManager.intakeOn();
+                movementManager.moveForward(1.25, 1);
+                movementManager.moveForward(1.25, -1);
+                setPathState(4);
+                break;
+            case 4:
+                if (allianceColor == AutonomousOptions.AllianceColor.Red) {
+                    movementManager.moveStrafe(1,1);
+                    movementManager.turn(1.233, -1);
+                } else {
+                    movementManager.moveStrafe(1,-1);
+                    movementManager.turn(0.74, 1);
+                }
+                setPathState(5);
+                break;
+            case 5:
+                launchOrer = cellManager.noColorLaunch();
+                cellManager.openCell(launchOrer.get(launches));
+                robot.launchManager.launchOn(0.255);
+                launches++;
+                driveTimer.reset();
+                afterShoot = 6;
+                setPathState(1);
+                break;
             case 6:
                 //Wait here
         }
@@ -316,32 +321,33 @@ public class Auto8034 extends OpMode {
                 break;
             case 2:
                 if (driveTimer.milliseconds() >= 1200) {
-                    cellManager.openCell(launchOrer.get(launches));
-                    launches++;
-                    driveTimer.reset();
                     if (launches == 3) {
-                        setPathState(3);
-                        break;
+                        if (driveTimer.milliseconds() >= 2500) {
+                            setPathState(3);
+                            break;
+                        }
+                    } else {
+                        cellManager.openCell(launchOrer.get(launches));
+                        launches++;
+                        driveTimer.reset();
                     }
                 }
                 break;
             case 3:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                     //The accuracy of the fifty degree turn is adjustable because it is 0.55...
-                    movementManager.turn(0.555,-0.5);
+                    movementManager.turn((2-0.555),-1);
                     movementManager.moveStrafe(0.5, 0.5);
                 } else {
-                    movementManager.turn(0.555, 0.5);
+                    movementManager.turn((2-0.555), 1);
                     movementManager.moveStrafe(0.5, -0.5);
                 }
                 setPathState(4); //I didn't feel like shoving all this in one case
                 break;
             case 4:
                 intakeManager.intakeOn();
-                movementManager.turn(2, 0.5);
                 movementManager.moveForward(.5, 0.5);
                 movementManager.moveForward(.5, -0.5);
-                movementManager.turn(2,0.5);
                 //We don't turn the intake off because then a ball could get stuck
                 setPathState(5);
                 break;
@@ -365,12 +371,15 @@ public class Auto8034 extends OpMode {
                 break;
             case 7:
                 if (driveTimer.milliseconds() >= 1200) {
-                    cellManager.openCell(launchOrer.get(launches));
-                    launches++;
-                    driveTimer.reset();
                     if (launches == 3) {
-                        setPathState(8);
-                        break;
+                        if (driveTimer.milliseconds() >= 2500) {
+                            setPathState(8);
+                            break;
+                        }
+                    } else {
+                        cellManager.openCell(launchOrer.get(launches));
+                        launches++;
+                        driveTimer.reset();
                     }
                 }
                 break;
