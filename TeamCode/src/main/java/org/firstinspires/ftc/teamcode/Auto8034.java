@@ -236,6 +236,7 @@ public class Auto8034 extends OpMode {
     public int launches = 0;
     public List<ArtifactCellManager.CELL> launchOrer;
     public int afterShoot;
+    public int afterAlign;
     public void startAudiencePathUpdate() {
         switch (pathState) {
             case 0:
@@ -245,7 +246,8 @@ public class Auto8034 extends OpMode {
                 launches++;
                 driveTimer.reset();
                 afterShoot = 2;
-                setPathState(1);
+                afterAlign = 1;
+                setPathState(7);
                 break;
             case 1:
                 if (driveTimer.milliseconds() >= 1200) {
@@ -294,10 +296,15 @@ public class Auto8034 extends OpMode {
                 launches++;
                 driveTimer.reset();
                 afterShoot = 6;
-                setPathState(1);
+                afterAlign = 1;
+                setPathState(7);
                 break;
             case 6:
                 //Wait here
+            case 7:
+                //It is out of order, but this is where we auto-aline
+                robot.aprilTagManager.execute(true);
+                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();setPathState(afterShoot);break;
         }
     }
     public void startGoalPathUpdate() {
@@ -317,7 +324,8 @@ public class Auto8034 extends OpMode {
                 cellManager.openCell(launchOrer.get(launches));
                 launches++;
                 driveTimer.reset();
-                setPathState(2);
+                afterAlign = 2;
+                setPathState(9);
                 break;
             case 2:
                 if (driveTimer.milliseconds() >= 1200) {
@@ -367,7 +375,8 @@ public class Auto8034 extends OpMode {
                 cellManager.openCell(launchOrer.get(launches));
                 launches++;
                 driveTimer.reset();
-                setPathState(7);
+                afterAlign = 7;
+                setPathState(9);
                 break;
             case 7:
                 if (driveTimer.milliseconds() >= 1200) {
@@ -386,6 +395,9 @@ public class Auto8034 extends OpMode {
             case 8:
                 //Once we test this we can expand this to go pick up different spots
                 //This can just wait here
+            case 9:
+                robot.aprilTagManager.execute(false);
+                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();setPathState(afterShoot);break;
         }
     }
 
