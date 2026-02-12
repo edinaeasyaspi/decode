@@ -232,11 +232,13 @@ public class Auto8034 extends OpMode {
     public void stop() {
 
     }
+
     /// This is a rough draft not the final disign there are many parts missing
     public int launches = 0;
     public List<ArtifactCellManager.CELL> launchOrer;
     public int afterShoot;
     public int afterAlign;
+
     public void startAudiencePathUpdate() {
         switch (pathState) {
             case 0:
@@ -266,10 +268,10 @@ public class Auto8034 extends OpMode {
             case 2:
                 if (allianceColor == AutonomousOptions.AllianceColor.Red) {
                     movementManager.turn(1.233, 1);
-                    movementManager.moveStrafe(1,-1);
+                    movementManager.moveStrafe(1, -1);
                 } else {
                     movementManager.turn(0.74, -1);
-                    movementManager.moveStrafe(1,1);
+                    movementManager.moveStrafe(1, 1);
                 }
                 setPathState(3);
                 break;
@@ -281,10 +283,10 @@ public class Auto8034 extends OpMode {
                 break;
             case 4:
                 if (allianceColor == AutonomousOptions.AllianceColor.Red) {
-                    movementManager.moveStrafe(1,1);
+                    movementManager.moveStrafe(1, 1);
                     movementManager.turn(1.233, -1);
                 } else {
-                    movementManager.moveStrafe(1,-1);
+                    movementManager.moveStrafe(1, -1);
                     movementManager.turn(0.74, 1);
                 }
                 setPathState(5);
@@ -304,9 +306,14 @@ public class Auto8034 extends OpMode {
             case 7:
                 //It is out of order, but this is where we auto-aline
                 robot.aprilTagManager.execute(true);
-                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();setPathState(afterShoot);break;
+                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();
+                setPathState(afterShoot);
+                break;
+            default:
+                break;
         }
     }
+
     public void startGoalPathUpdate() {
         switch (pathState) {
             case 0:
@@ -344,10 +351,10 @@ public class Auto8034 extends OpMode {
             case 3:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                     //The accuracy of the fifty degree turn is adjustable because it is 0.55...
-                    movementManager.turn((2-0.555),-1);
+                    movementManager.turn((2 - 0.555), -1);
                     movementManager.moveStrafe(0.5, 0.5);
                 } else {
-                    movementManager.turn((2-0.555), 1);
+                    movementManager.turn((2 - 0.555), 1);
                     movementManager.moveStrafe(0.5, -0.5);
                 }
                 setPathState(4); //I didn't feel like shoving all this in one case
@@ -362,7 +369,7 @@ public class Auto8034 extends OpMode {
             case 5:
                 if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
                     movementManager.moveStrafe(0.5, 0.5);
-                    movementManager.turn(0.555,0.5);
+                    movementManager.turn(0.555, 0.5);
                 } else {
                     movementManager.moveStrafe(0.5, -0.5);
                     movementManager.turn(0.555, -0.5);
@@ -397,7 +404,11 @@ public class Auto8034 extends OpMode {
                 //This can just wait here
             case 9:
                 robot.aprilTagManager.execute(false);
-                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();setPathState(afterShoot);break;
+                if (driveTimer.milliseconds() >= 1000) driveTimer.reset();
+                setPathState(afterShoot);
+                break;
+            default:
+                break;
         }
     }
 
@@ -462,6 +473,8 @@ public class Auto8034 extends OpMode {
                     driveTimer.reset();
                     setPathState(3);
                 }
+            default:
+                break;
         }
     }
 
