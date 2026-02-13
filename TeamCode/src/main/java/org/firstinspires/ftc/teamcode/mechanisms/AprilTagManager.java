@@ -203,7 +203,7 @@ public class AprilTagManager {
     private boolean isAprilTagAligned(boolean shootFar) {
         boolean aligned = false;
         //TODO Adjust this to account for launcher offset from robot center if needed.
-        double COMPENSATION_ANGLE_DEGREES = 2.0;
+        double COMPENSATION_ANGLE_DEGREES = 5.0;
         // Assume there are 2 launch distances: short and long
         double desiredRange = shootFar ? DESIRED_LONG_DISTANCE : DESIRED_SHORT_DISTANCE;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();

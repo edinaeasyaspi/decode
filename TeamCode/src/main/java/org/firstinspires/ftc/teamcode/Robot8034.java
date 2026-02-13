@@ -68,7 +68,7 @@ public class Robot8034 extends LinearOpMode {
     public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
     public static double LONG_SHOT = 0.255;
     public boolean launching = false;
-    public static int gap = 1200;
+    public static int gap = 1500;
     public int launchStage = 0;
     public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
 

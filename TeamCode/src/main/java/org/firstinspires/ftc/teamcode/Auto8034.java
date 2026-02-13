@@ -220,9 +220,9 @@ public class Auto8034 extends OpMode {
                 if (driveTimer.milliseconds() > 2000) {
                     if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
                         if (allianceColor == AutonomousOptions.AllianceColor.Blue) {
-                            robot.mecanumDrive.driveRobotCentric(.5, 0, 0, false);
+                            robot.mecanumDrive.driveRobotCentric(1, 0, 0, false);
                         } else {
-                            robot.mecanumDrive.driveRobotCentric(-0.5, 0, 0, false);
+                            robot.mecanumDrive.driveRobotCentric(1, 0, 0, false);
 
                         }
                     } else {
