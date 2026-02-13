@@ -154,10 +154,14 @@ public class Auto8034 extends OpMode {
         }
         delayTimer.reset();
         while (delayTimer.seconds() < startDelaySeconds) {
+        //TODO execute just gets gets velocities and feedforward values. Does this need to be called during the delay?
             robot.launchManager.execute();
         }
+        //TODO What is this supposed to do?
+        // What stops the while loop?
         delayTimer.reset();
         while (delayTimer.seconds() > 1) {
+            //TODO execute just gets gets velocities and feedforward values. Does this need to be called during the delay?
             robot.launchManager.execute();
         }
         runtime.reset();
@@ -209,11 +213,14 @@ public class Auto8034 extends OpMode {
                 }
                 break;
             case 2:
-                // This case will execute the AprilTag detection and open the artifact cells
-//                    if (robot.aprilTagManager.execute(true)) {
-                robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
-                driveTimer.reset();
-                setPathState(5);
+                // This case will auto aligns open the artifact cells.
+                // If auto align fails the timer will run out and the launch will proceed.
+                //TODO Adjust the timeout as needed.
+                if (robot.aprilTagManager.execute(true) || driveTimer.milliseconds() > 1500) {
+                    robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
+                    driveTimer.reset();
+                    setPathState(5);
+                }
                 break;
             case 3:
                 // This case will move the robot off the launch line
