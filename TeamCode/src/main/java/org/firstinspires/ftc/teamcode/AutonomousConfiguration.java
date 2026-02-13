@@ -59,6 +59,8 @@ public class AutonomousConfiguration {
         } else {
             autonomousOptions = getSaveAutoOptions();
         }
+
+        ShowHelp();
     }
 
     public AutonomousOptions.AllianceColor getAlliance() {
@@ -114,11 +116,7 @@ public class AutonomousConfiguration {
         return readyToStart;
     }
 
-    // This needs to be called if you are selecting configuration options.
-    // This was changed so that you use this class to retrieve the options without displaying
-    // the selection menu.
-
-    public void ShowHelp() {
+    private void ShowHelp() {
         teleAlliance = telemetry.addData("X = Blue, B = Red", autonomousOptions.getAllianceColor());
         teleStartPosition = telemetry.addData("D-pad left/right, select start position", autonomousOptions.getStartPosition());
         teleParkOnSignalZone = telemetry.addData("D-pad down to cycle retrieve from spike", autonomousOptions.getRetrieveFromSpike());
