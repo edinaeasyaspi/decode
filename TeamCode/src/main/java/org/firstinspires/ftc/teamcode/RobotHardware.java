@@ -26,7 +26,7 @@ public class RobotHardware {
     /* Declare OpMode members. */
     private final OpMode myOpMode;   // gain access to methods in the calling OpMode.
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
-    private final double[] cellPositions = new double[]{0.768, 0.486, 0.79}; //ups
+    private final double[] cellPositions = new double[]{0.768, 0.486, 0.7975}; //ups
     private final double[] cellDownPositions = new double[]{1.000, 0.709, 0.746}; //downs
 
     public MecanumDrive mecanumDrive;
