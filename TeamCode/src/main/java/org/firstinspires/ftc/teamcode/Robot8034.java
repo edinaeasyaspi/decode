@@ -63,6 +63,7 @@ public class Robot8034 extends LinearOpMode {
     private final RobotHardware robot = new RobotHardware(this);
 
     ArtifactCellManager cellManager;
+    LaunchManager launchManager;
 
     //TODO: Adjust shot variables as needed
     public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
@@ -84,7 +85,6 @@ public class Robot8034 extends LinearOpMode {
     Telemetry telemetry2;
 
     GamepadEx gamePadEx;
-    ToggleButtonReader aReader;
     TriggerReader leftTriggerReader;
     TriggerReader rightTriggerReader;
 
@@ -105,15 +105,12 @@ public class Robot8034 extends LinearOpMode {
 
         //Define gamepad (from SolversLib)
         gamePadEx = new GamepadEx(gamepad1);
-        aReader = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        MecanumDrive mecanumDrive = robot.mecanumDrive;
-        IntakeManager intakeManager = robot.intakeManager;
-        LaunchManager launchManager = robot.launchManager;
+        launchManager = robot.launchManager;
         cellManager = robot.cellManager;
-        // Get the current motif saved in AprilTagManager and the dashboard.
+        // Get the current motif saved in AprilTagManager and the sdk dashboard.
         cellManager.setCurrentMotif(robot.aprilTagManager.getCurrentMotif());
 
         telemetry.addData("Status", "Initialized");
@@ -138,12 +135,11 @@ public class Robot8034 extends LinearOpMode {
         while (opModeIsActive()) {
             // Read gamepad inputs
             gamePadEx.readButtons();
+            leftTriggerReader.readValue();
             // Update the cell manager and launch manager
             cellManager.execute();
             cellManager.checkColors();
             launchManager.execute();
-
-            leftTriggerReader.readValue();
 
             // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -169,11 +165,11 @@ public class Robot8034 extends LinearOpMode {
 
             // Intake controls
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
-                intakeManager.intakeOn();
+                robot.intakeManager.intakeOn();
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
-                intakeManager.intakeOff();
+                robot.intakeManager.intakeOff();
             }
 
             //Distance control
@@ -209,7 +205,8 @@ public class Robot8034 extends LinearOpMode {
             // Launch without regard to color.
             if (leftTriggerReader.wasJustReleased()) {
                 launching = true;
-                if (SHOOT_FAR) gap = 1500; else gap = 1200;
+                if (SHOOT_FAR) gap = 1500;
+                else gap = 1200;
                 launchOrder = cellManager.noColorLaunch();
                 launchStage = 0;
                 cellManager.openCell(launchOrder.get(launchStage));
@@ -241,7 +238,8 @@ public class Robot8034 extends LinearOpMode {
             // If D-Pad left is pressed, we are auto-aligning, so don't accept joystick inputs.
             if (!gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 double SLOW_MODE_FACTOR = 0.4;
-                mecanumDrive.driveRobotCentric(isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
+                robot.mecanumDrive.driveRobotCentric(
+                        isSlowMode ? gamePadEx.getLeftX() * SLOW_MODE_FACTOR : gamePadEx.getLeftX(),
                         isSlowMode ? gamePadEx.getLeftY() * SLOW_MODE_FACTOR : gamePadEx.getLeftY(),
                         isSlowMode ? gamePadEx.getRightX() * SLOW_MODE_FACTOR : gamePadEx.getRightX());
             }
@@ -260,9 +258,5 @@ public class Robot8034 extends LinearOpMode {
             telemetry.update();
             telemetry2.update();
         }
-    }
-
-    private void switchStage(int num) {
-        launchStage = num;
     }
 }
