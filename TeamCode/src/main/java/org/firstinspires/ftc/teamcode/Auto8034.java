@@ -55,7 +55,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class Auto8034 extends OpMode {
     private final RobotHardware robot = new RobotHardware(this);
     AutonomousConfiguration autonomousConfiguration = new AutonomousConfiguration();
-    private ArtifactCellManager cellManager;
 
     private final ElapsedTime runtime = new ElapsedTime();
     private final ElapsedTime delayTimer = new ElapsedTime();
@@ -90,7 +89,7 @@ public class Auto8034 extends OpMode {
     @Override
     public void init() {
         // Initialize the robot hardware
-        robot.driftInit();
+        robot.init();
         autonomousConfiguration.init(this.gamepad1, this.telemetry, hardwareMap.appContext);
         // Get the alliance color from the autonomous configuration
         AutonomousOptions.AllianceColor allianceColor = autonomousConfiguration.getAlliance();
@@ -100,7 +99,6 @@ public class Auto8034 extends OpMode {
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 96; // Offset to be added/subtracted based on alliance color
         allianceAudienceOffset =
                 autonomousConfiguration.getAlliance() == AutonomousOptions.AllianceColor.Blue ? 0 : 48; // Offset to be added/subtracted based on alliance color
-        cellManager = robot.cellManager;
         driveTimer = new ElapsedTime();
 //        follower = Constants.createFollower(hardwareMap);
 //        buildPaths();
@@ -138,11 +136,12 @@ public class Auto8034 extends OpMode {
         scorePreload = new Pose(62 + allianceGoalOffset, 81, Math.toRadians(135));
         moveOffLaunchLine = new Pose(54 + allianceGoalOffset, 69, Math.toRadians(135));
 
-        // Apply any requested delay before starting
 
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
+        // Start the AprilTag detection to find the motif before starting the path following.
+        robot.aprilTagManager.findMotif();
 
         // Set the starting pose based on the selected starting position
         if (startPosition == AutonomousOptions.StartPosition.GoalGate) {
@@ -152,18 +151,11 @@ public class Auto8034 extends OpMode {
             robot.launchManager.launchOn(0.255);
             setPathState(2);
         }
+        // Apply any requested delay before starting
         delayTimer.reset();
         while (delayTimer.seconds() < startDelaySeconds) {
-        //TODO execute just gets gets velocities and feedforward values. Does this need to be called during the delay?
-            robot.launchManager.execute();
         }
-        //TODO What is this supposed to do?
-        // What stops the while loop?
-        delayTimer.reset();
-        while (delayTimer.seconds() > 1) {
-            //TODO execute just gets gets velocities and feedforward values. Does this need to be called during the delay?
-            robot.launchManager.execute();
-        }
+
         runtime.reset();
     }
 
@@ -174,7 +166,7 @@ public class Auto8034 extends OpMode {
     @Override
     public void loop() {
 //        follower.update();
-        cellManager.execute();
+        robot.cellManager.execute();
         robot.launchManager.execute();
         autonomousPathUpdate();
 

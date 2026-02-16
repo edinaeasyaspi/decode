@@ -40,8 +40,9 @@ public class AprilTagManager {
     private int OBELISK_GPP_ID = 21;
     private int OBELISK_PGP_ID = 22;
     private int OBELISK_PPG_ID = 23;
-    public ArtifactCellManager.motif currentMotif;
-
+    private ArtifactCellManager.motif currentMotif;
+    private double currentRange = 0.0;
+    public static double BEARING_TOLERANCE = 2.5f;
 
     public AprilTagManager(OpMode opMode, WebcamName webcamName, MecanumDrive mecanumDrive) {
         this.webcamName = webcamName;
@@ -103,6 +104,7 @@ public class AprilTagManager {
     private String CURRENT_MOTIF_KEY = "currentmotif";
 
     // Execute the AprilTag auto alignment process for launching.
+    // Return true if aligned, false if not. This method can be called repeatedly in a loop until alignment is achieved.
     public boolean execute(boolean shootFar) {
         return isAprilTagAligned(shootFar);
     }
@@ -122,8 +124,14 @@ public class AprilTagManager {
         blackboard.put(CURRENT_MOTIF_KEY, currentMotif);
     }
 
+    /* Getters for current motif and range, to adjust behavior based on the detected AprilTag information.
+     */
     public ArtifactCellManager.motif getCurrentMotif() {
         return currentMotif;
+    }
+
+    public double getCurrentRange() {
+        return currentRange;
     }
 
     /**
@@ -210,25 +218,15 @@ public class AprilTagManager {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 if (detection.id == 20 || detection.id == 24) {
+                    // Save so launching can be dynamically adjusted to account for
+                    // distance to the goal.
+                    currentRange = detection.ftcPose.range;
                     // Check if the tag is within alignment tolerances
-                    double rangeError = Math.abs(detection.ftcPose.range - desiredRange);
                     // Use static variable for dashboard tuning
                     double bearing = detection.ftcPose.bearing;
-                    double yawError = Math.abs(detection.ftcPose.yaw);
 
-                    //TODO: Adjust tolerances as needed
-                    // Define tolerances
-                    double rangeTolerance = 2.0; // inches
-                    // Use static variable for dashboard tuning
-                    double bearingTolerance = 2.5; // degrees
-                    double yawTolerance = 12.0; // degrees
-
-//TODO: Decide if you want to use range and yaw corrections as well
-//                    if (rangeError <= rangeTolerance && bearingError <= bearingTolerance && yawError <= yawTolerance) {
-//                        aligned = true;
-//                    } else {
-                    // Only correct for bearing for now
-                    if (Math.abs(bearing + COMPENSATION_ANGLE_DEGREES) <= bearingTolerance) {
+                    // Only correct for bearing.
+                    if (Math.abs(bearing + COMPENSATION_ANGLE_DEGREES) <= BEARING_TOLERANCE) {
                         aligned = true;
                         mecanumDrive.driveRobotCentric(0, 0, 0);
                     } else {
@@ -252,11 +250,11 @@ public class AprilTagManager {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 // Only correct for bearing for now
-                if (detection.id == 21) {
+                if (detection.id == OBELISK_GPP_ID) {
                     motif = ArtifactCellManager.motif.GPP;
-                } else if (detection.id == 22) {
+                } else if (detection.id == OBELISK_PGP_ID) {
                     motif = ArtifactCellManager.motif.PGP;
-                } else if (detection.id == 23) {
+                } else if (detection.id == OBELISK_PPG_ID) {
                     motif = ArtifactCellManager.motif.PPG;
                 }
             }
