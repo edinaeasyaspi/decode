@@ -39,27 +39,24 @@ public class ArtifactCellManager {
         NONE
     }
 
-    public CellState leftCellState = CellState.IDLE;
-    public CellState centerCellState = CellState.IDLE;
-    public CellState rightCellState = CellState.IDLE;
+    private CellState leftCellState = CellState.IDLE;
+    private CellState centerCellState = CellState.IDLE;
+    private CellState rightCellState = CellState.IDLE;
     // Servos for cells
     private final ServoEx leftCellServo;
-
     private final ServoEx centerCellServo;
     private final ServoEx rightCellServo;
     //Color sensor
     private RevColorV3Manager revColorV3Manager;
-    public static CellColor rightCellColor = CellColor.NONE;
-    public static CellColor centerCellColor = CellColor.NONE;
-    public static CellColor leftCellColor = CellColor.NONE;
-    public static RevColorSensorV3 leftColorSensor;
-
-    public static RevColorSensorV3 centerColorSensor;
-    public static RevColorSensorV3 rightColorSensor;
+    private CellColor rightCellColor = CellColor.NONE;
+    private CellColor centerCellColor = CellColor.NONE;
+    private CellColor leftCellColor = CellColor.NONE;
+    private RevColorSensorV3 leftColorSensor;
+    private RevColorSensorV3 centerColorSensor;
+    private RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
-
-    public static Motif currentMotif = Motif.NONE;
+    private Motif currentMotif = Motif.NONE;
 
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
                                RevColorSensorV3 csOne, RevColorSensorV3 csTwo, RevColorSensorV3 csThree,
@@ -79,9 +76,8 @@ public class ArtifactCellManager {
     }
 
     //  This can be set from auto if it finds the AprilTag or manually from teleop.
-
-    public void setCurrentMotif(Motif motif1) {
-        currentMotif = motif1;
+    public void setCurrentMotif(Motif motif) {
+        currentMotif = motif;
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
@@ -114,7 +110,7 @@ public class ArtifactCellManager {
         }
     }
 
-    public CellColor checkColor(RevColorSensorV3 colorSensor) {
+    private CellColor checkColor(RevColorSensorV3 colorSensor) {
         if (ColorSensor.isGreen(colorSensor)) return CellColor.GREEN;
         if (ColorSensor.isPurple(colorSensor)) return CellColor.PURPLE;
         if (Math.random() > 0.5) {
@@ -141,7 +137,7 @@ public class ArtifactCellManager {
         }
     }
 
-    public static String colors() {
+    public String colors() {
         String end;
         end = colorToString(leftCellColor);
         end += colorToString(centerCellColor);
@@ -170,7 +166,7 @@ public class ArtifactCellManager {
         return launchOrder;
     }
 
-    public static List<Cell> launchOrder() {
+    public List<Cell> launchOrder() {
         // Initialize launch order and cell colors
         List<Cell> launchOrder = new ArrayList<>();
         List<Cell> plainOrder = List.of(Cell.LEFT, Cell.CENTER, Cell.RIGHT);
