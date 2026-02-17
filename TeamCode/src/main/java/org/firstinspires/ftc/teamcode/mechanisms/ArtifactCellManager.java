@@ -9,6 +9,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class ArtifactCellManager {
+    public enum Cell {
+        LEFT,
+        CENTER,
+        RIGHT,
+        NONE
+    }
+
     public enum CellState {
         IDLE,
         MOVING_TO_UP,
@@ -17,6 +24,7 @@ public class ArtifactCellManager {
         DOWN
     }
 
+
     //For holding color data
     public enum CellColor {
         NONE,
@@ -24,24 +32,33 @@ public class ArtifactCellManager {
         PURPLE
     }
 
+    public enum Motif {
+        GPP,
+        PGP,
+        PPG,
+        NONE
+    }
+
     public CellState leftCellState = CellState.IDLE;
     public CellState centerCellState = CellState.IDLE;
     public CellState rightCellState = CellState.IDLE;
     // Servos for cells
     private final ServoEx leftCellServo;
+
     private final ServoEx centerCellServo;
     private final ServoEx rightCellServo;
-
     //Color sensor
     private RevColorV3Manager revColorV3Manager;
     public static CellColor rightCellColor = CellColor.NONE;
     public static CellColor centerCellColor = CellColor.NONE;
     public static CellColor leftCellColor = CellColor.NONE;
     public static RevColorSensorV3 leftColorSensor;
+
     public static RevColorSensorV3 centerColorSensor;
     public static RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
+
     public static Motif currentMotif = Motif.NONE;
 
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
@@ -62,15 +79,9 @@ public class ArtifactCellManager {
     }
 
     //  This can be set from auto if it finds the AprilTag or manually from teleop.
+
     public void setCurrentMotif(Motif motif1) {
         currentMotif = motif1;
-    }
-
-    public enum Cell {
-        LEFT,
-        CENTER,
-        RIGHT,
-        NONE
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
@@ -78,14 +89,8 @@ public class ArtifactCellManager {
     private final double[] cellDownPositions;
     private final double UP_WAIT_TIME = 0.4;
     private final double DOWN_WAIT_TIME = 0.1;
-    public static final ElapsedTime timer = new ElapsedTime();
 
-    public enum Motif {
-        GPP,
-        PGP,
-        PPG,
-        NONE
-    }
+    public static final ElapsedTime timer = new ElapsedTime();
 
     public void execute() {
         checkColors();
@@ -112,8 +117,8 @@ public class ArtifactCellManager {
     public CellColor checkColor(RevColorSensorV3 colorSensor) {
         if (ColorSensor.isGreen(colorSensor)) return CellColor.GREEN;
         if (ColorSensor.isPurple(colorSensor)) return CellColor.PURPLE;
-        if (Math.random() > 0.5){
-            return  CellColor.GREEN;
+        if (Math.random() > 0.5) {
+            return CellColor.GREEN;
         } else {
             return CellColor.PURPLE;
         }
@@ -164,6 +169,7 @@ public class ArtifactCellManager {
         launchOrder.add(Cell.RIGHT);
         return launchOrder;
     }
+
     public static List<Cell> launchOrder() {
         // Initialize launch order and cell colors
         List<Cell> launchOrder = new ArrayList<>();
@@ -174,22 +180,31 @@ public class ArtifactCellManager {
             switch (currentMotif) {
                 case GPP:
                     launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
+                        launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
+                        launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
+                        launchOrder.add(Cell.RIGHT);
                     break;
 
                 case PGP:
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
-                    launchOrder.add(1,plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
+                        launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
+                        launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
+                        launchOrder.add(Cell.RIGHT);
+                    launchOrder.add(1, plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
                     break;
 
                 case PPG:
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
+                        launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
+                        launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
+                        launchOrder.add(Cell.RIGHT);
                     launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
                     break;
                 case NONE:
