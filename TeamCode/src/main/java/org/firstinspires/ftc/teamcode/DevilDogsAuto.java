@@ -202,7 +202,7 @@ public class DevilDogsAuto extends OpMode {
             case 2:
                 // This case will execute the AprilTag detection and open the artifact cells
 //                    if (robot.aprilTagManager.execute(true)) {
-                robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
+                robot.cellManager.openCell(ArtifactCellManager.Cell.LEFT);
                 driveTimer.reset();
                 setPathState(5);
                 break;
@@ -233,13 +233,13 @@ public class DevilDogsAuto extends OpMode {
                 break;
             case 5:
                 if (driveTimer.milliseconds() > 2000) {
-                    robot.cellManager.openCell(ArtifactCellManager.CELL.Center);
+                    robot.cellManager.openCell(ArtifactCellManager.Cell.CENTER);
                     driveTimer.reset();
                     setPathState(6);
                 }
             case 6:
                 if (driveTimer.milliseconds() > 2000) {
-                    robot.cellManager.openCell(ArtifactCellManager.CELL.Right);
+                    robot.cellManager.openCell(ArtifactCellManager.Cell.RIGHT);
                     driveTimer.reset();
                     setPathState(3);
                 }

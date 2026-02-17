@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
-import android.graphics.Color;
-
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -12,24 +9,24 @@ import java.util.Collections;
 import java.util.List;
 
 public class ArtifactCellManager {
-    public enum CELL_STATE {
-        Idle,
-        MovingToUp,
-        Up,
-        MovingToDown,
-        Down
+    public enum CellState {
+        IDLE,
+        MOVING_TO_UP,
+        UP,
+        MOVING_TO_DOWN,
+        DOWN
     }
 
     //For holding color data
-    public enum CELL_COLOR {
-        None,
-        Green,
-        Purple
+    public enum CellColor {
+        NONE,
+        GREEN,
+        PURPLE
     }
 
-    public CELL_STATE leftCellState = CELL_STATE.Idle;
-    public CELL_STATE centerCellState = CELL_STATE.Idle;
-    public CELL_STATE rightCellState = CELL_STATE.Idle;
+    public CellState leftCellState = CellState.IDLE;
+    public CellState centerCellState = CellState.IDLE;
+    public CellState rightCellState = CellState.IDLE;
     // Servos for cells
     private final ServoEx leftCellServo;
     private final ServoEx centerCellServo;
@@ -37,15 +34,15 @@ public class ArtifactCellManager {
 
     //Color sensor
     private RevColorV3Manager revColorV3Manager;
-    public static CELL_COLOR rightCellColor = CELL_COLOR.None;
-    public static CELL_COLOR centerCellColor = CELL_COLOR.None;
-    public static CELL_COLOR leftCellColor = CELL_COLOR.None;
+    public static CellColor rightCellColor = CellColor.NONE;
+    public static CellColor centerCellColor = CellColor.NONE;
+    public static CellColor leftCellColor = CellColor.NONE;
     public static RevColorSensorV3 leftColorSensor;
     public static RevColorSensorV3 centerColorSensor;
     public static RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
-    public static motif currentMotif = motif.NONE;
+    public static Motif currentMotif = Motif.NONE;
 
     public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
                                RevColorSensorV3 csOne, RevColorSensorV3 csTwo, RevColorSensorV3 csThree,
@@ -65,15 +62,15 @@ public class ArtifactCellManager {
     }
 
     //  This can be set from auto if it finds the AprilTag or manually from teleop.
-    public void setCurrentMotif(motif motif1) {
+    public void setCurrentMotif(Motif motif1) {
         currentMotif = motif1;
     }
 
-    public enum CELL {
-        Left,
-        Center,
-        Right,
-        None
+    public enum Cell {
+        LEFT,
+        CENTER,
+        RIGHT,
+        NONE
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
@@ -83,7 +80,7 @@ public class ArtifactCellManager {
     private final double DOWN_WAIT_TIME = 0.1;
     public static final ElapsedTime timer = new ElapsedTime();
 
-    public enum motif {
+    public enum Motif {
         GPP,
         PGP,
         PPG,
@@ -91,47 +88,48 @@ public class ArtifactCellManager {
     }
 
     public void execute() {
-        leftCellState = processCell(CELL.Left, leftCellState, leftCellServo);
-        centerCellState = processCell(CELL.Center, centerCellState, centerCellServo);
-        rightCellState = processCell(CELL.Right, rightCellState, rightCellServo);
+        checkColors();
+        leftCellState = processCell(Cell.LEFT, leftCellState, leftCellServo);
+        centerCellState = processCell(Cell.CENTER, centerCellState, centerCellServo);
+        rightCellState = processCell(Cell.RIGHT, rightCellState, rightCellServo);
     }
 
     // Opens the specified cell with designated wait times
-    public void openCell(CELL cell) {
+    public void openCell(Cell cell) {
         switch (cell) {
-            case Left:
-                leftCellState = CELL_STATE.MovingToUp;
+            case LEFT:
+                leftCellState = CellState.MOVING_TO_UP;
                 break;
-            case Center:
-                centerCellState = CELL_STATE.MovingToUp;
+            case CENTER:
+                centerCellState = CellState.MOVING_TO_UP;
                 break;
-            case Right:
-                rightCellState = CELL_STATE.MovingToUp;
+            case RIGHT:
+                rightCellState = CellState.MOVING_TO_UP;
                 break;
         }
     }
 
-    public CELL_COLOR checkColor(RevColorSensorV3 colorSensor) {
-        if (ColorSensor.isGreen(colorSensor)) return CELL_COLOR.Green;
-        if (ColorSensor.isPurple(colorSensor)) return CELL_COLOR.Purple;
+    public CellColor checkColor(RevColorSensorV3 colorSensor) {
+        if (ColorSensor.isGreen(colorSensor)) return CellColor.GREEN;
+        if (ColorSensor.isPurple(colorSensor)) return CellColor.PURPLE;
         if (Math.random() > 0.5){
-            return  CELL_COLOR.Green;
+            return  CellColor.GREEN;
         } else {
-            return CELL_COLOR.Purple;
+            return CellColor.PURPLE;
         }
     }
 
     // Find out what colors are in each cell.
-    public void checkColors() {
+    private void checkColors() {
         leftCellColor = checkColor(leftColorSensor);
         centerCellColor = checkColor(centerColorSensor);
         rightCellColor = checkColor(rightColorSensor);
     }
 
-    public static String colorToString(CELL_COLOR cellColor) {
-        if (cellColor == CELL_COLOR.Green) {
+    public static String colorToString(CellColor cellColor) {
+        if (cellColor == CellColor.GREEN) {
             return "G";
-        } else if (cellColor == CELL_COLOR.Purple) {
+        } else if (cellColor == CellColor.PURPLE) {
             return "P";
         } else {
             return "N";
@@ -150,52 +148,52 @@ public class ArtifactCellManager {
     }
 
     /**
-     * Determines the launch order of cells based on their colors and the current motif.
+     * Determines the launch order of cells based on their colors and the current Motif.
      * <p>
-     * The method initializes a list of cells (`launchOrder`) with default values (`CELL.None`)
+     * The method initializes a list of cells (`launchOrder`) with default values (`Cell.None`)
      * and a list of cell colors (`cellColors`) representing the colors of the left, center,
-     * and right cells. Based on the current motif, it assigns the cells to specific positions
-     * in the `launchOrder` list according to the color and motif logic.
+     * and right cells. Based on the current Motif, it assigns the cells to specific positions
+     * in the `launchOrder` list according to the color and Motif logic.
      *
-     * @return A list of `CELL` objects representing the launch order of the cells.
+     * @return A list of `Cell` objects representing the launch order of the cells.
      */
-    public static List<CELL> noColorLaunch() {
-        List<CELL> launchOrder = new ArrayList<>();
-        launchOrder.add(CELL.Left);
-        launchOrder.add(CELL.Center);
-        launchOrder.add(CELL.Right);
+    public static List<Cell> noColorLaunch() {
+        List<Cell> launchOrder = new ArrayList<>();
+        launchOrder.add(Cell.LEFT);
+        launchOrder.add(Cell.CENTER);
+        launchOrder.add(Cell.RIGHT);
         return launchOrder;
     }
-    public static List<CELL> launchOrder() {
+    public static List<Cell> launchOrder() {
         // Initialize launch order and cell colors
-        List<CELL> launchOrder = new ArrayList<>();
-        List<CELL> plainOrder = List.of(CELL.Left, CELL.Center, CELL.Right);
-        List<CELL_COLOR> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
+        List<Cell> launchOrder = new ArrayList<>();
+        List<Cell> plainOrder = List.of(Cell.LEFT, Cell.CENTER, Cell.RIGHT);
+        List<CellColor> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
 
-        if (Collections.frequency(cellColors, CELL_COLOR.Purple) == 2 && Collections.frequency(cellColors, CELL_COLOR.Green) == 1) {
+        if (Collections.frequency(cellColors, CellColor.PURPLE) == 2 && Collections.frequency(cellColors, CellColor.GREEN) == 1) {
             switch (currentMotif) {
                 case GPP:
-                    launchOrder.add(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)));
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Left)) launchOrder.add(CELL.Left);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Center)) launchOrder.add(CELL.Center);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Right)) launchOrder.add(CELL.Right);
+                    launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
                     break;
 
                 case PGP:
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Left)) launchOrder.add(CELL.Left);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Center)) launchOrder.add(CELL.Center);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Right)) launchOrder.add(CELL.Right);
-                    launchOrder.add(1,plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)));
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
+                    launchOrder.add(1,plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
                     break;
 
                 case PPG:
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Left)) launchOrder.add(CELL.Left);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Center)) launchOrder.add(CELL.Center);
-                    if (!(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)) == CELL.Right)) launchOrder.add(CELL.Right);
-                    launchOrder.add(plainOrder.get(cellColors.indexOf(CELL_COLOR.Green)));
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT)) launchOrder.add(Cell.LEFT);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER)) launchOrder.add(Cell.CENTER);
+                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT)) launchOrder.add(Cell.RIGHT);
+                    launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
                     break;
                 case NONE:
-                    launchOrder.add(CELL.None);
+                    launchOrder.add(Cell.NONE);
             }
         }
 
@@ -203,34 +201,34 @@ public class ArtifactCellManager {
     }
 
     // Processes the state of a cell and updates its servo position accordingly
-    private CELL_STATE processCell(CELL cell, CELL_STATE state, ServoEx servo) {
+    private CellState processCell(Cell cell, CellState state, ServoEx servo) {
         double servoUpPosition = cellPositions[cell.ordinal()];
         double servoDownPosition = cellDownPositions[cell.ordinal()];
 
         switch (state) {
-            case Idle:
+            case IDLE:
                 break;
-            case MovingToUp:
+            case MOVING_TO_UP:
                 servo.set(servoUpPosition);
                 timer.reset();
-                state = CELL_STATE.Up;
+                state = CellState.UP;
                 break;
-            case Up:
+            case UP:
                 if (timer.seconds() > UP_WAIT_TIME) {
                     timer.reset();
-                    state = CELL_STATE.MovingToDown;
+                    state = CellState.MOVING_TO_DOWN;
                     break;
                 }
                 break;
-            case MovingToDown:
+            case MOVING_TO_DOWN:
                 servo.set(servoDownPosition);
                 timer.reset();
-                state = CELL_STATE.Down;
+                state = CellState.DOWN;
                 break;
-            case Down:
+            case DOWN:
                 if (timer.seconds() > DOWN_WAIT_TIME) {
                     servo.set(servoDownPosition);
-                    state = CELL_STATE.Idle;
+                    state = CellState.IDLE;
                     break;
                 }
             default:

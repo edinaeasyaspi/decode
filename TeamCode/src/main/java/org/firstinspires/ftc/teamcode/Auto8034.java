@@ -37,12 +37,8 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
-import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 /*
  * Auto opMode for FTC Team 8034.
@@ -140,7 +136,7 @@ public class Auto8034 extends OpMode {
         allianceColor = autonomousConfiguration.getAlliance();
         startPosition = autonomousConfiguration.getStartPosition();
         startDelaySeconds = autonomousConfiguration.getDelayStartSeconds();
-        // Start the AprilTag detection to find the motif before starting the path following.
+        // Start the AprilTag detection to find the Motif before starting the path following.
         robot.aprilTagManager.findMotif();
 
         // Set the starting pose based on the selected starting position
@@ -209,7 +205,7 @@ public class Auto8034 extends OpMode {
                 // If auto align fails the timer will run out and the launch will proceed.
                 //TODO Adjust the timeout as needed.
                 if (robot.aprilTagManager.execute(true) || driveTimer.milliseconds() > 1500) {
-                    robot.cellManager.openCell(ArtifactCellManager.CELL.Left);
+                    robot.cellManager.openCell(ArtifactCellManager.Cell.LEFT);
                     driveTimer.reset();
                     setPathState(5);
                 }
@@ -241,13 +237,13 @@ public class Auto8034 extends OpMode {
                 break;
             case 5:
                 if (driveTimer.milliseconds() > 2500) {
-                    robot.cellManager.openCell(ArtifactCellManager.CELL.Center);
+                    robot.cellManager.openCell(ArtifactCellManager.Cell.CENTER);
                     driveTimer.reset();
                     setPathState(6);
                 }
             case 6:
                 if (driveTimer.milliseconds() > 2500) {
-                    robot.cellManager.openCell(ArtifactCellManager.CELL.Right);
+                    robot.cellManager.openCell(ArtifactCellManager.Cell.RIGHT);
                     driveTimer.reset();
                     setPathState(3);
                 }

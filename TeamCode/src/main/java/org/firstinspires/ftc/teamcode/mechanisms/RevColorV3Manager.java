@@ -30,11 +30,11 @@ public class RevColorV3Manager {
         this.useRGB = useRGB;
     }
 
-    public ArtifactCellManager.CELL_COLOR GetCellColor(RevColorSensorV3 sensor) {
+    public ArtifactCellManager.CellColor GetCellColor(RevColorSensorV3 sensor) {
         return useRGB ? getCellColorRGB(sensor) : getCellColorHSV(sensor);
     }
 
-    private ArtifactCellManager.CELL_COLOR getCellColorHSV(RevColorSensorV3 sensor) {
+    private ArtifactCellManager.CellColor getCellColorHSV(RevColorSensorV3 sensor) {
         HSV hsv = getHSV(sensor);
         float hue = hsv.getHue();
         float saturation = hsv.getSaturation();
@@ -42,15 +42,15 @@ public class RevColorV3Manager {
 
         // Simple threshold-based color detection using HSV
         if (hue >= 85 && hue <= 150 && saturation > 0.4 && value > 0.2) {
-            return ArtifactCellManager.CELL_COLOR.Green;
+            return ArtifactCellManager.CellColor.GREEN;
         } else if (hue >= 250 && hue <= 290 && saturation > 0.4 && value > 0.2) {
-            return ArtifactCellManager.CELL_COLOR.Purple;
+            return ArtifactCellManager.CellColor.PURPLE;
         } else {
-            return ArtifactCellManager.CELL_COLOR.None;
+            return ArtifactCellManager.CellColor.NONE;
         }
     }
 
-    private ArtifactCellManager.CELL_COLOR getCellColorRGB(RevColorSensorV3 sensor) {
+    private ArtifactCellManager.CellColor getCellColorRGB(RevColorSensorV3 sensor) {
         NormalizedRGBA colors = getRGBA(sensor);
         float red = colors.red;
         float green = colors.green;
@@ -59,11 +59,11 @@ public class RevColorV3Manager {
         // Simple threshold-based color detection
         //TODO: Tune these thresholds based on testing in opmode SensorColor.
         if (green > 0.15 && red > 0.04 && blue > 0.12) {
-            return ArtifactCellManager.CELL_COLOR.Green;
+            return ArtifactCellManager.CellColor.GREEN;
         } else if (blue > 0.11 && red > 0.065 && green > 0.07) {
-            return ArtifactCellManager.CELL_COLOR.Purple;
+            return ArtifactCellManager.CellColor.PURPLE;
         } else {
-            return ArtifactCellManager.CELL_COLOR.None;
+            return ArtifactCellManager.CellColor.NONE;
         }
     }
 

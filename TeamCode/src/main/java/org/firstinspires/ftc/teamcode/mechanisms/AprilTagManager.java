@@ -40,7 +40,7 @@ public class AprilTagManager {
     private int OBELISK_GPP_ID = 21;
     private int OBELISK_PGP_ID = 22;
     private int OBELISK_PPG_ID = 23;
-    private ArtifactCellManager.motif currentMotif;
+    private ArtifactCellManager.Motif currentMotif;
     private double currentRange = 0.0;
     public static double BEARING_TOLERANCE = 2.5f;
 
@@ -57,9 +57,9 @@ public class AprilTagManager {
 
         initAprilTag();
         setManualExposure(exposure, gain);
-        // Get the motif from the dashboard, default to NONE
-        Object dashboardCurrentMotif = blackboard.getOrDefault(CURRENT_MOTIF_KEY, ArtifactCellManager.motif.NONE);
-        currentMotif = (ArtifactCellManager.motif) dashboardCurrentMotif;
+        // Get the Motif from the dashboard, default to NONE
+        Object dashboardCurrentMotif = blackboard.getOrDefault(CURRENT_MOTIF_KEY, ArtifactCellManager.Motif.NONE);
+        currentMotif = (ArtifactCellManager.Motif) dashboardCurrentMotif;
     }
 
     /**
@@ -100,7 +100,7 @@ public class AprilTagManager {
     // This is only used for auto-alignment if range is implemented.
     final double DESIRED_SHORT_DISTANCE = 24.0;
     final double DESIRED_LONG_DISTANCE = 48.0;
-    // Store the current motif in the opmode dashboard for retrieval by tele OpModes.
+    // Store the current Motif in the opmode dashboard for retrieval by tele OpModes.
     private String CURRENT_MOTIF_KEY = "currentmotif";
 
     // Execute the AprilTag auto alignment process for launching.
@@ -109,24 +109,24 @@ public class AprilTagManager {
         return isAprilTagAligned(shootFar);
     }
 
-    // Find the obelisk motif AprilTag.
-    // Returns motif.NONE if no tag is found.
-    public ArtifactCellManager.motif findMotif() {
+    // Find the obelisk Motif AprilTag.
+    // Returns Motif.NONE if no tag is found.
+    public ArtifactCellManager.Motif findMotif() {
         this.currentMotif = getMotifApriltag();
-        // Store the current motif in the blackboard for retrieval by tele OpModes.
+        // Store the current Motif in the blackboard for retrieval by tele OpModes.
         blackboard.put(CURRENT_MOTIF_KEY, currentMotif);
         return this.currentMotif;
     }
 
-    // For use by teleop when auto does not find the motif.
-    public void setCurrentMotif(ArtifactCellManager.motif motif) {
+    // For use by teleop when auto does not find the Motif.
+    public void setCurrentMotif(ArtifactCellManager.Motif motif) {
         this.currentMotif = motif;
         blackboard.put(CURRENT_MOTIF_KEY, currentMotif);
     }
 
-    /* Getters for current motif and range, to adjust behavior based on the detected AprilTag information.
+    /* Getters for current Motif and range, to adjust behavior based on the detected AprilTag information.
      */
-    public ArtifactCellManager.motif getCurrentMotif() {
+    public ArtifactCellManager.Motif getCurrentMotif() {
         return currentMotif;
     }
 
@@ -244,18 +244,18 @@ public class AprilTagManager {
         return aligned;
     }
 
-    private ArtifactCellManager.motif getMotifApriltag() {
-        ArtifactCellManager.motif motif = ArtifactCellManager.motif.NONE;
+    private ArtifactCellManager.Motif getMotifApriltag() {
+        ArtifactCellManager.Motif motif = ArtifactCellManager.Motif.NONE;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 // Only correct for bearing for now
                 if (detection.id == OBELISK_GPP_ID) {
-                    motif = ArtifactCellManager.motif.GPP;
+                    motif = ArtifactCellManager.Motif.GPP;
                 } else if (detection.id == OBELISK_PGP_ID) {
-                    motif = ArtifactCellManager.motif.PGP;
+                    motif = ArtifactCellManager.Motif.PGP;
                 } else if (detection.id == OBELISK_PPG_ID) {
-                    motif = ArtifactCellManager.motif.PPG;
+                    motif = ArtifactCellManager.Motif.PPG;
                 }
             }
         }

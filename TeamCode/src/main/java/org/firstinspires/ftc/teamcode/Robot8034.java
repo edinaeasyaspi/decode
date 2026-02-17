@@ -36,15 +36,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.mechanisms.AprilTagManager;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
-import org.firstinspires.ftc.teamcode.mechanisms.IntakeManager;
-import org.firstinspires.ftc.teamcode.mechanisms.LaunchManager;
 
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import java.util.ArrayList;
@@ -62,16 +57,13 @@ public class Robot8034 extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware(this);
 
-    ArtifactCellManager cellManager;
-    LaunchManager launchManager;
-
     //TODO: Adjust shot variables as needed
     public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
     public static double LONG_SHOT = 0.255;
     public boolean launching = false;
     public static int gap = 1500;
     public int launchStage = 0;
-    public List<ArtifactCellManager.CELL> launchOrder = new ArrayList<>();
+    public List<ArtifactCellManager.Cell> launchOrder = new ArrayList<>();
 
     public ElapsedTime launchTimer = new ElapsedTime();
     // Track whether we are shooting far or short.
@@ -108,16 +100,14 @@ public class Robot8034 extends LinearOpMode {
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        launchManager = robot.launchManager;
-        cellManager = robot.cellManager;
-        // Get the current motif saved in AprilTagManager and the sdk dashboard.
-        cellManager.setCurrentMotif(robot.aprilTagManager.getCurrentMotif());
+        // Get the current Motif saved in AprilTagManager and the sdk dashboard.
+        robot.cellManager.setCurrentMotif(robot.aprilTagManager.getCurrentMotif());
 
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("a: Toggle Slow Mode");
-        telemetry.addLine("x: sets GPP motif");
-        telemetry.addLine("y: sets PGP motif");
-        telemetry.addLine("b: sets PPG motif");
+        telemetry.addLine("x: sets GPP Motif");
+        telemetry.addLine("y: sets PGP Motif");
+        telemetry.addLine("b: sets PPG Motif");
         telemetry.addLine("Left Bumper: Intake On");
         telemetry.addLine("Right Bumper: Intake Off");
         telemetry.addLine("D-Pad Up: Long shot");
@@ -137,9 +127,10 @@ public class Robot8034 extends LinearOpMode {
             gamePadEx.readButtons();
             leftTriggerReader.readValue();
             // Update the cell manager and launch manager
-            cellManager.execute();
-            cellManager.checkColors();
-            launchManager.execute();
+            // Opens the cells to launch.
+            robot.cellManager.execute();
+            // Keeps the launch motors at the desired speed using PIDF controllers.
+            robot.launchManager.execute();
 
             // toggle slow drive mode
             if (gamePadEx.isDown(GamepadKeys.Button.A)) {
@@ -147,20 +138,20 @@ public class Robot8034 extends LinearOpMode {
             }
 
             // Activate the appropriate cell servo to launch an artifact
-            // This overrides the current motif set in Auto.
+            // This overrides the current Motif set in Auto.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
-                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
-                cellManager.setCurrentMotif(ArtifactCellManager.motif.GPP);
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.Motif.GPP);
+                robot.cellManager.setCurrentMotif(ArtifactCellManager.Motif.GPP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.Y)) {
-                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
-                cellManager.setCurrentMotif(ArtifactCellManager.motif.PGP);
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.Motif.PGP);
+                robot.cellManager.setCurrentMotif(ArtifactCellManager.Motif.PGP);
             }
 
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.B)) {
-                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
-                cellManager.setCurrentMotif(ArtifactCellManager.motif.PPG);
+                robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.Motif.PPG);
+                robot.cellManager.setCurrentMotif(ArtifactCellManager.Motif.PPG);
             }
 
             // Intake controls
@@ -172,27 +163,13 @@ public class Robot8034 extends LinearOpMode {
                 robot.intakeManager.intakeOff();
             }
 
-            //Distance control
-            // If there is time, the auto-centering could also set the power for distance.
+            // DPAD_UP turns on the launch motors.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_UP)) {
                 SHOOT_FAR = true;
-                launchManager.launchOn(LONG_SHOT);
+                robot.launchManager.launchOn(robot.aprilTagManager.getCurrentRange());
 //                launching = true;
 //                launchOrder = cellManager.launchOrder();
-//                if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
-//                    launching = false;
-//                } else {
-//                    launchStage = 0;
-//                    cellManager.openCell(launchOrder.get(launchStage));
-//                    launchStage++;
-//                    launchTimer.reset();
-//                }
-            } else if (gamePadEx.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
-                SHOOT_FAR = false;
-                launchManager.launchOn(SHORT_SHOT);
-//                launching = true;
-//                launchOrder = cellManager.launchOrder();
-//                if (launchOrder.get(0) == ArtifactCellManager.CELL.None) {
+//                if (launchOrder.get(0) == ArtifactCellManager.Cell.None) {
 //                    launching = false;
 //                } else {
 //                    launchStage = 0;
@@ -207,19 +184,19 @@ public class Robot8034 extends LinearOpMode {
                 launching = true;
                 if (SHOOT_FAR) gap = 1500;
                 else gap = 1200;
-                launchOrder = cellManager.noColorLaunch();
+                launchOrder = robot.cellManager.noColorLaunch();
                 launchStage = 0;
-                cellManager.openCell(launchOrder.get(launchStage));
+                robot.cellManager.openCell(launchOrder.get(launchStage));
                 launchStage++;
                 launchTimer.reset();
             }
 
             if (launching) {
                 if (launchTimer.milliseconds() >= gap) {
-                    cellManager.openCell(launchOrder.get(launchStage));
+                    robot.cellManager.openCell(launchOrder.get(launchStage));
                     launchStage++;
                     launchTimer.reset();
-                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.CELL.None)
+                    if (launchStage == 3 || launchOrder.get(launchStage) == ArtifactCellManager.Cell.NONE)
                         launching = false;
                 }
             }
@@ -231,7 +208,7 @@ public class Robot8034 extends LinearOpMode {
 
             // Turn off the launch motors to save the battery.
             if (gamePadEx.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                launchManager.launchOff();
+                robot.launchManager.launchOff();
                 launching = false;
             }
 
@@ -248,12 +225,12 @@ public class Robot8034 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime);
             telemetry.addLine("------");
-            telemetry.addData("Colors", cellManager.colors());
+            telemetry.addData("Colors", robot.cellManager.colors());
             telemetry.addData("Launch stage", launchStage);
-            telemetry.addData("Launch Order", String.valueOf(cellManager.launchOrder()));
+            telemetry.addData("Launch Order", String.valueOf(robot.cellManager.launchOrder()));
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
-            telemetry2.addData("Launch left speed:", launchManager.launchMotorLeftVelocity);
-            telemetry2.addData("Launch right speed:", launchManager.launchMotorRightVelocity);
+            telemetry2.addData("Launch left speed:", robot.launchManager.launchMotorLeftVelocity);
+            telemetry2.addData("Launch right speed:", robot.launchManager.launchMotorRightVelocity);
             telemetry.addData("April tag aligned:", isAprilTagAligned);
             telemetry.update();
             telemetry2.update();
