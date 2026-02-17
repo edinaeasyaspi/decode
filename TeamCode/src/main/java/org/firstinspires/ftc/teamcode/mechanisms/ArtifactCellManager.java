@@ -39,6 +39,8 @@ public class ArtifactCellManager {
         NONE
     }
 
+    // These variables hold the current state of each cell, which is used in the state machine in
+    // processCell() to determine how to move the servos in the execute() method.
     private CellState leftCellState = CellState.IDLE;
     private CellState centerCellState = CellState.IDLE;
     private CellState rightCellState = CellState.IDLE;
@@ -58,11 +60,11 @@ public class ArtifactCellManager {
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
     private Motif currentMotif = Motif.NONE;
 
-    public ArtifactCellManager(double[] cellPositions, double[] cellDownPositions,
+    public ArtifactCellManager(double[] cellOpenPositions, double[] cellClosedPositions,
                                RevColorSensorV3 csOne, RevColorSensorV3 csTwo, RevColorSensorV3 csThree,
                                ServoEx leftServo, ServoEx centerServo, ServoEx rightServo) {
-        this.cellPositions = cellPositions;
-        this.cellDownPositions = cellDownPositions;
+        this.cellOpenPositions = cellOpenPositions;
+        this.cellClosedPositions = cellClosedPositions;
         //Put in sensors
         this.leftColorSensor = csOne;
         this.centerColorSensor = csTwo;
@@ -81,14 +83,17 @@ public class ArtifactCellManager {
     }
 
     // Servo positions for each cell, [0] = left, [1] = center, [2] = right
-    private final double[] cellPositions;
-    private final double[] cellDownPositions;
+    private final double[] cellOpenPositions;
+    private final double[] cellClosedPositions;
+    // How long should we wait for the servo to open the cell.
     private final double UP_WAIT_TIME = 0.4;
+    // How long should we wait for the servo to close the cell.
     private final double DOWN_WAIT_TIME = 0.1;
 
     public static final ElapsedTime timer = new ElapsedTime();
 
     public void execute() {
+        // Get the colors of the cells every loop, so that we can determine the launch order.
         checkColors();
         leftCellState = processCell(Cell.LEFT, leftCellState, leftCellServo);
         centerCellState = processCell(Cell.CENTER, centerCellState, centerCellServo);
@@ -166,6 +171,12 @@ public class ArtifactCellManager {
         return launchOrder;
     }
 
+    /* Determines the launch order of cells based on their colors and the current Motif.
+     * The method initializes a list of cells (launchOrder) with default values (Cell.None)
+     * and a list of cell colors (cellColors) representing the colors of the left, center,
+     * and right cells. Based on the current Motif, it assigns the cells to specific positions
+     * in the launchOrder list according to the color and Motif logic.
+     */
     public List<Cell> launchOrder() {
         // Initialize launch order and cell colors
         List<Cell> launchOrder = new ArrayList<>();
@@ -211,10 +222,35 @@ public class ArtifactCellManager {
         return launchOrder;
     }
 
-    // Processes the state of a cell and updates its servo position accordingly
+    //TODO figure out how to sequence the launches in the execute loop.
+    // We want to be able to open the cells in the correct order, but we also need to wait for the
+    // servos to move before we can open the next cell. We also need to make sure that we don't
+    // try to open a cell that is already open.
+    private void processLaunch() {
+        List<Cell> launchOrder = launchOrder();
+        for (Cell cell : launchOrder) {
+            switch (cell) {
+                case LEFT:
+                    processCell(cell, leftCellState, leftCellServo);
+                    break;
+                case CENTER:
+                    processCell(cell, centerCellState, centerCellServo);
+                    break;
+                case RIGHT:
+                    processCell(cell, rightCellState, rightCellServo);
+                    break;
+            }
+        }
+    }
+
+    /* Processes the state of a cell and updates its servo position accordingly.
+        This actually launches artifacts.
+        Returns the new state of the cell after processing.
+     */
     private CellState processCell(Cell cell, CellState state, ServoEx servo) {
-        double servoUpPosition = cellPositions[cell.ordinal()];
-        double servoDownPosition = cellDownPositions[cell.ordinal()];
+        // Get the servo positions for the current cell.
+        double servoUpPosition = cellOpenPositions[cell.ordinal()];
+        double servoDownPosition = cellClosedPositions[cell.ordinal()];
 
         switch (state) {
             case IDLE:
