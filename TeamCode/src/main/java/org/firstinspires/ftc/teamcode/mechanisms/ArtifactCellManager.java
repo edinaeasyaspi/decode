@@ -53,9 +53,9 @@ public class ArtifactCellManager {
     private CellColor rightCellColor = CellColor.NONE;
     private CellColor centerCellColor = CellColor.NONE;
     private CellColor leftCellColor = CellColor.NONE;
-    private RevColorSensorV3 leftColorSensor;
-    private RevColorSensorV3 centerColorSensor;
-    private RevColorSensorV3 rightColorSensor;
+    private final RevColorSensorV3 leftColorSensor;
+    private final RevColorSensorV3 centerColorSensor;
+    private final RevColorSensorV3 rightColorSensor;
 
     // Defaults to NONE, assuming the setCurrentMotif will be called from the OpModes.
     private Motif currentMotif = Motif.NONE;
@@ -90,7 +90,7 @@ public class ArtifactCellManager {
     // How long should we wait for the servo to close the cell.
     private final double DOWN_WAIT_TIME = 0.1;
 
-    public static final ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
 
     public void execute() {
         // Get the colors of the cells every loop, so that we can determine the launch order.
@@ -180,42 +180,88 @@ public class ArtifactCellManager {
     public List<Cell> launchOrder() {
         // Initialize launch order and cell colors
         List<Cell> launchOrder = new ArrayList<>();
-        List<Cell> plainOrder = List.of(Cell.LEFT, Cell.CENTER, Cell.RIGHT);
+        List<Cell> cellList = List.of(Cell.LEFT, Cell.CENTER, Cell.RIGHT);
         List<CellColor> cellColors = List.of(leftCellColor, centerCellColor, rightCellColor);
+        int colorIndex;
 
-        if (Collections.frequency(cellColors, CellColor.PURPLE) == 2 && Collections.frequency(cellColors, CellColor.GREEN) == 1) {
-            switch (currentMotif) {
-                case GPP:
-                    launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
-                        launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
-                        launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
-                        launchOrder.add(Cell.RIGHT);
-                    break;
-
-                case PGP:
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
-                        launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
-                        launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
-                        launchOrder.add(Cell.RIGHT);
-                    launchOrder.add(1, plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
-                    break;
-
-                case PPG:
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.LEFT))
-                        launchOrder.add(Cell.LEFT);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.CENTER))
-                        launchOrder.add(Cell.CENTER);
-                    if (!(plainOrder.get(cellColors.indexOf(CellColor.GREEN)) == Cell.RIGHT))
-                        launchOrder.add(Cell.RIGHT);
-                    launchOrder.add(plainOrder.get(cellColors.indexOf(CellColor.GREEN)));
-                    break;
-                case NONE:
+        switch (currentMotif) {
+            case GPP:
+                colorIndex = cellColors.indexOf(CellColor.GREEN);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
                     launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+                break;
+
+            case PGP:
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.GREEN);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+                break;
+
+            case PPG:
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.PURPLE);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+
+                colorIndex = cellColors.indexOf(CellColor.GREEN);
+                if (colorIndex != -1) {
+                    launchOrder.add(cellList.get(colorIndex));
+                } else {
+                    launchOrder.add(Cell.NONE);
+                }
+                break;
+            case NONE:
+                launchOrder.add(Cell.NONE);
+
+        }
+        // If there are any remaining cells that haven't been added to the launch order,
+        // add them.
+        for (Cell cell : cellList) {
+            if (!launchOrder.contains(cell)) {
+                launchOrder.add(cell);
             }
         }
 
