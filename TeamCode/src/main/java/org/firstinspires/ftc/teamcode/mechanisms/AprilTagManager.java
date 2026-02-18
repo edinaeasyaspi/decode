@@ -118,7 +118,9 @@ public class AprilTagManager {
         return this.currentMotif;
     }
 
-    // For use by teleop when auto does not find the Motif.
+    /* For use by teleop when auto does not find the Motif.
+     * This sets the Motif and saves it in the SDK blackboard for use in opModes.
+     */
     public void setCurrentMotif(ArtifactCellManager.Motif motif) {
         this.currentMotif = motif;
         blackboard.put(CURRENT_MOTIF_KEY, currentMotif);

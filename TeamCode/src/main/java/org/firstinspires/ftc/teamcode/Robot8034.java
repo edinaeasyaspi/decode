@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.widget.ToggleButton;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -40,6 +42,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.ArtifactCellManager;
 
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import java.util.ArrayList;
@@ -57,9 +60,6 @@ public class Robot8034 extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware(this);
 
-    //TODO: Adjust shot variables as needed
-    public static double SHORT_SHOT = 0.2; //Haven't actually gotten this variable
-    public static double LONG_SHOT = 0.255;
     public boolean launching = false;
     public static int gap = 1500;
     public int launchStage = 0;
@@ -79,6 +79,7 @@ public class Robot8034 extends LinearOpMode {
     GamepadEx gamePadEx;
     TriggerReader leftTriggerReader;
     TriggerReader rightTriggerReader;
+    ToggleButtonReader slowModeToggle;
 
     @Override
     public void runOpMode() {
@@ -99,6 +100,7 @@ public class Robot8034 extends LinearOpMode {
         gamePadEx = new GamepadEx(gamepad1);
         leftTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.LEFT_TRIGGER);
         rightTriggerReader = new TriggerReader(gamePadEx, GamepadKeys.Trigger.RIGHT_TRIGGER);
+        slowModeToggle = new ToggleButtonReader(gamePadEx, GamepadKeys.Button.A);
 
         // Get the current Motif saved in AprilTagManager and the sdk dashboard.
         robot.cellManager.setCurrentMotif(robot.aprilTagManager.getCurrentMotif());
@@ -126,6 +128,7 @@ public class Robot8034 extends LinearOpMode {
             // Read gamepad inputs
             gamePadEx.readButtons();
             leftTriggerReader.readValue();
+            slowModeToggle.readValue();
             // Update the cell manager and launch manager
             // Opens the cells to launch.
             robot.cellManager.execute();
@@ -133,12 +136,10 @@ public class Robot8034 extends LinearOpMode {
             robot.launchManager.execute();
 
             // toggle slow drive mode
-            if (gamePadEx.isDown(GamepadKeys.Button.A)) {
-                isSlowMode = !isSlowMode;
-            }
+            isSlowMode = slowModeToggle.getState();
 
-            // Activate the appropriate cell servo to launch an artifact
-            // This overrides the current Motif set in Auto.
+            // Select a motif for artifact classification.
+            // NOTE: This overrides the current Motif set in Auto.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.X)) {
                 robot.aprilTagManager.setCurrentMotif(ArtifactCellManager.Motif.GPP);
                 robot.cellManager.setCurrentMotif(ArtifactCellManager.Motif.GPP);
@@ -154,7 +155,7 @@ public class Robot8034 extends LinearOpMode {
                 robot.cellManager.setCurrentMotif(ArtifactCellManager.Motif.PPG);
             }
 
-            // Intake controls
+            // Intake controls. Turn it on or off.
             if (gamePadEx.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
                 robot.intakeManager.intakeOn();
             }
