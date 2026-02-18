@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechanisms.HSV;
@@ -188,7 +187,7 @@ public class SensorColor extends LinearOpMode {
                 .addData("\nargb Color", "%d", Color.HSVToColor(hsvValues))
                 .addData("\nGain", "%.3f", gain);
 
-        telemetry.addData("Color", revColorV3Manager.GetCellColor(colorSensor));
+        telemetry.addData("Color", revColorV3Manager.getCellColor(colorSensor));
         /* If this color sensor also has a distance sensor, display the measured distance.
          * Note that the reported distance is only useful at very close range, and is impacted by
          * ambient light and surface reflectivity. */

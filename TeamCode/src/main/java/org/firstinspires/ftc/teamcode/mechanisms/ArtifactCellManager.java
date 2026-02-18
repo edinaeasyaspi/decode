@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ArtifactCellManager {
@@ -116,13 +115,7 @@ public class ArtifactCellManager {
     }
 
     private CellColor checkColor(RevColorSensorV3 colorSensor) {
-        if (ColorSensor.isGreen(colorSensor)) return CellColor.GREEN;
-        if (ColorSensor.isPurple(colorSensor)) return CellColor.PURPLE;
-        if (Math.random() > 0.5) {
-            return CellColor.GREEN;
-        } else {
-            return CellColor.PURPLE;
-        }
+        return revColorV3Manager.getCellColor(colorSensor);
     }
 
     // Find out what colors are in each cell.
@@ -132,24 +125,11 @@ public class ArtifactCellManager {
         rightCellColor = checkColor(rightColorSensor);
     }
 
-    public static String colorToString(CellColor cellColor) {
-        if (cellColor == CellColor.GREEN) {
-            return "G";
-        } else if (cellColor == CellColor.PURPLE) {
-            return "P";
-        } else {
-            return "N";
-        }
-    }
-
     public String colors() {
         String end;
-        end = colorToString(leftCellColor);
-        end += colorToString(centerCellColor);
-        end += colorToString(rightCellColor);
-        end += "-" + ColorSensor.hue(leftColorSensor);
-        end += "-" + ColorSensor.hue(centerColorSensor);
-        end += "-" + ColorSensor.hue(rightColorSensor);
+        end = leftCellColor.toString();
+        end += centerCellColor.toString();
+        end += rightCellColor.toString();
         return end;
     }
 

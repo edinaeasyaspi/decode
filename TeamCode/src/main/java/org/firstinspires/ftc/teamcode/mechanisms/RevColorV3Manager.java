@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
@@ -9,10 +11,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class RevColorV3Manager {
     //TODO: Tune the gain to optimize calibrated values.
     private float GAIN = 4.0f; // Sensor gain
-    // Gain value for Low pass filter.
-    // Lower values = more smoothing, but more lag.
-    public static double lowPassGain = 0.9;
-    public boolean useRGB = true; // Flag to use RGB or HSV
+    public boolean useRGB = false; // Flag to use RGB or HSV
     private float redAverage = 0;
     private float greenAverage = 0;
     private float blueAverage = 0;
@@ -26,10 +25,18 @@ public class RevColorV3Manager {
         this.useRGB = useRGB;
     }
 
-    public ArtifactCellManager.CellColor GetCellColor(RevColorSensorV3 sensor) {
+    /*
+        Get the cell color using either RGB or HSV method based on the useRGB flag.
+     */
+    public ArtifactCellManager.CellColor getCellColor(RevColorSensorV3 sensor) {
         return useRGB ? getCellColorRGB(sensor) : getCellColorHSV(sensor);
     }
 
+    /*
+        Simple threshold-based color detection using HSV values.
+        This method is generally more robust to changes in lighting conditions than the RGB method,
+        as it separates color information (hue) from intensity (value).
+     */
     private ArtifactCellManager.CellColor getCellColorHSV(RevColorSensorV3 sensor) {
         HSV hsv = getHSV(sensor);
         float hue = hsv.getHue();
@@ -46,6 +53,11 @@ public class RevColorV3Manager {
         }
     }
 
+    /*
+        Simple threshold-based color detection using RGB values.
+        This method is less robust than the HSV method, but it can be useful in certain
+        situations where lighting conditions are consistent and well-controlled.
+     */
     private ArtifactCellManager.CellColor getCellColorRGB(RevColorSensorV3 sensor) {
         NormalizedRGBA colors = getRGBA(sensor);
         float red = colors.red;
@@ -64,7 +76,7 @@ public class RevColorV3Manager {
     }
 
     /*
-        Return Normalized RGBA values, with low pass filter applied.
+        Return Normalized RGBA values.
      */
     public NormalizedRGBA getRGBA(RevColorSensorV3 colorSensor) {
         setSensorGain(colorSensor);
@@ -76,22 +88,19 @@ public class RevColorV3Manager {
     }
 
     /*
-        Returns HSV values, with low pass filter applied.
+        Returns HSV values.
      */
     public HSV getHSV(RevColorSensorV3 colorSensor) {
         setSensorGain(colorSensor);
         NormalizedRGBA colors = getRGBA(colorSensor);
         float[] hsvValues = new float[3];
-        // Convert the RGB values to HSV values with filter smoothing.
-        android.graphics.Color.RGBToHSV((int) colors.red * 255,
-                (int) colors.green * 255,
-                (int) colors.blue * 255, hsvValues);
-
+        // Convert the RGB values to HSV values.
+        Color.colorToHSV(colors.toColor(), hsvValues);
         return new HSV(hsvValues[0], hsvValues[1], hsvValues[2]);
     }
 
     /*
-        Return HSV values with the low pass filter applied.
+        Return HSV values as an array.
      */
     public float[] getHSVArray(RevColorSensorV3 colorSensor) {
         NormalizedRGBA colors = getRGBA(colorSensor);

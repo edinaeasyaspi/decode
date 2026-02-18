@@ -227,7 +227,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addLine("------");
             telemetry.addData("Colors", robot.cellManager.colors());
             telemetry.addData("Launch stage", launchStage);
-            telemetry.addData("Launch Order", String.valueOf(robot.cellManager.launchOrder()));
+            telemetry.addData("Launch Order", robot.cellManager.launchOrder().toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry2.addData("Launch left speed:", robot.launchManager.launchMotorLeftVelocity);
             telemetry2.addData("Launch right speed:", robot.launchManager.launchMotorRightVelocity);
