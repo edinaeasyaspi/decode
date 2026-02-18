@@ -16,10 +16,6 @@ public class RevColorV3Manager {
     private float redAverage = 0;
     private float greenAverage = 0;
     private float blueAverage = 0;
-    private LowPassFilter lowPassFilterR = new LowPassFilter(lowPassGain);
-    private LowPassFilter lowPassFilterG = new LowPassFilter(lowPassGain);
-    private LowPassFilter lowPassFilterB = new LowPassFilter(lowPassGain);
-
 
     // default constructor.
     public RevColorV3Manager() {
@@ -67,15 +63,6 @@ public class RevColorV3Manager {
         }
     }
 
-    // Used to filter all color sensor readings.
-    private NormalizedRGBA applylowPassFilter(NormalizedRGBA colors) {
-        // Compensate for gain and use low pass filter to smooth values.
-        colors.red = (float) lowPassFilterR.estimate(colors.red);
-        colors.green = (float) lowPassFilterG.estimate(colors.green);
-        colors.blue = (float) lowPassFilterB.estimate(colors.blue);
-        return colors;
-    }
-
     /*
         Return Normalized RGBA values, with low pass filter applied.
      */
@@ -85,7 +72,7 @@ public class RevColorV3Manager {
         colors.red = colors.red / colors.alpha;
         colors.green = colors.green / colors.alpha;
         colors.blue = colors.blue / colors.alpha;
-        return applylowPassFilter(colors);
+        return colors;
     }
 
     /*
@@ -93,7 +80,7 @@ public class RevColorV3Manager {
      */
     public HSV getHSV(RevColorSensorV3 colorSensor) {
         setSensorGain(colorSensor);
-        NormalizedRGBA colors = applylowPassFilter(getRGBA(colorSensor));
+        NormalizedRGBA colors = getRGBA(colorSensor);
         float[] hsvValues = new float[3];
         // Convert the RGB values to HSV values with filter smoothing.
         android.graphics.Color.RGBToHSV((int) colors.red * 255,
@@ -123,40 +110,43 @@ public class RevColorV3Manager {
         colorSensor.setGain(GAIN);
     }
 
-    public class LowPassFilter {
-        protected double gain;
-        protected double previousEstimate = 0;
-
-        /**
-         * gain of the low pass filter.
-         * <p>
-         * (0 < x < 1)
-         * <p>
-         * High values of A are smoother but have more phase lag, low values of A allow more noise but
-         * will respond faster to quick changes in the measured state.
-         *
-         * @param gain Aforementioned Gain. (0 < x < 1)
-         */
-        public LowPassFilter(double gain) {
-            this.gain = gain;
-        }
-
-        // Added to allow changes using dashboard.
-        public void setGain(double gain) {
-            this.gain = gain;
-        }
-
-        /**
-         * Low Pass Filter estimate
-         *
-         * @param measurement current measurement
-         * @return filtered value
-         */
-        public double estimate(double measurement) {
-            if (measurement > 1) return previousEstimate;
-            double estimate = gain * previousEstimate + (1 - gain) * measurement;
-            previousEstimate = estimate;
-            return estimate;
-        }
-    }
+    // This was not needed when used to detect artifact colors.
+    // The code is left here for reference and potential future use if we want to detect colors
+    // in a more complex environment.
+//    public class LowPassFilter {
+//        protected double gain;
+//        protected double previousEstimate = 0;
+//
+//        /**
+//         * gain of the low pass filter.
+//         * <p>
+//         * (0 < x < 1)
+//         * <p>
+//         * High values of A are smoother but have more phase lag, low values of A allow more noise but
+//         * will respond faster to quick changes in the measured state.
+//         *
+//         * @param gain Aforementioned Gain. (0 < x < 1)
+//         */
+//        public LowPassFilter(double gain) {
+//            this.gain = gain;
+//        }
+//
+//        // Added to allow changes using dashboard.
+//        public void setGain(double gain) {
+//            this.gain = gain;
+//        }
+//
+//        /**
+//         * Low Pass Filter estimate
+//         *
+//         * @param measurement current measurement
+//         * @return filtered value
+//         */
+//        public double estimate(double measurement) {
+//            if (measurement > 1) return previousEstimate;
+//            double estimate = gain * previousEstimate + (1 - gain) * measurement;
+//            previousEstimate = estimate;
+//            return estimate;
+//        }
+//    }
 }
