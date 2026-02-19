@@ -204,7 +204,7 @@ public class Robot8034 extends LinearOpMode {
 
             // Auto-align to AprilTag when D-Pad left is pressed.
             if (gamePadEx.isDown(GamepadKeys.Button.DPAD_LEFT)) {
-                isAprilTagAligned = robot.aprilTagManager.execute(SHOOT_FAR);
+                isAprilTagAligned = robot.aprilTagManager.execute();
             }
 
             // Turn off the launch motors to save the battery.

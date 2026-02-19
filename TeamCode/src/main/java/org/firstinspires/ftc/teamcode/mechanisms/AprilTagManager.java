@@ -105,8 +105,9 @@ public class AprilTagManager {
 
     // Execute the AprilTag auto alignment process for launching.
     // Return true if aligned, false if not. This method can be called repeatedly in a loop until alignment is achieved.
-    public boolean execute(boolean shootFar) {
-        return isAprilTagAligned(shootFar);
+    // This also sets the current range to the AprilTag goal, which can be used to adjust the launch power dynamically.
+    public boolean execute() {
+        return isAprilTagAligned();
     }
 
     // Find the obelisk Motif AprilTag.
@@ -210,12 +211,10 @@ public class AprilTagManager {
      *
      * @return true if aligned.
      */
-    private boolean isAprilTagAligned(boolean shootFar) {
+    private boolean isAprilTagAligned() {
         boolean aligned = false;
         //TODO Adjust this to account for launcher offset from robot center if needed.
         double COMPENSATION_ANGLE_DEGREES = 5.0;
-        // Assume there are 2 launch distances: short and long
-        double desiredRange = shootFar ? DESIRED_LONG_DISTANCE : DESIRED_SHORT_DISTANCE;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {

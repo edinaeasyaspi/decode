@@ -204,7 +204,7 @@ public class Auto8034 extends OpMode {
                 // This case will auto aligns open the artifact cells.
                 // If auto align fails the timer will run out and the launch will proceed.
                 //TODO Adjust the timeout as needed.
-                if (robot.aprilTagManager.execute(true) || driveTimer.milliseconds() > 1500) {
+                if (robot.aprilTagManager.execute() || driveTimer.milliseconds() > 1500) {
                     robot.cellManager.openCell(ArtifactCellManager.Cell.LEFT);
                     driveTimer.reset();
                     setPathState(5);
