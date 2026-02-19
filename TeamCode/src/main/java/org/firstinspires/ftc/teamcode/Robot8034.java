@@ -29,8 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.widget.ToggleButton;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -180,7 +178,10 @@ public class Robot8034 extends LinearOpMode {
 //                }
             }
 
-            // Launch without regard to color.
+            // Left trigger starts the Launch process.
+            // It will start no matter what the cells contain. This gives the driver control over
+            // launching in case the cell manager messes up the launch order or misidentifies cells.
+            // The driver can choose to launch cells that are not the correct color if they want to.
             if (leftTriggerReader.wasJustReleased()) {
                 launching = true;
                 if (SHOOT_FAR) gap = 1500;
@@ -228,7 +229,7 @@ public class Robot8034 extends LinearOpMode {
             telemetry.addLine("------");
             telemetry.addData("Colors", robot.cellManager.colors());
             telemetry.addData("Launch stage", launchStage);
-            telemetry.addData("Launch Order", robot.cellManager.launchOrder().toString());
+            telemetry.addData("Launch Order", robot.cellManager.getLaunchOrder().toString());
             telemetry.addData("Movement Speed", "%s", isSlowMode ? "SLOW" : "FAST");
             telemetry2.addData("Launch left speed:", robot.launchManager.launchMotorLeftVelocity);
             telemetry2.addData("Launch right speed:", robot.launchManager.launchMotorRightVelocity);

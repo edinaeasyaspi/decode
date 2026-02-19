@@ -43,6 +43,9 @@ public class ArtifactCellManager {
     private CellState leftCellState = CellState.IDLE;
     private CellState centerCellState = CellState.IDLE;
     private CellState rightCellState = CellState.IDLE;
+    private Cell currentLaunchingCell = Cell.NONE;
+    private List<Cell> currentLaunchOrder;
+
     // Servos for cells
     private final ServoEx leftCellServo;
     private final ServoEx centerCellServo;
@@ -94,9 +97,43 @@ public class ArtifactCellManager {
     public void execute() {
         // Get the colors of the cells every loop, so that we can determine the launch order.
         checkColors();
-        leftCellState = processCell(Cell.LEFT, leftCellState, leftCellServo);
-        centerCellState = processCell(Cell.CENTER, centerCellState, centerCellServo);
-        rightCellState = processCell(Cell.RIGHT, rightCellState, rightCellServo);
+        // Update the launch order based on the current colors and motif.
+        currentLaunchOrder = getLaunchOrder();
+        // Process launching that was started with startLaunch().
+        processLaunch();
+    }
+
+    private void processLaunch() {
+        int orderIndex = currentLaunchOrder.indexOf(currentLaunchingCell);
+        switch (currentLaunchOrder.get(orderIndex)) {
+            case LEFT:
+                leftCellState = processCell(currentLaunchingCell, leftCellState, leftCellServo);
+                if (leftCellState == CellState.DOWN) {
+                    leftCellState = CellState.IDLE;
+                }
+                break;
+            case CENTER:
+                centerCellState = processCell(currentLaunchingCell, centerCellState, centerCellServo);
+                if (centerCellState == CellState.DOWN) {
+                    centerCellState = CellState.IDLE;
+                }
+                break;
+            case RIGHT:
+                rightCellState = processCell(currentLaunchingCell, rightCellState, rightCellServo);
+                if (rightCellState == CellState.DOWN) {
+                    rightCellState = CellState.IDLE;
+                }
+                break;
+            default:
+                break;
+        }
+
+        orderIndex = orderIndex + 1 % currentLaunchOrder.size();
+        if (orderIndex < currentLaunchOrder.size()) {
+            currentLaunchingCell = currentLaunchOrder.get(orderIndex);
+        } else {
+            currentLaunchingCell = Cell.NONE;
+        }
     }
 
     // Opens the specified cell with designated wait times
@@ -157,7 +194,7 @@ public class ArtifactCellManager {
      * and right cells. Based on the current Motif, it assigns the cells to specific positions
      * in the launchOrder list according to the color and Motif logic.
      */
-    public List<Cell> launchOrder() {
+    public List<Cell> getLaunchOrder() {
         // Initialize launch order and cell colors
         List<Cell> launchOrder = new ArrayList<>();
         List<Cell> cellList = List.of(Cell.LEFT, Cell.CENTER, Cell.RIGHT);
@@ -248,13 +285,29 @@ public class ArtifactCellManager {
         return launchOrder;
     }
 
-    //TODO figure out how to sequence the launches in the execute loop.
-    // We want to be able to open the cells in the correct order, but we also need to wait for the
-    // servos to move before we can open the next cell. We also need to make sure that we don't
-    // try to open a cell that is already open.
-    private void processLaunch() {
-        List<Cell> launchOrder = launchOrder();
-        for (Cell cell : launchOrder) {
+    /* Starts the launch sequence for the current launch order. It sets the state of the first cell
+     * in the launch order to MOVING_TO_UP, which will trigger the state machine in processCell()
+     * to move the servo and launch the artifact. The method then processes each cell in the
+     * current launch order by calling processCell() for each cell, which will handle the servo
+     * movements and state transitions for launching.
+     */
+    public void startLaunch() {
+        currentLaunchingCell = currentLaunchOrder.get(0);
+        switch (currentLaunchingCell) {
+            case LEFT:
+                leftCellState = CellState.MOVING_TO_UP;
+                break;
+            case CENTER:
+                centerCellState = CellState.MOVING_TO_UP;
+                break;
+            case RIGHT:
+                rightCellState = CellState.MOVING_TO_UP;
+                break;
+            default:
+                break;
+        }
+
+        for (Cell cell : currentLaunchOrder) {
             switch (cell) {
                 case LEFT:
                     processCell(cell, leftCellState, leftCellServo);
